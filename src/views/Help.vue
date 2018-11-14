@@ -1,12 +1,12 @@
 <template>
   <v-layout column fill-height>
-    <h1>Home</h1>
+    <h1>Help</h1>
+    <p>Coming soon...</p>
   </v-layout>
 </template>
 
 <script>
-
 export default {
-  name: 'Home'
+  name: 'Help'
 }
 </script>
