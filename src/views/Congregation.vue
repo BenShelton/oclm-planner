@@ -14,10 +14,7 @@
           <td v-text="props.item.appointment" />
           <td v-text="props.item.languageGroup" />
           <td class="text-xs-center">
-            <v-icon
-              :color="props.item.show ? 'green' : 'red'"
-              v-text="props.item.show ? 'check' : 'clear'"
-            />
+            <BooleanIcon :value="props.item.show" />
           </td>
           <td class="text-xs-center">
             <v-btn
@@ -40,11 +37,7 @@
             class="pa-3 shrink"
           >
             <span v-text="privilege.name" />
-            <v-icon
-              class="px-1"
-              :color="privilege.selected ? 'green' : 'red'"
-              v-text="privilege.selected ? 'check' : 'clear'"
-            />
+            <BooleanIcon class="px-1" :value="privilege.selected" />
           </v-layout>
         </v-layout>
       </template>
@@ -53,6 +46,8 @@
 </template>
 
 <script>
+import BooleanIcon from '@/components/BooleanIcon'
+
 const PRIVILEGES = [
   { name: 'Chairman', key: 'chairman' },
   { name: 'Talk', key: 'talk' },
@@ -72,6 +67,8 @@ const PRIVILEGES = [
 
 export default {
   name: 'Congregation',
+
+  components: { BooleanIcon },
 
   data () {
     return {
