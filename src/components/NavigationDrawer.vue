@@ -4,6 +4,7 @@
       <v-list-tile
         v-for="item in items"
         :key="item.title"
+        exact
         :to="item.link"
       >
         <v-list-tile-action>
@@ -19,6 +20,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import routeNames from '@/router/routeNames'
 
 export default {
   name: 'NavigationDrawer',
@@ -26,8 +28,9 @@ export default {
   data () {
     return {
       items: [
-        { title: 'Home', icon: 'home', link: '/' },
-        { title: 'Help', icon: 'help', link: '/help' }
+        { title: 'Home', icon: 'home', link: { name: routeNames.HOME } },
+        { title: 'Congregation', icon: 'people', link: { name: routeNames.CONGREGATION } },
+        { title: 'Help', icon: 'help', link: { name: routeNames.HELP } }
       ]
     }
   },
