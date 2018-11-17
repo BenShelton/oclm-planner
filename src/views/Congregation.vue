@@ -12,6 +12,13 @@
           <td v-text="props.item.name" />
           <td v-text="props.item.gender" />
           <td v-text="props.item.appointment" />
+          <td v-text="props.item.languageGroup" />
+          <td class="text-xs-center">
+            <v-icon
+              :color="props.item.show ? 'green' : 'red'"
+              v-text="props.item.show ? 'check' : 'clear'"
+            />
+          </td>
           <td class="text-xs-center">
             <v-btn
               flat
@@ -72,6 +79,8 @@ export default {
         { text: 'Name', value: 'name' },
         { text: 'Gender', value: 'gender' },
         { text: 'Appointment', value: 'appointment' },
+        { text: 'Language Group', value: 'languageGroup' },
+        { text: 'Show On Schedule', value: 'show', align: 'center' },
         { text: 'Actions', value: '', align: 'center', sortable: false }
       ],
       rowsPerPageItems: [20, 50, 100, { text: 'All', value: -1 }],
@@ -82,7 +91,7 @@ export default {
           abbreviation: 'J. Smith',
           appointment: 'Elder',
           gender: 'Male',
-          active: true,
+          show: true,
           privileges: {
             chairman: true,
             talk: true,
@@ -105,7 +114,7 @@ export default {
           name: 'Ben Jones',
           abbreviation: 'B. Jones',
           gender: 'Male',
-          active: true,
+          show: true,
           privileges: {}
         },
         {
@@ -114,7 +123,7 @@ export default {
           abbreviation: 'P. Sister',
           gender: 'Female',
           languageGroup: 'Portuguese',
-          active: true,
+          show: true,
           privileges: {}
         }
       ]
