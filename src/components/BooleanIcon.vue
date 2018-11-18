@@ -1,7 +1,7 @@
 <template>
   <v-icon
-    :color="value ? 'green' : 'red'"
-    v-text="value ? 'check' : 'clear'"
+    :color="color"
+    v-text="icon"
   />
 </template>
 
@@ -11,6 +11,16 @@ export default {
 
   props: {
     value: { type: Boolean, default: false }
+  },
+
+  computed: {
+    color () {
+      return this.value ? 'green' : 'red'
+    },
+
+    icon () {
+      return this.value ? 'check' : 'clear'
+    }
   }
 }
 </script>
