@@ -5,7 +5,8 @@
       expand
       :headers="headers"
       :rows-per-page-items="rowsPerPageItems"
-      :items="items"
+      :items="members"
+      :loading="loading"
     >
       <template slot="items" slot-scope="props">
         <tr @click="expandRow(props)">
@@ -46,6 +47,8 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+
 import BooleanIcon from '@/components/BooleanIcon'
 
 const PRIVILEGES = [
@@ -70,6 +73,10 @@ export default {
 
   components: { BooleanIcon },
 
+  mounted () {
+    this.loadCongregation()
+  },
+
   data () {
     return {
       headers: [
@@ -80,54 +87,21 @@ export default {
         { text: 'Show On Schedule', value: 'show', align: 'center' },
         { text: 'Actions', value: '', align: 'center', sortable: false }
       ],
-      rowsPerPageItems: [20, 50, 100, { text: 'All', value: -1 }],
-      items: [
-        {
-          id: 0,
-          name: 'John Smith',
-          abbreviation: 'J. Smith',
-          appointment: 'Elder',
-          gender: 'Male',
-          show: true,
-          privileges: {
-            chairman: true,
-            talk: true,
-            gems: true,
-            items: true,
-            bookStudy: true,
-            reader: true,
-            prayer: true,
-            initialCall: true,
-            initialCallAssist: true,
-            returnVisit: true,
-            returnVisitAssist: true,
-            bibleStudy: true,
-            bibleStudyAssist: true,
-            studentTalk: true
-          }
-        },
-        {
-          id: 1,
-          name: 'Ben Jones',
-          abbreviation: 'B. Jones',
-          gender: 'Male',
-          show: true,
-          privileges: {}
-        },
-        {
-          id: 2,
-          name: 'Portuguese Sister',
-          abbreviation: 'P. Sister',
-          gender: 'Female',
-          languageGroup: 'Portuguese',
-          show: true,
-          privileges: {}
-        }
-      ]
+      rowsPerPageItems: [20, 50, 100, { text: 'All', value: -1 }]
     }
   },
 
+  computed: {
+    ...mapState({
+      members: state => state.congregation.members,
+      loading: state => state.congregation.loading
+    })
+  },
+
   methods: {
+    ...mapActions({
+      loadCongregation: 'congregation/load'
+    }),
     expandRow (props) {
       props.expanded = !props.expanded
     },
