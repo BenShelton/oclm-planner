@@ -10,6 +10,8 @@
 
 <script>
 export default {
+  name: 'ScheduleAssignee',
+
   props: {
     assignee: { type: String, default: '' }
   },

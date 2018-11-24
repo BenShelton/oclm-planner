@@ -14,26 +14,26 @@
       <ScheduleAssignment :assignment="assignments.chairman" @edit="onEdit" />
       <ScheduleAssignment :assignment="assignments.openingPrayer" @edit="onEdit" />
 
-      <v-subheader class="grey darken-2 white--text">TREASURES FROM GOD'S WORD</v-subheader>
-      <v-divider />
-      <ScheduleAssignment :assignment="assignments.talk" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.gems" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.bibleReading" @edit="onEdit" />
+      <ScheduleSection title="TREASURES FROM GOD'S WORD" color="grey darken-2">
+        <ScheduleAssignment :assignment="assignments.talk" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.gems" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.bibleReading" @edit="onEdit" />
+      </ScheduleSection>
 
-      <v-subheader class="yellow darken-3 white--text">APPLY YOURSELF TO THE FIELD MINISTRY</v-subheader>
-      <v-divider />
-      <ScheduleAssignment :assignment="assignments.studentTalk1" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.studentTalk2" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.studentTalk3" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.studentTalk4" @edit="onEdit" />
+      <ScheduleSection title="APPLY YOURSELF TO THE FIELD MINISTRY" color="yellow darken-3">
+        <ScheduleAssignment :assignment="assignments.studentTalk1" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.studentTalk2" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.studentTalk3" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.studentTalk4" @edit="onEdit" />
+      </ScheduleSection>
 
-      <v-subheader class="red darken-2 white--text">LIVING AS CHRISTIANS</v-subheader>
-      <v-divider />
-      <ScheduleAssignment :assignment="assignments.serviceTalk1" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.serviceTalk2" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.congregationBibleStudy" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.reader" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.closingPrayer" @edit="onEdit" />
+      <ScheduleSection title="LIVING AS CHRISTIANS" color="red darken-2">
+        <ScheduleAssignment :assignment="assignments.serviceTalk1" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.serviceTalk2" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.congregationBibleStudy" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.reader" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.closingPrayer" @edit="onEdit" />
+      </ScheduleSection>
     </v-list>
   </v-card>
 </template>
@@ -41,12 +41,16 @@
 <script>
 import { mapActions } from 'vuex'
 
+import ScheduleSection from '@/components/ScheduleSection'
 import ScheduleAssignment from '@/components/ScheduleAssignment'
 
 export default {
   name: 'ScheduleWeek',
 
-  components: { ScheduleAssignment },
+  components: {
+    ScheduleSection,
+    ScheduleAssignment
+  },
 
   props: {
     weekDate: { type: String, required: true },
