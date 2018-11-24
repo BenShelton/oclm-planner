@@ -17,6 +17,8 @@ export default {
       switch (this.$route.name) {
         case routeNames.HOME:
           return 'Home'
+        case routeNames.SCHEDULE:
+          return 'Schedule'
         case routeNames.CONGREGATION:
           return 'Congregation'
         case routeNames.HELP:

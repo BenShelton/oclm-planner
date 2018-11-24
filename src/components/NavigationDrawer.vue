@@ -29,6 +29,7 @@ export default {
     return {
       items: [
         { title: 'Home', icon: 'home', link: { name: routeNames.HOME } },
+        { title: 'Schedule', icon: 'assignment', link: { name: routeNames.SCHEDULE } },
         { title: 'Congregation', icon: 'people', link: { name: routeNames.CONGREGATION } },
         { title: 'Help', icon: 'help', link: { name: routeNames.HELP } }
       ]
