@@ -1,24 +1,25 @@
+import api from '@/api'
+
 const state = {
   weeks: []
 }
 
 const actions = {
-  loadWeek ({ state, commit }, weekDate) {
-    const week = state.weeks.find(w => w.date === weekDate)
+  loadWeek ({ state, commit }, date) {
+    const week = state.weeks.find(w => w.date === date)
     if (week) return Promise.resolve(week)
-    return new Promise((resolve, reject) => {
-      if (Math.random() < 0.1) reject(new Error('Fake Load Error'))
-      else {
-        commit('LOAD_WEEK', defaultWeek)
-        resolve(defaultWeek)
-      }
+    return api.schedule.week({ date })
+      .then(res => {
+        const { week } = res.data
+        commit('LOAD_WEEK', week)
+        return week
     })
   }
 }
 
 const mutations = {
-  LOAD_WEEK (state, week) {
-    state.weeks.push(week)
+  LOAD_WEEK (state, payload) {
+    state.weeks.push(payload)
   }
 }
 
