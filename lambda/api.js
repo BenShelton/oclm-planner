@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const serverless = require('serverless-http')
 
-const setupDB = require('../database')
+const schedule = require('../database/schedule')
 
 // Initialize express app
 const app = express()
@@ -30,7 +30,7 @@ router.get('/schedule/week/:date', (req, res) => {
     }
   }
   res.json({ week: defaultWeek })
-    })
+})
 router.post('/schedule/updateAssignment', (req, res) => {
 
 })

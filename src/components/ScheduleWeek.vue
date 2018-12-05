@@ -35,6 +35,45 @@
         <ScheduleAssignment :assignment="assignments.closingPrayer" @edit="onEdit" />
       </ScheduleSection>
     </v-list>
+    <v-dialog
+      v-model="editDialog"
+      lazy
+    >
+      <v-card>
+        <v-card-title>
+          <span class="headline" v-text="editTitle" />
+        </v-card-title>
+        <v-card-text>
+          <v-layout wrap>
+            <v-flex xs4>
+              <v-text-field
+                v-model="editAssignment.title"
+                label="Title"
+              />
+            </v-flex>
+            <v-flex xs4>
+              <v-text-field
+                v-model="editAssignment.assignee"
+                label="Assignee"
+              />
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            flat
+            color="grey"
+            @click="closeEditor"
+          >CANCEL</v-btn>
+          <v-btn
+            flat
+            color="primary"
+            @click="saveEditor"
+          >SAVE</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -69,7 +108,10 @@ export default {
   data () {
     return {
       week: null,
-      loadError: false
+      loadError: false,
+      editDialog: false,
+      editTitle: '',
+      editAssignment: {}
     }
   },
 
@@ -115,10 +157,27 @@ export default {
 
   methods: {
     ...mapActions({
-      loadWeek: 'schedule/loadWeek'
+      loadWeek: 'schedule/loadWeek',
+      updateAssignment: 'schedule/updateAssignment'
     }),
     onEdit (name) {
-      console.log(this.week.assignments[name])
+      const { displayName, details } = this.assignments[name]
+      this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
+      Object.assign(this.editAssignment, { ...details })
+      this.editDialog = true
+    },
+    closeEditor () {
+      this.editDialog = false
+    },
+    saveEditor () {
+      this.updateAssignment({
+        weekDate: this.weekDate,
+        assignment: this.editAssignment
+      })
+        .then(week => {
+          this.week = week
+          this.closeEditor()
+        })
     }
   }
 }
