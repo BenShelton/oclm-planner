@@ -115,6 +115,7 @@ export default {
       week: null,
       loadError: false,
       editDialog: false,
+      editName: '',
       editTitle: '',
       editAssignment: {}
     }
@@ -166,6 +167,7 @@ export default {
       updateAssignment: 'schedule/updateAssignment'
     }),
     onEdit (name) {
+      this.editName = name
       const { displayName, details } = this.assignments[name]
       this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
       Object.assign(this.editAssignment, { ...details })
@@ -177,6 +179,7 @@ export default {
     saveEditor () {
       this.updateAssignment({
         weekDate: this.weekDate,
+        name: this.editName,
         assignment: this.editAssignment
       })
         .then(week => {
