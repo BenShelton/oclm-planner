@@ -3,7 +3,7 @@
     <v-flex
       v-for="week in visibleWeeks"
       :key="week.weekDate"
-      class="ma-2 xs12 sm6 md4 lg3 xl2"
+      class="ma-2 xs12 sm6 md4 lg3 xl2 grow"
     >
       <ScheduleWeek
         :week-date="week.weekDate"
