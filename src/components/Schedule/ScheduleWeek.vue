@@ -10,7 +10,12 @@
       </v-layout>
       <v-progress-circular v-else indeterminate color="primary" />
     </v-layout>
-    <v-list v-else two-line subheader>
+    <v-list
+      v-else
+      two-line
+      subheader
+      class="pa-0"
+    >
       <ScheduleAssignment :assignment="assignments.chairman" @edit="onEdit" />
       <ScheduleAssignment :assignment="assignments.openingPrayer" @edit="onEdit" />
 
