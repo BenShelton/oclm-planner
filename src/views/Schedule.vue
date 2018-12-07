@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import ScheduleWeek from '@/components/ScheduleWeek'
+import ScheduleWeek from '@/components/Schedule/ScheduleWeek'
 
 export default {
   name: 'Schedule',

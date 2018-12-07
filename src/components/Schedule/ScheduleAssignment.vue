@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import ScheduleAssignee from '@/components/ScheduleAssignee'
+import ScheduleAssignee from '@/components/Schedule/ScheduleAssignee'
 
 export default {
   name: 'ScheduleAssignment',

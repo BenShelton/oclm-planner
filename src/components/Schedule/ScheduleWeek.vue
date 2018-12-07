@@ -80,8 +80,8 @@
 <script>
 import { mapActions } from 'vuex'
 
-import ScheduleSection from '@/components/ScheduleSection'
-import ScheduleAssignment from '@/components/ScheduleAssignment'
+import ScheduleSection from '@/components/Schedule/ScheduleSection'
+import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment'
 
 export default {
   name: 'ScheduleWeek',
