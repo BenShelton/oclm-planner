@@ -10,16 +10,16 @@ const actions = {
     if (week) return Promise.resolve(week)
     return api.schedule.week({ date })
       .then(res => {
-        const { week } = res.data
+        const week = res.data.result
         commit('LOAD_WEEK', week)
         return week
       })
   },
-  updateAssignment ({ state, commit }, { weekDate, assignment }) {
+  updateAssignment ({ state, commit }, { weekDate, name, assignment }) {
     console.log(assignment)
     const { date, assignments } = state.weeks.find(w => w.date === weekDate) || {}
     const newWeek = { date, assignments: { ...assignments } }
-    newWeek.assignments[assignment.name] = assignment
+    newWeek.assignments[name] = assignment
     commit('UPDATE_WEEK', newWeek)
     return newWeek
   }
