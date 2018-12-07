@@ -1,3 +1,4 @@
+const assert = require('assert')
 const setup = require('./setup')
 
 const getCollection = new Promise(resolve => {
@@ -6,13 +7,16 @@ const getCollection = new Promise(resolve => {
     .then(resolve)
 })
 
-const updateAssignment = week => {
-  getCollection
+exports.updateAssignment = ({ weekID, name, assignment }) => {
+  return getCollection
     .then(coll => {
-      coll.findOneAndUpdate({ id: week.id }, { }, { returnOriginal: false })
+      const query = { date: weekID }
+      const update = {}
+      update.$set[`${assignment}.${name}`] = assignment
+      return coll.findOneAndUpdate(query, update, { returnOriginal: false })
     })
-}
-
-module.exports = {
-  updateAssignment
+    .then(result => {
+      assert.notEqual(null, result)
+      return result
+    })
 }

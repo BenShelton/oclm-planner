@@ -9,6 +9,7 @@ const app = express()
 app.use(bodyParser.json())
 
 const router = express.Router()
+
 router.get('/schedule/week/:date', (req, res) => {
   const { date } = req.params
   if (!date) return res.status(400).json({ message: 'No date provided' })
@@ -31,14 +32,25 @@ router.get('/schedule/week/:date', (req, res) => {
   }
   res.json({ week: defaultWeek })
 })
-router.post('/schedule/updateAssignment', (req, res) => {
 
+router.post('/schedule/updateAssignment', (req, res) => {
+  const { weekID, name, assignment } = req.body
+  if (!weekID || !name || !assignment) {
+    return res.status(400).json({ message: 'Required Fields are: weekID, name, assignment' })
+  }
+  schedule.updateAssignment({ weekID, name, assignment })
+    .then(result => {
+      res.json({ result })
+    })
+    .catch(error => {
+      res.status(500).json({ message: 'An unknown error occured', error })
+    })
 })
 
 // The lambda function route starts with api so account for that here
 app.use('/api', router)
 app.use((req, res) => {
-  res.status(404).send('Not found')
+  res.status(404).json({ message: 'Not found' })
 })
 
 // Export lambda handler
