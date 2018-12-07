@@ -1,12 +1,15 @@
 <template>
-  <v-layout fill-height justify-center>
-    <ScheduleWeek
+  <v-layout fill-height justify-center class="px-2">
+    <v-flex
       v-for="week in visibleWeeks"
       :key="week.weekDate"
-      class="ma-2"
-      :week-date="week.weekDate"
-      :current="week.current"
-    />
+      class="ma-2 xs12 sm6 md4 lg3 xl2"
+    >
+      <ScheduleWeek
+        :week-date="week.weekDate"
+        :current="week.current"
+      />
+    </v-flex>
   </v-layout>
 </template>
 
@@ -25,9 +28,31 @@ export default {
   },
 
   computed: {
+    bufferBefore () {
+      switch (this.$vuetify.breakpoint.name) {
+        case 'sm':
+          return 1
+        case 'md':
+        case 'lg':
+          return 2
+        case 'xl':
+          return 3
+        default:
+          return 0
+      }
+    },
+    bufferAfter () {
+      switch (this.$vuetify.breakpoint.name) {
+        case 'lg':
+          return 1
+        case 'xl':
+          return 2
+        default:
+          return 0
+      }
+    },
     visibleWeeks () {
-      const bufferBefore = 2
-      const bufferAfter = 1
+      const { bufferBefore, bufferAfter } = this
       const weeks = []
       for (let i = -bufferBefore; i <= bufferAfter; i++) {
         const current = i === 0
