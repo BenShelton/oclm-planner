@@ -5,7 +5,9 @@ module.exports = {
   // optimization: {
   //   minimize: false
   // },
-  externals: [nodeExternals()],
+  externals: [nodeExternals({
+    whitelist: [/^core-js/, /^regenerator-runtime/]
+  })],
   module: {
     rules: [
       {
@@ -14,7 +16,13 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            babelrc: false
+            babelrc: false,
+            presets: [
+              ['@babel/preset-env', {
+                debug: true,
+                targets: { node: '8.1' }
+              }]
+            ]
           }
         }
       }
