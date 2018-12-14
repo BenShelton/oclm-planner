@@ -1,3 +1,5 @@
+require('dotenv').config()
+console.log(process.env)
 const express = require('express')
 const bodyParser = require('body-parser')
 const serverless = require('serverless-http')
@@ -21,6 +23,7 @@ const handleErrors = res => error => {
 }
 
 router.get('/schedule/week/:date', (req, res) => {
+  console.log('request received')
   const { date } = req.params
   if (!date) return res.status(400).json({ message: 'No date provided' })
   if (!(/^\d{4}-\d{2}-\d{2}$/.test(date))) return res.status(400).json({ message: 'Date should be in yyyy-mm-dd format' })
@@ -40,8 +43,7 @@ router.post('/schedule/updateAssignment', (req, res) => {
     .catch(handleErrors(res))
 })
 
-// The lambda function route starts with api so account for that here
-app.use('/api', router)
+app.use(router)
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' })
 })
