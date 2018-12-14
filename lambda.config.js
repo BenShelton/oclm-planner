@@ -1,14 +1,10 @@
-const nodeExternals = require('webpack-node-externals')
-
 module.exports = {
   target: 'node',
   // optimization: {
   //   minimize: false
   // },
-  externals: [nodeExternals({
-    whitelist: [/^core-js/, /^regenerator-runtime/]
-  })],
   module: {
+    exprContextCritical: false,
     rules: [
       {
         test: /\.js?$/,
