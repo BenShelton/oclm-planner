@@ -1,21 +1,21 @@
 <template>
-  <v-navigation-drawer v-model="drawer" app temporary>
-    <v-list>
-      <v-list-tile
+  <VNavigationDrawer v-model="drawer" app temporary>
+    <VList>
+      <VListTile
         v-for="item in items"
         :key="item.title"
         exact
         :to="item.link"
       >
-        <v-list-tile-action>
-          <v-icon>{{ item.icon }}</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-    </v-list>
-  </v-navigation-drawer>
+        <VListTileAction>
+          <VIcon>{{ item.icon }}</VIcon>
+        </VListTileAction>
+        <VListTileContent>
+          <VListTileTitle>{{ item.title }}</VListTileTitle>
+        </VListTileContent>
+      </VListTile>
+    </VList>
+  </VNavigationDrawer>
 </template>
 
 <script>

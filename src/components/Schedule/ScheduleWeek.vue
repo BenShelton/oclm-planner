@@ -1,16 +1,20 @@
 <template>
-  <v-card>
-    <v-toolbar :color="toolbarColor">
-      <v-toolbar-title v-text="prettyDate" />
-    </v-toolbar>
-    <v-layout v-if="!week" justify-center class="pa-3">
-      <v-layout v-if="loadError" column align-center>
-        <v-icon color="red">warning</v-icon>
-        <p class="red--text">An error occured when loading this week.</p>
-      </v-layout>
-      <v-progress-circular v-else indeterminate color="primary" />
-    </v-layout>
-    <v-list
+  <VCard>
+    <VToolbar :color="toolbarColor">
+      <VToolbarTitle v-text="prettyDate" />
+    </VToolbar>
+    <VLayout v-if="!week" justify-center class="pa-3">
+      <VLayout v-if="loadError" column align-center>
+        <VIcon color="red">
+          warning
+        </VIcon>
+        <p class="red--text">
+          An error occured when loading this week.
+        </p>
+      </VLayout>
+      <VProgressCircular v-else indeterminate color="primary" />
+    </VLayout>
+    <VList
       v-else
       two-line
       subheader
@@ -39,47 +43,51 @@
         <ScheduleAssignment :assignment="assignments.reader" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.closingPrayer" @edit="onEdit" />
       </ScheduleSection>
-    </v-list>
-    <v-dialog
+    </VList>
+    <VDialog
       v-model="editDialog"
       lazy
     >
-      <v-card>
-        <v-card-title>
+      <VCard>
+        <VCardTitle>
           <span class="headline" v-text="editTitle" />
-        </v-card-title>
-        <v-card-text>
-          <v-layout wrap>
-            <v-flex xs4>
-              <v-text-field
+        </VCardTitle>
+        <VCardText>
+          <VLayout wrap>
+            <VFlex xs4>
+              <VTextField
                 v-model="editAssignment.title"
                 label="Title"
               />
-            </v-flex>
-            <v-flex xs4>
-              <v-text-field
+            </VFlex>
+            <VFlex xs4>
+              <VTextField
                 v-model="editAssignment.assignee"
                 label="Assignee"
               />
-            </v-flex>
-          </v-layout>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
+            </VFlex>
+          </VLayout>
+        </VCardText>
+        <VCardActions>
+          <VSpacer />
+          <VBtn
             flat
             color="grey"
             @click="closeEditor"
-          >CANCEL</v-btn>
-          <v-btn
+          >
+            CANCEL
+          </VBtn>
+          <VBtn
             flat
             color="primary"
             @click="saveEditor"
-          >SAVE</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-card>
+          >
+            SAVE
+          </VBtn>
+        </VCardActions>
+      </VCard>
+    </VDialog>
+  </VCard>
 </template>
 
 <script>

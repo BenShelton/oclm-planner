@@ -1,30 +1,30 @@
 <template>
-  <v-hover>
+  <VHover>
     <div slot-scope="{ hover }">
-      <v-list-tile class="py-2" :class="{ grey: !assignment.details }">
-        <v-list-tile-content>
-          <v-list-tile-title v-text="assignment.displayName" />
-          <v-list-tile-sub-title v-if="!assignment.details">
+      <VListTile class="py-2" :class="{ grey: !assignment.details }">
+        <VListTileContent>
+          <VListTileTitle v-text="assignment.displayName" />
+          <VListTileSubTitle v-if="!assignment.details">
             No Assignment Found
-          </v-list-tile-sub-title>
+          </VListTileSubTitle>
           <template v-else>
-            <v-list-tile-sub-title>
+            <VListTileSubTitle>
               <ScheduleAssignee :assignee="assignment.details.assignee" />
               <ScheduleAssignee v-if="hasAssistant" :assignee="assignment.details.assistant" />
-            </v-list-tile-sub-title>
-            <v-list-tile-sub-title v-text="assignment.details.title" />
+            </VListTileSubTitle>
+            <VListTileSubTitle v-text="assignment.details.title" />
           </template>
-        </v-list-tile-content>
-        <v-list-tile-action>
-          <v-list-tile-action-text v-if="assignment.details" v-text="assignment.details.time" />
-          <v-btn v-show="hover" icon @click="onEdit">
-            <v-icon>edit</v-icon>
-          </v-btn>
-        </v-list-tile-action>
-      </v-list-tile>
-      <v-divider />
+        </VListTileContent>
+        <VListTileAction>
+          <VListTileActionText v-if="assignment.details" v-text="assignment.details.time" />
+          <VBtn v-show="hover" icon @click="onEdit">
+            <VIcon>edit</VIcon>
+          </VBtn>
+        </VListTileAction>
+      </VListTile>
+      <VDivider />
     </div>
-  </v-hover>
+  </VHover>
 </template>
 
 <script>
