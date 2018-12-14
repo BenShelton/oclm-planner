@@ -1,5 +1,7 @@
-require('dotenv').config()
-const MongoClient = require('mongodb').MongoClient
+import dotenv from 'dotenv'
+import { MongoClient } from 'mongodb'
+
+dotenv.config()
 
 const { MONGDB_CONNECTION } = process.env
 const connectionOptions = {
@@ -7,5 +9,5 @@ const connectionOptions = {
   validateOptions: true
 }
 
-module.exports = MongoClient.connect(MONGDB_CONNECTION, connectionOptions)
+export default MongoClient.connect(MONGDB_CONNECTION, connectionOptions)
   .then(client => client.db('oclm'))

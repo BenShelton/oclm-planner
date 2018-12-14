@@ -38,6 +38,7 @@ module.exports = {
       ]
     }],
     'vue/no-spaces-around-equal-signs-in-attribute': 'error',
+    'vue/name-property-casing': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
