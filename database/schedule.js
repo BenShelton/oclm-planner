@@ -1,5 +1,5 @@
-const assert = require('assert')
-const setup = require('./setup')
+import assert from 'assert'
+import setup from './setup'
 
 const getCollection = new Promise(resolve => {
   setup
@@ -7,38 +7,26 @@ const getCollection = new Promise(resolve => {
     .then(resolve)
 })
 
-exports.getWeek = ({ date }) => {
-  let coll
-  return getCollection
-    .then(c => {
-      coll = c
-      const query = { date }
-      return coll.findOne(query)
-    })
-    .then(result => {
-      if (result) return result
-      // if week doesn't exist add it and return the added week
-      return coll.insertOne({ date, assignments: {} })
-        .then(result => result && result.ops[0])
-    })
-    .then(result => {
-      assert.notEqual(null, result, 'Adding Missing Week was unsuccessful')
-      return result
-    })
+export const getWeek = async ({ date }) => {
+  const coll = await getCollection
+  const query = { date }
+  const existingWeek = await coll.findOne(query)
+  if (existingWeek) return existingWeek
+  // if week doesn't exist add it and return the added week
+  const newWeekResult = await coll.insertOne({ date, assignments: {} })
+  const newWeek = newWeekResult && newWeekResult.ops && newWeekResult.ops[0]
+  assert.notStrictEqual(null, newWeek, 'Adding Missing Week was unsuccessful')
+  return newWeek
 }
 
-exports.updateAssignment = ({ weekID, name, assignment }) => {
-  return getCollection
-    .then(coll => {
-      const query = { date: weekID }
-      const update = {}
-      update.$set[`${assignment}.${name}`] = assignment
-      return coll.findOneAndUpdate(query, update, { returnOriginal: false })
-    })
-    .then(result => {
-      if (!result) throw new Error(404)
-      return result
-    })
+export const updateAssignment = async ({ weekID, name, assignment }) => {
+  const coll = await getCollection
+  const query = { date: weekID }
+  const update = {}
+  update.$set[`${assignment}.${name}`] = assignment
+  const result = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
+  assert.notStrictEqual(null, result, 404)
+  return result
 }
 
 // Sample Assignments
