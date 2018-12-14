@@ -1,7 +1,7 @@
 <template>
-  <v-layout column fill-height>
+  <VLayout column fill-height>
     <p>Coming soon...</p>
-  </v-layout>
+  </VLayout>
 </template>
 
 <script>

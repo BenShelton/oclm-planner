@@ -1,11 +1,11 @@
 <template>
-  <v-chip
+  <VChip
     class="ml-0 mr-2"
     small
     :color="color"
   >
     {{ assignee || 'Assignee Required' }}
-  </v-chip>
+  </VChip>
 </template>
 
 <script>

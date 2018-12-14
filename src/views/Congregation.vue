@@ -1,6 +1,6 @@
 <template>
-  <v-layout column fill-height>
-    <v-data-table
+  <VLayout column fill-height>
+    <VDataTable
       class="elevation-1"
       expand
       :headers="headers"
@@ -18,20 +18,20 @@
             <BooleanIcon :value="props.item.show" />
           </td>
           <td class="text-xs-center">
-            <v-btn
+            <VBtn
               flat
               round
               icon
               @click.stop="openEditor(props)"
             >
-              <v-icon>edit</v-icon>
-            </v-btn>
+              <VIcon>edit</VIcon>
+            </VBtn>
           </td>
         </tr>
       </template>
       <template slot="expand" slot-scope="props">
-        <v-layout row wrap class="grey lighten-5">
-          <v-layout
+        <VLayout row wrap class="grey lighten-5">
+          <VLayout
             v-for="privilege in prettyPrivileges(props.item.privileges)"
             :key="privilege.name"
             align-center
@@ -39,11 +39,11 @@
           >
             <span v-text="privilege.name" />
             <BooleanIcon class="px-1" :value="privilege.selected" />
-          </v-layout>
-        </v-layout>
+          </VLayout>
+        </VLayout>
       </template>
-    </v-data-table>
-  </v-layout>
+    </VDataTable>
+  </VLayout>
 </template>
 
 <script>

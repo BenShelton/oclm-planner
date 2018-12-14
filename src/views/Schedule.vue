@@ -1,6 +1,6 @@
 <template>
-  <v-layout fill-height justify-center class="px-2">
-    <v-flex
+  <VLayout fill-height justify-center class="px-2">
+    <VFlex
       v-for="week in visibleWeeks"
       :key="week.weekDate"
       class="ma-2 xs12 sm6 md4 lg3 xl2 grow"
@@ -9,8 +9,8 @@
         :week-date="week.weekDate"
         :current="week.current"
       />
-    </v-flex>
-  </v-layout>
+    </VFlex>
+  </VLayout>
 </template>
 
 <script>

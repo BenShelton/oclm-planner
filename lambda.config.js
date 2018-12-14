@@ -1,12 +1,12 @@
-const nodeExternals = require('webpack-node-externals')
+const devMode = process.env.NODE_ENV === 'development'
 
 module.exports = {
   target: 'node',
-  // optimization: {
-  //   minimize: false
-  // },
-  externals: [nodeExternals()],
+  optimization: {
+    minimize: !devMode
+  },
   module: {
+    exprContextCritical: false,
     rules: [
       {
         test: /\.js?$/,
@@ -14,7 +14,13 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            babelrc: false
+            babelrc: false,
+            presets: [
+              ['@babel/preset-env', {
+                debug: devMode,
+                targets: { node: '8.1' }
+              }]
+            ]
           }
         }
       }

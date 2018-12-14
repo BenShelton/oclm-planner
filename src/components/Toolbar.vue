@@ -1,8 +1,8 @@
 <template>
-  <v-toolbar app>
-    <v-toolbar-side-icon @click.stop="toggleDrawer" />
-    <v-toolbar-title>{{ title }}</v-toolbar-title>
-  </v-toolbar>
+  <VToolbar app>
+    <VToolbarSideIcon @click.stop="toggleDrawer" />
+    <VToolbarTitle>{{ title }}</VToolbarTitle>
+  </VToolbar>
 </template>
 
 <script>

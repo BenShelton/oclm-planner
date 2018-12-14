@@ -40,10 +40,11 @@ router.post('/schedule/updateAssignment', (req, res) => {
     .catch(handleErrors(res))
 })
 
-// The lambda function route starts with api so account for that here
-app.use('/api', router)
+// The lambda function route must match the netlify path
+app.use('/.netlify/functions/api', router)
 app.use((req, res) => {
-  res.status(404).json({ message: 'Not found' })
+  const { path } = req
+  res.status(404).json({ message: 'API Path Not Found', path })
 })
 
 // Export lambda handler
