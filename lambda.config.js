@@ -1,8 +1,10 @@
+const devMode = process.env.NODE_ENV === 'development'
+
 module.exports = {
   target: 'node',
-  // optimization: {
-  //   minimize: false
-  // },
+  optimization: {
+    minimize: !devMode
+  },
   module: {
     exprContextCritical: false,
     rules: [
@@ -15,7 +17,7 @@ module.exports = {
             babelrc: false,
             presets: [
               ['@babel/preset-env', {
-                debug: true,
+                debug: devMode,
                 targets: { node: '8.1' }
               }]
             ]

@@ -1,5 +1,3 @@
-require('dotenv').config()
-console.log(process.env)
 const express = require('express')
 const bodyParser = require('body-parser')
 const serverless = require('serverless-http')
@@ -23,7 +21,6 @@ const handleErrors = res => error => {
 }
 
 router.get('/schedule/week/:date', (req, res) => {
-  console.log('request received')
   const { date } = req.params
   if (!date) return res.status(400).json({ message: 'No date provided' })
   if (!(/^\d{4}-\d{2}-\d{2}$/.test(date))) return res.status(400).json({ message: 'Date should be in yyyy-mm-dd format' })

@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "npm-run-all --parallel serve:**",
     "serve:app": "vue-cli-service serve",
-    "serve:lambda": "netlify-lambda -c lambda.config.js serve lambda",
+    "serve:lambda": "cross-env NODE_ENV=development netlify-lambda -c lambda.config.js serve lambda",
     "build": "npm-run-all --parallel build:**",
     "build:app": "vue-cli-service build",
     "build:lambda": "netlify-lambda -c lambda.config.js build lambda",
@@ -38,6 +38,7 @@
     "@vue/eslint-config-standard": "^4.0.0",
     "@vue/test-utils": "^1.0.0-beta.27",
     "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
     "electron": "^3.0.11",
     "eslint-plugin-vue": "next",
     "netlify-lambda": "^1.1.0",
@@ -46,8 +47,7 @@
     "stylus-loader": "^3.0.2",
     "vue-cli-plugin-electron-builder": "^1.0.0-rc.9",
     "vue-cli-plugin-vuetify": "^0.4.6",
-    "vue-template-compiler": "^2.5.21",
-    "webpack-node-externals": "^1.7.2"
+    "vue-template-compiler": "^2.5.21"
   },
   "main": "background.js"
 }
