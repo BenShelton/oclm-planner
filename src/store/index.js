@@ -2,8 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 
-import { updateHeaders } from '@/api'
-
 import alert from './alert'
 import auth from './auth'
 import congregation from './congregation'
@@ -12,7 +10,7 @@ import schedule from './schedule'
 
 Vue.use(Vuex)
 
-const store = new Vuex.Store({
+export default new Vuex.Store({
   modules: {
     alert,
     auth,
@@ -24,8 +22,3 @@ const store = new Vuex.Store({
     paths: ['auth']
   })]
 })
-
-// update api token after restoring state
-updateHeaders(store.state.auth.token)
-
-export default store

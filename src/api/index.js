@@ -1,12 +1,14 @@
 import axios from 'axios'
+import store from '@/store'
 
 const api = axios.create({
   baseURL: '/.netlify/functions/api'
 })
 
-export const updateHeaders = ({ token }) => {
-  api.defaults.headers.common.Authorization = token
-}
+api.interceptors.request.use(config => {
+  config.headers.authorization = store.state.auth.token
+  return config
+})
 
 export default {
   auth: {

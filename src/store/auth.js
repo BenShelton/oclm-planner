@@ -1,4 +1,4 @@
-import api, { updateHeaders } from '@/api'
+import api from '@/api'
 
 const state = {
   token: ''
@@ -9,20 +9,19 @@ const getters = {
 }
 
 const actions = {
-  requestToken ({ dispatch }, { password }) {
-    dispatch('setToken', '')
+  requestToken ({ commit }, { password }) {
+    commit('CLEAR_TOKEN')
     return api.auth.requestToken({ password })
-      .then(res => dispatch('setToken', { token: res.data.result }))
-  },
-  setToken ({ commit }, { token }) {
-    commit('UPDATE_TOKEN', token)
-    updateHeaders({ token })
+      .then(res => commit('UPDATE_TOKEN', res.data.result))
   }
 }
 
 const mutations = {
   UPDATE_TOKEN (state, payload) {
     state.token = payload
+  },
+  CLEAR_TOKEN (state) {
+    state.token = ''
   }
 }
 
