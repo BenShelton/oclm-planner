@@ -20,7 +20,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import routeNames from '@/router/routeNames'
+import routes from '@/router/routes'
 
 export default {
   name: 'NavigationDrawer',
@@ -28,10 +28,10 @@ export default {
   data () {
     return {
       items: [
-        { title: 'Home', icon: 'home', link: { name: routeNames.HOME } },
-        { title: 'Schedule', icon: 'assignment', link: { name: routeNames.SCHEDULE } },
-        { title: 'Congregation', icon: 'people', link: { name: routeNames.CONGREGATION } },
-        { title: 'Help', icon: 'help', link: { name: routeNames.HELP } }
+        { title: 'Home', icon: 'home', link: { name: routes.HOME } },
+        { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE } },
+        { title: 'Congregation', icon: 'people', link: { name: routes.CONGREGATION } },
+        { title: 'Help', icon: 'help', link: { name: routes.HELP } }
       ]
     }
   },

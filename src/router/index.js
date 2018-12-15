@@ -6,7 +6,7 @@ import Schedule from '@/views/Schedule.vue'
 import Congregation from '@/views/Congregation.vue'
 import Help from '@/views/Help.vue'
 
-import routeNames from './routeNames'
+import routes from './routes'
 
 Vue.use(Router)
 
@@ -16,22 +16,21 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: routeNames.HOME,
-      component: Home
+      name: routes.HOME,
     },
     {
       path: '/schedule',
-      name: routeNames.SCHEDULE,
+      name: routes.SCHEDULE,
       component: Schedule
     },
     {
       path: '/congregation',
-      name: routeNames.CONGREGATION,
+      name: routes.CONGREGATION,
       component: Congregation
     },
     {
       path: '/help',
-      name: routeNames.HELP,
+      name: routes.HELP,
       component: Help
     }
   ]

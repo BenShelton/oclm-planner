@@ -7,7 +7,7 @@
 
 <script>
 import { mapMutations } from 'vuex'
-import routeNames from '@/router/routeNames'
+import routes from '@/router/routes'
 
 export default {
   name: 'Toolbar',
@@ -15,13 +15,13 @@ export default {
   computed: {
     title () {
       switch (this.$route.name) {
-        case routeNames.HOME:
+        case routes.HOME:
           return 'Home'
-        case routeNames.SCHEDULE:
+        case routes.SCHEDULE:
           return 'Schedule'
-        case routeNames.CONGREGATION:
+        case routes.CONGREGATION:
           return 'Congregation'
-        case routeNames.HELP:
+        case routes.HELP:
           return 'Help'
         default:
           return 'OCLM Planner'

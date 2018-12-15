@@ -1,5 +1,6 @@
 export default {
   HOME: 'HOME',
+  LOGIN: 'LOGIN',
   SCHEDULE: 'SCHEDULE',
   CONGREGATION: 'CONGREGATION',
   HELP: 'HELP'
