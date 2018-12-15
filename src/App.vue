@@ -3,7 +3,7 @@
     <NavigationDrawer />
     <Toolbar />
     <VContent>
-      <VContainer fluid>
+      <VContainer fluid fill-height>
         <RouterView />
       </VContainer>
     </VContent>
