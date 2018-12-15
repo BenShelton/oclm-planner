@@ -54,7 +54,7 @@ export default {
 
   methods: {
     ...mapActions({
-      login: 'auth/requestToken'
+      login: 'auth/login'
     }),
     ...mapMutations({
       alert: 'alert/UPDATE_ALERT'

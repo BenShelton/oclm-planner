@@ -12,7 +12,8 @@ api.interceptors.request.use(config => {
 
 export default {
   auth: {
-    requestToken: ({ password }) => api.post('/auth/requestToken', { password })
+    login: ({ password }) => api.post('/auth/login', { password }),
+    logout: () => api.get('/auth/logout')
   },
   schedule: {
     week: ({ date }) => api.get(`/schedule/week/${date}`),

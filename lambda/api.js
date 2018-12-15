@@ -23,7 +23,7 @@ const handleErrors = res => error => {
   }
 }
 
-router.post('/auth/requestToken', (req, res) => {
+router.post('/auth/login', (req, res) => {
   const { password } = req.body
   if (!password) return res.status(400).json({ message: 'No password provided' })
   auth.createToken({ password })
@@ -35,11 +35,18 @@ router.use(async (req, res, next) => {
   try {
     const token = req.headers.authorization
     if (!token) throw new Error('No token sent')
-    await auth.validateToken({ token })
+    const decoded = await auth.validateToken({ token })
+    req.tokenID = decoded._id
     next()
   } catch (err) {
     res.status(403).json({ message: '403 - Not Authorised', err })
   }
+})
+
+router.get('/auth/logout', (req, res) => {
+  auth.removeToken(req.tokenID)
+    .then(() => res.status(200).json({ message: 'Logout Successful' }))
+    .catch(handleErrors(res))
 })
 
 router.get('/schedule/week/:date', (req, res) => {

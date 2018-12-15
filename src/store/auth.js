@@ -9,10 +9,14 @@ const getters = {
 }
 
 const actions = {
-  requestToken ({ commit }, { password }) {
+  login ({ commit }, { password }) {
     commit('CLEAR_TOKEN')
-    return api.auth.requestToken({ password })
+    return api.auth.login({ password })
       .then(res => commit('UPDATE_TOKEN', res.data.result))
+  },
+  logout ({ commit }) {
+    return api.auth.logout()
+      .then(() => commit('CLEAR_TOKEN'))
   }
 }
 
