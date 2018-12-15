@@ -11,7 +11,7 @@ const getCollection = new Promise(resolve => {
     .then(resolve)
 })
 
-const verifyToken = async ({ token }) => {
+const verifyToken = async (token) => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
       if (err) return reject(err)
@@ -33,7 +33,7 @@ export const createToken = async ({ password }) => {
 export const validateToken = async ({ token }) => {
   const decoded = await verifyToken(token)
   const coll = await getCollection
-  const query = { _id: ObjectID(decoded.data._id) }
+  const query = { _id: ObjectID(decoded._id) }
   const existingToken = await coll.findOne(query)
   assert.notStrictEqual(null, existingToken, 'Token no longer valid')
   return decoded.data

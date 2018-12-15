@@ -33,7 +33,7 @@ router.post('/auth/requestToken', (req, res) => {
 
 router.use(async (req, res, next) => {
   try {
-    const token = req.headers.Authorization
+    const token = req.headers.authorization
     if (!token) throw new Error('No token sent')
     await auth.validateToken({ token })
     next()
