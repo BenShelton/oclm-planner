@@ -1,20 +1,22 @@
 <template>
   <VLayout fill-height align-center justify-center>
     <VCard width="400" class="pa-4">
-      <VCardTitle>
-        <h1>Login</h1>
+      <VCardTitle class="justify-center">
+        <p class="headline text-xs-center">
+          Please enter a password to continue
+        </p>
       </VCardTitle>
       <VCardText>
         <VTextField
           v-model="password"
-          outline
+          solo
           label="Password"
           :type="visible ? 'text' : 'password'"
           :append-icon="visible ? 'visibility_off' : 'visibility'"
           @click:append="toggleVisible"
         />
       </VCardText>
-      <VCardActions>
+      <VCardActions class="justify-center">
         <VBtn
           color="primary"
           :disabled="disabled"
@@ -29,6 +31,10 @@
 </template>
 
 <script>
+import { mapActions, mapMutations } from 'vuex'
+
+import routes from '@/router/routes'
+
 export default {
   name: 'Login',
 
@@ -47,14 +53,26 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      login: 'auth/requestToken'
+    }),
+    ...mapMutations({
+      alert: 'alert/UPDATE_ALERT'
+    }),
     toggleVisible () {
       this.visible = !this.visible
     },
     onLogin () {
-      if (!this.password) {
-
-      }
+      const { password } = this
+      if (!password) return
       this.loading = true
+      this.login({ password })
+        .then(() => this.$router.push({ name: routes.HOME }))
+        .catch(err => {
+          this.alert({ text: 'Login was unsuccessful', color: 'error' })
+          console.error(err)
+        })
+        .finally(() => { this.loading = false })
     }
   }
 }

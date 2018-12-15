@@ -11,8 +11,8 @@ const getters = {
 const actions = {
   requestToken ({ commit }, { password }) {
     commit('CLEAR_TOKEN')
-    return api.requestToken({ password })
-      .then(res => commit('LOAD_TOKEN', res.data.result))
+    return api.auth.requestToken({ password })
+      .then(res => commit('UPDATE_TOKEN', res.data.result))
   }
 }
 
