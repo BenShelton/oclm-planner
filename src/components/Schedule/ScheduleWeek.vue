@@ -113,7 +113,7 @@ export default {
   },
 
   mounted () {
-    this.loadWeek(this.weekDate)
+    this.loadWeek({ date: this.weekDate })
       .then(week => { this.week = week })
       .catch(err => {
         this.loadError = true

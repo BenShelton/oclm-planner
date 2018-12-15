@@ -5,7 +5,7 @@ const state = {
 }
 
 const actions = {
-  loadWeek ({ state, commit }, date) {
+  loadWeek ({ state, commit }, { date }) {
     const week = state.weeks.find(w => w.date === date)
     if (week) return Promise.resolve(week)
     return api.schedule.week({ date })
