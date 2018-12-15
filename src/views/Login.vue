@@ -14,6 +14,7 @@
           :type="visible ? 'text' : 'password'"
           :append-icon="visible ? 'visibility_off' : 'visibility'"
           @click:append="toggleVisible"
+          @keydown.enter="onLogin"
         />
       </VCardText>
       <VCardActions class="justify-center">
