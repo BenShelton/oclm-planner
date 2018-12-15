@@ -2,21 +2,31 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import Home from '@/views/Home.vue'
+import Login from '@/views/Login.vue'
 import Schedule from '@/views/Schedule.vue'
 import Congregation from '@/views/Congregation.vue'
 import Help from '@/views/Help.vue'
 
 import routes from './routes'
+import { authenticationGuard } from './guards'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
       path: '/',
       name: routes.HOME,
+      component: Home,
+      meta: { open: true }
+    },
+    {
+      path: '/login',
+      name: routes.LOGIN,
+      component: Login,
+      meta: { open: true }
     },
     {
       path: '/schedule',
@@ -35,3 +45,7 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach(authenticationGuard)
+
+export default router
