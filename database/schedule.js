@@ -4,7 +4,7 @@ import setup from './setup'
 
 const getCollection = new Promise(resolve => {
   setup
-    .then(db => db.collection('weeks'))
+    .then(db => db.collection('schedule'))
     .then(resolve)
 })
 
