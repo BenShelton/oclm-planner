@@ -6,6 +6,7 @@ const api = axios.create({
 
 export default {
   schedule: {
-    week: ({ date }) => api.get(`/schedule/week/${date}`)
+    week: ({ date }) => api.get(`/schedule/week/${date}`),
+    updateAssignment: ({ weekID, name, assignment }) => api.put(`/schedule/updateAssignment`, { weekID, name, assignment })
   }
 }

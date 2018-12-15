@@ -30,7 +30,7 @@ router.get('/schedule/week/:date', (req, res) => {
     .catch(handleErrors(res))
 })
 
-router.post('/schedule/updateAssignment', (req, res) => {
+router.put('/schedule/updateAssignment', (req, res) => {
   const { weekID, name, assignment } = req.body
   if (!weekID || !name || !assignment) {
     return res.status(400).json({ message: 'Required Fields are: weekID, name, assignment' })

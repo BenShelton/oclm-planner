@@ -1,3 +1,4 @@
+import { ObjectID } from 'mongodb'
 import assert from 'assert'
 import setup from './setup'
 
@@ -21,12 +22,13 @@ export const getWeek = async ({ date }) => {
 
 export const updateAssignment = async ({ weekID, name, assignment }) => {
   const coll = await getCollection
-  const query = { date: weekID }
+  const query = { _id: ObjectID(weekID) }
   const update = {}
-  update.$set[`${assignment}.${name}`] = assignment
-  const result = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
-  assert.notStrictEqual(null, result, 404)
-  return result
+  const assignmentPath = 'assignments.' + name
+  update.$set = { [assignmentPath]: assignment }
+  const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
+  assert.notStrictEqual(null, value, 404)
+  return value
 }
 
 // Sample Assignments

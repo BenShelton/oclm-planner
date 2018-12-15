@@ -73,6 +73,7 @@
           <VBtn
             flat
             color="grey"
+            :disabled="editLoading"
             @click="closeEditor"
           >
             CANCEL
@@ -80,6 +81,8 @@
           <VBtn
             flat
             color="primary"
+            :disabled="editLoading"
+            :loading="editLoading"
             @click="saveEditor"
           >
             SAVE
@@ -125,7 +128,8 @@ export default {
       editDialog: false,
       editName: '',
       editTitle: '',
-      editAssignment: {}
+      editAssignment: {},
+      editLoading: false
     }
   },
 
@@ -185,14 +189,21 @@ export default {
       this.editDialog = false
     },
     saveEditor () {
+      this.editLoading = true
       this.updateAssignment({
-        weekDate: this.weekDate,
+        weekID: this.week._id,
         name: this.editName,
         assignment: this.editAssignment
       })
         .then(week => {
           this.week = week
           this.closeEditor()
+        })
+        .catch(err => {
+          console.error(err)
+        })
+        .finally(() => {
+          this.editLoading = false
         })
     }
   }
