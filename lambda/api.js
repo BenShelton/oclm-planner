@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const serverless = require('serverless-http')
 
+const auth = require('../database/auth')
 const schedule = require('../database/schedule')
 
 // Initialize express app
@@ -13,12 +14,40 @@ const router = express.Router()
 const handleErrors = res => error => {
   console.error('Error Message: ' + error.message)
   switch (error.message.toString()) {
+    case '401':
+      return res.status(401).json({ message: '401 - Unauthorized', error: { message: 'Invalid Password' } })
     case '404':
       return res.status(404).json({ message: '404 - Not Found', error })
     default:
-      return res.status(500).json({ message: '500 - An unknown error occured', error })
+      return res.status(500).json({ message: '500 - Server Error', error })
   }
 }
+
+router.post('/auth/login', (req, res) => {
+  const { password } = req.body
+  if (!password) return res.status(400).json({ message: 'No password provided' })
+  auth.createToken({ password })
+    .then(result => res.status(200).json({ result }))
+    .catch(handleErrors(res))
+})
+
+router.use(async (req, res, next) => {
+  try {
+    const token = req.headers.authorization
+    if (!token) throw new Error('No token sent')
+    const decoded = await auth.validateToken({ token })
+    req.tokenID = decoded._id
+    next()
+  } catch (err) {
+    res.status(403).json({ message: '403 - Not Authorised', err })
+  }
+})
+
+router.get('/auth/logout', (req, res) => {
+  auth.removeToken(req.tokenID)
+    .then(() => res.status(200).json({ message: 'Logout Successful' }))
+    .catch(handleErrors(res))
+})
 
 router.get('/schedule/week/:date', (req, res) => {
   const { date } = req.params
@@ -30,7 +59,7 @@ router.get('/schedule/week/:date', (req, res) => {
     .catch(handleErrors(res))
 })
 
-router.post('/schedule/updateAssignment', (req, res) => {
+router.put('/schedule/updateAssignment', (req, res) => {
   const { weekID, name, assignment } = req.body
   if (!weekID || !name || !assignment) {
     return res.status(400).json({ message: 'Required Fields are: weekID, name, assignment' })

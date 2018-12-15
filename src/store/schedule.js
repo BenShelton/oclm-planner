@@ -5,7 +5,7 @@ const state = {
 }
 
 const actions = {
-  loadWeek ({ state, commit }, date) {
+  loadWeek ({ state, commit }, { date }) {
     const week = state.weeks.find(w => w.date === date)
     if (week) return Promise.resolve(week)
     return api.schedule.week({ date })
@@ -15,13 +15,13 @@ const actions = {
         return week
       })
   },
-  updateAssignment ({ state, commit }, { weekDate, name, assignment }) {
-    console.log(assignment)
-    const { date, assignments } = state.weeks.find(w => w.date === weekDate) || {}
-    const newWeek = { date, assignments: { ...assignments } }
-    newWeek.assignments[name] = assignment
-    commit('UPDATE_WEEK', newWeek)
-    return newWeek
+  updateAssignment ({ commit }, { weekID, name, assignment }) {
+    return api.schedule.updateAssignment({ weekID, name, assignment })
+      .then(res => {
+        const newWeek = res.data.result
+        commit('UPDATE_WEEK', newWeek)
+        return newWeek
+      })
   }
 }
 
@@ -30,9 +30,8 @@ const mutations = {
     state.weeks.push(payload)
   },
   UPDATE_WEEK (state, payload) {
-    const prevIndex = state.weeks.find(w => w.date === payload.date)
-    if (prevIndex) state.weeks.splice(prevIndex, 1, payload)
-    else state.weeks.push(payload)
+    const prevIndex = state.weeks.find(w => w._id === payload._id)
+    state.weeks.splice(prevIndex, 1, payload)
   }
 }
 

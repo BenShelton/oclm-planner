@@ -2,37 +2,50 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import Home from '@/views/Home.vue'
+import Login from '@/views/Login.vue'
 import Schedule from '@/views/Schedule.vue'
 import Congregation from '@/views/Congregation.vue'
 import Help from '@/views/Help.vue'
 
-import routeNames from './routeNames'
+import routes from './routes'
+import { authenticationGuard } from './guards'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
       path: '/',
-      name: routeNames.HOME,
-      component: Home
+      name: routes.HOME,
+      component: Home,
+      meta: { open: true }
+    },
+    {
+      path: '/login',
+      name: routes.LOGIN,
+      component: Login,
+      meta: { open: true }
     },
     {
       path: '/schedule',
-      name: routeNames.SCHEDULE,
+      name: routes.SCHEDULE,
       component: Schedule
     },
     {
       path: '/congregation',
-      name: routeNames.CONGREGATION,
+      name: routes.CONGREGATION,
       component: Congregation
     },
     {
       path: '/help',
-      name: routeNames.HELP,
+      name: routes.HELP,
       component: Help
     }
   ]
 })
+
+router.beforeEach(authenticationGuard)
+
+export default router
