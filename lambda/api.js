@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const serverless = require('serverless-http')
 
+const auth = require('../database/auth')
 const schedule = require('../database/schedule')
 
 // Initialize express app
@@ -13,12 +14,33 @@ const router = express.Router()
 const handleErrors = res => error => {
   console.error('Error Message: ' + error.message)
   switch (error.message.toString()) {
+    case '401':
+      return res.status(401).json({ message: '401 - Unauthorized', error: { message: 'Invalid Password' } })
     case '404':
       return res.status(404).json({ message: '404 - Not Found', error })
     default:
-      return res.status(500).json({ message: '500 - An unknown error occured', error })
+      return res.status(500).json({ message: '500 - Server Error', error })
   }
 }
+
+router.post('/auth/requestToken', (req, res) => {
+  const { password } = req.body
+  if (!password) return res.status(400).json({ message: 'No password provided' })
+  auth.createToken({ password })
+    .then(result => res.status(200).json({ result }))
+    .catch(handleErrors(res))
+})
+
+router.use(async (req, res, next) => {
+  try {
+    const token = req.headers.Authorization
+    if (!token) throw new Error('No token sent')
+    await auth.validateToken({ token })
+    next()
+  } catch (err) {
+    res.status(403).json({ message: '403 - Not Authorised', err })
+  }
+})
 
 router.get('/schedule/week/:date', (req, res) => {
   const { date } = req.params

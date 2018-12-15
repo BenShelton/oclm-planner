@@ -5,6 +5,9 @@ const api = axios.create({
 })
 
 export default {
+  auth: {
+    requestToken: ({ password }) => api.post('/auth/requestToken', { password })
+  },
   schedule: {
     week: ({ date }) => api.get(`/schedule/week/${date}`),
     updateAssignment: ({ weekID, name, assignment }) => api.put(`/schedule/updateAssignment`, { weekID, name, assignment })
