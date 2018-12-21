@@ -54,16 +54,41 @@
         </VCardTitle>
         <VCardText>
           <VLayout wrap>
-            <VFlex xs4>
+            <VFlex v-if="editName.includes('studentTalk')" xs12>
+              <VSelect
+                v-model="editAssignment.type"
+                label="Type"
+                :items="[
+                  { text: 'Ministry Video', value: 'MINISTRY_VIDEO' },
+                  { text: 'Initial Call', value: 'INITIAL_CALL' },
+                  { text: 'Return Visit', value: 'RETURN_VISIT' },
+                  { text: 'Bible Study', value: 'BIBLE_STUDY' },
+                  { text: 'Talk', value: 'STUDENT_TALK' }
+                ]"
+              />
+            </VFlex>
+            <VFlex xs12>
               <VTextField
                 v-model="editAssignment.title"
                 label="Title"
               />
             </VFlex>
-            <VFlex xs4>
-              <VTextField
+            <VFlex xs12>
+              <AssigneeSelect
                 v-model="editAssignment.assignee"
                 label="Assignee"
+              />
+            </VFlex>
+            <VFlex v-if="['INITIAL_CALL', 'RETURN_VISIT', 'BIBLE_STUDY'].includes(editAssignment.type)" xs12>
+              <AssigneeSelect
+                v-model="editAssignment.assistant"
+                label="Assistant"
+              />
+            </VFlex>
+            <VFlex v-if="!(['CHAIRMAN', 'PRAYER', 'READER'].includes(editAssignment.type))" xs12>
+              <VTextField
+                v-model="editAssignment.time"
+                label="Time"
               />
             </VFlex>
           </VLayout>
@@ -98,13 +123,17 @@ import { mapActions } from 'vuex'
 
 import ScheduleSection from '@/components/Schedule/ScheduleSection'
 import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment'
+import AssigneeSelect from '@/components/AssigneeSelect'
+
+import { ASSIGNMENT_TYPE_MAP } from '@/constants'
 
 export default {
   name: 'ScheduleWeek',
 
   components: {
     ScheduleSection,
-    ScheduleAssignment
+    ScheduleAssignment,
+    AssigneeSelect
   },
 
   props: {
@@ -182,7 +211,9 @@ export default {
       this.editName = name
       const { displayName, details } = this.assignments[name]
       this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
-      Object.assign(this.editAssignment, { ...details })
+      const assignment = { ...details }
+      if (!assignment.type) assignment.type = ASSIGNMENT_TYPE_MAP[name]
+      this.editAssignment = assignment
       this.editDialog = true
     },
     closeEditor () {
