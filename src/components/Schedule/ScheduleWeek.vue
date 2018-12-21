@@ -246,7 +246,7 @@ export default {
     }),
     onScrape () {
       this.scrapeLoading = true
-      this.scrapeWeek({ date: this.weekDate })
+      this.scrapeWeek({ weekID: this.week._id })
         .then(week => { this.week = week })
         .catch(err => {
           this.scrapeError = true

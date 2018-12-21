@@ -59,6 +59,14 @@ router.get('/schedule/week/:date', (req, res) => {
     .catch(handleErrors(res))
 })
 
+router.put('/schedule/scrape', (req, res) => {
+  const { weekID } = req.body
+  if (!weekID) return res.status(400).json({ message: 'weekID is required' })
+  schedule.scrapeWeek({ weekID })
+    .then(result => res.json({ result }))
+    .catch(handleErrors(res))
+})
+
 router.put('/schedule/updateAssignment', (req, res) => {
   const { weekID, name, assignment } = req.body
   if (!weekID || !name || !assignment) {
