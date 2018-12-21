@@ -7,7 +7,7 @@
     >
       <span v-text="title" />
       <VSpacer />
-      <VIcon color="white" v-text="show ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" />
+      <VIcon color="white" v-text="show ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
     </VSubheader>
     <VDivider />
     <slot v-if="show" />
