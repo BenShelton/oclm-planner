@@ -3,17 +3,49 @@
     <VToolbar :color="toolbarColor">
       <VToolbarTitle v-text="prettyDate" />
     </VToolbar>
+
+    <!-- Loading Week Display -->
     <VLayout v-if="!week" justify-center class="pa-3">
       <VLayout v-if="loadError" column align-center>
         <VIcon color="red">
           warning
         </VIcon>
-        <p class="red--text">
-          An error occured when loading this week.
+        <p class="text-xs-center red--text">
+          An error occured when loading this week
         </p>
       </VLayout>
       <VProgressCircular v-else indeterminate color="primary" />
     </VLayout>
+
+    <!-- Unscraped Week Display -->
+    <VLayout v-else-if="!week.scraped" justify-center class="pa-3">
+      <VLayout v-if="!scrapeError" column align-center>
+        <VIcon color="primary">
+          info
+        </VIcon>
+        <p class="pt-3 text-xs-center primary--text">
+          Assignment information for this week hasn't been downloaded yet, click the button below if you would like to try and download this week's information
+        </p>
+        <VBtn
+          color="primary"
+          :loading="scrapeLoading"
+          :disabled="scrapeLoading"
+          @click="onScrape"
+        >
+          Download
+        </VBtn>
+      </VLayout>
+      <VLayout v-else column align-center>
+        <VIcon color="error">
+          warning
+        </VIcon>
+        <p class="pt-3 text-xs-center error--text">
+          There was an error scraping this week's data (most likely because the information isn't available yet on WOL) if you believe this is a mistake contact support
+        </p>
+      </VLayout>
+    </VLayout>
+
+    <!-- Assignment Display -->
     <VList
       v-else
       two-line
@@ -44,6 +76,8 @@
         <ScheduleAssignment :assignment="assignments.closingPrayer" @edit="onEdit" />
       </ScheduleSection>
     </VList>
+
+    <!-- Edit Assignment Dialog -->
     <VDialog
       v-model="editDialog"
       lazy
@@ -154,6 +188,8 @@ export default {
     return {
       week: null,
       loadError: false,
+      scrapeLoading: false,
+      scrapeError: false,
       editDialog: false,
       editName: '',
       editTitle: '',
@@ -205,8 +241,19 @@ export default {
   methods: {
     ...mapActions({
       loadWeek: 'schedule/loadWeek',
+      scrapeWeek: 'schedule/scrapeWeek',
       updateAssignment: 'schedule/updateAssignment'
     }),
+    onScrape () {
+      this.scrapeLoading = true
+      this.scrapeWeek({ date: this.weekDate })
+        .then(week => { this.week = week })
+        .catch(err => {
+          this.scrapeError = true
+          console.error(err)
+        })
+        .finally(() => { this.scrapeLoading = false })
+    },
     onEdit (name) {
       this.editName = name
       const { displayName, details } = this.assignments[name]

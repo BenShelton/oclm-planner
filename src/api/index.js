@@ -17,6 +17,7 @@ export default {
   },
   schedule: {
     week: ({ date }) => api.get(`/schedule/week/${date}`),
+    scrape: ({ date }) => api.post(`/schedule/scape/`, { date }),
     updateAssignment: ({ weekID, name, assignment }) => api.put(`/schedule/updateAssignment`, { weekID, name, assignment })
   }
 }
