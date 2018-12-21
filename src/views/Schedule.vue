@@ -8,6 +8,13 @@
         <VIcon>play_arrow</VIcon>
       </VBtn>
       <VSpacer />
+      <VDialog v-model="dateDialog" lazy width="290px">
+        <VBtn slot="activator" color="primary" @click="dateDialog = true">
+          Select Week
+        </VBtn>
+        <VDatePicker v-model="currentWeek" :allowed-dates="allowedDates" @input="dateDialog = false" />
+      </VDialog>
+      <VSpacer />
       <VBtn icon @click="shiftCurrentWeek(1)">
         <VIcon>play_arrow</VIcon>
       </VBtn>
@@ -40,7 +47,8 @@ export default {
 
   data () {
     return {
-      currentWeek: this.weekStart(new Date())
+      currentWeek: this.weekStart(new Date()),
+      dateDialog: false
     }
   },
 
@@ -83,6 +91,9 @@ export default {
   },
 
   methods: {
+    allowedDates (date) {
+      return new Date(date).getDay() === 1
+    },
     weekStart (date) {
       const outputDate = new Date(date)
       const daysSinceMonday = outputDate.getDay() - 1
