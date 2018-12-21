@@ -12,3 +12,10 @@ export function authenticationGuard (to, from, next) {
     next(!to.meta.open ? { name: routes.LOGIN } : undefined)
   }
 }
+
+export function congregationGuard (to, from, next) {
+  if (!to.meta.open && !store.getters['congregation/members'].length) {
+    store.dispatch('congregation/load')
+  }
+  next()
+}

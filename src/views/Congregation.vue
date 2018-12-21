@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 
 import BooleanIcon from '@/components/BooleanIcon'
 
@@ -73,10 +73,6 @@ export default {
 
   components: { BooleanIcon },
 
-  mounted () {
-    this.loadCongregation()
-  },
-
   data () {
     return {
       headers: [
@@ -92,16 +88,13 @@ export default {
   },
 
   computed: {
-    ...mapState({
-      members: state => state.congregation.members,
-      loading: state => state.congregation.loading
+    ...mapGetters({
+      members: 'congregation/members',
+      loading: 'congregation/loading'
     })
   },
 
   methods: {
-    ...mapActions({
-      loadCongregation: 'congregation/load'
-    }),
     expandRow (props) {
       props.expanded = !props.expanded
     },

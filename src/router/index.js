@@ -8,7 +8,7 @@ import Congregation from '@/views/Congregation.vue'
 import Help from '@/views/Help.vue'
 
 import routes from './routes'
-import { authenticationGuard } from './guards'
+import { authenticationGuard, congregationGuard } from './guards'
 
 Vue.use(Router)
 
@@ -47,5 +47,6 @@ const router = new Router({
 })
 
 router.beforeEach(authenticationGuard)
+router.beforeEach(congregationGuard)
 
 export default router
