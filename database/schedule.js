@@ -48,7 +48,7 @@ export const updateAssignment = async ({ weekID, name, assignment }) => {
 // assignments: {
 //   chairman: { type: 'CHAIRMAN', assignee: 'John Smith' },
 //   openingPrayer: { type: 'PRAYER', assignee: 'John Smith' },
-//   talk: { type: 'TALK', assignee: 'John Smith', title: 'Paul Appeals to Caesar and Then Witnesses to King Herod Agrippa', time: '10 min.' },
+//   highlights: { type: 'HIGHLIGHTS', assignee: 'John Smith', title: 'Paul Appeals to Caesar and Then Witnesses to King Herod Agrippa', time: '10 min.' },
 //   gems: { type: 'GEMS', time: '8 min.' },
 //   bibleReading: { type: 'BIBLE_READING', assignee: 'John Smith', title: 'Ac 25:1-12', studyPoint: 5, time: '4 min. or less' },
 //   studentTalk1: { type: 'MINISTRY_VIDEO', assignee: 'John Smith', title: 'First Return Visit Video: (5 min.) Play and discuss the video.', time: '5 min.' },

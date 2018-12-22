@@ -56,7 +56,7 @@
       <ScheduleAssignment :assignment="assignments.openingPrayer" @edit="onEdit" />
 
       <ScheduleSection title="TREASURES FROM GOD'S WORD" color="grey darken-2">
-        <ScheduleAssignment :assignment="assignments.talk" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.highlights" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.gems" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.bibleReading" @edit="onEdit" />
       </ScheduleSection>
@@ -213,7 +213,7 @@ export default {
       const assignmentRefs = [
         { name: 'chairman', displayName: 'Chairman' },
         { name: 'openingPrayer', displayName: 'Opening Prayer' },
-        { name: 'talk', displayName: 'Talk' },
+        { name: 'highlights', displayName: 'Highlights' },
         { name: 'gems', displayName: 'Gems' },
         { name: 'bibleReading', displayName: 'Bible Reading' },
         { name: 'studentTalk1', displayName: 'Student Talk 1' },

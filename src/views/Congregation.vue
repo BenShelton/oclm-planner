@@ -53,7 +53,7 @@ import BooleanIcon from '@/components/BooleanIcon'
 
 const PRIVILEGES = [
   { name: 'Chairman', key: 'chairman' },
-  { name: 'Talk', key: 'talk' },
+  { name: 'Highlights', key: 'highlights' },
   { name: 'Gems', key: 'gems' },
   { name: 'Items', key: 'items' },
   { name: 'Book Study', key: 'bookStudy' },

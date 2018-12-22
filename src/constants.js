@@ -1,7 +1,7 @@
 export const ASSIGNMENT_TYPE_MAP = {
   chairman: 'CHAIRMAN',
   openingPrayer: 'PRAYER',
-  talk: 'TALK',
+  highlights: 'HIGHLIGHTS',
   gems: 'GEMS',
   bibleReading: 'BIBLE_READING',
   serviceTalk1: 'SERVICE_TALK',

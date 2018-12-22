@@ -51,7 +51,7 @@ const testMembers = [
     show: true,
     privileges: {
       chairman: true,
-      talk: true,
+      highlights: true,
       gems: true,
       items: true,
       bookStudy: true,
