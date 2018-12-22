@@ -19,7 +19,15 @@
 
     <!-- Unscraped Week Display -->
     <VLayout v-else-if="!week.scraped" justify-center class="pa-3">
-      <VLayout v-if="!scrapeError" column align-center>
+      <VLayout v-if="week.unavailable" column align-center>
+        <VIcon color="primary">
+          info
+        </VIcon>
+        <p class="pt-3 text-xs-center primary--text">
+          This week date cannot be organised, only weeks from Jan 2019 are available
+        </p>
+      </VLayout>
+      <VLayout v-else-if="!scrapeError" column align-center>
         <VIcon color="primary">
           info
         </VIcon>
@@ -176,6 +184,10 @@ export default {
   },
 
   mounted () {
+    if (this.weekDate < '2019-01-07') {
+      this.week = { date: this.weekDate, unavailable: true }
+      return
+    }
     this.loadWeek({ date: this.weekDate })
       .then(week => { this.week = week })
       .catch(err => {
