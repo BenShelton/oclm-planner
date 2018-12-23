@@ -51,22 +51,7 @@ import { mapGetters } from 'vuex'
 
 import BooleanIcon from '@/components/BooleanIcon'
 
-const PRIVILEGES = [
-  { name: 'Chairman', key: 'chairman' },
-  { name: 'Highlights', key: 'highlights' },
-  { name: 'Gems', key: 'gems' },
-  { name: 'Items', key: 'items' },
-  { name: 'Book Study', key: 'bookStudy' },
-  { name: 'Reader', key: 'reader' },
-  { name: 'Prayer', key: 'prayer' },
-  { name: 'Initial Call', key: 'initialCall' },
-  { name: 'Initial Call Assistant', key: 'initialCallAssist' },
-  { name: 'Return Visit', key: 'returnVisit' },
-  { name: 'Return Visit Assistant', key: 'returnVisitAssist' },
-  { name: 'Bible Study', key: 'bibleStudy' },
-  { name: 'Bible Study Assistant', key: 'bibleStudyAssist' },
-  { name: 'Student Talk', key: 'studentTalk' }
-]
+import { PRIVILEGES } from '@/constants'
 
 export default {
   name: 'Congregation',
