@@ -109,25 +109,25 @@
                 ]"
               />
             </VFlex>
-            <VFlex xs12>
+            <VFlex v-if="!(['CHAIRMAN', 'PRAYER', 'GEMS', 'READER'].includes(editAssignment.type))" class="xs12 sm6 md4 px-2">
               <VTextField
                 v-model="editAssignment.title"
                 label="Title"
               />
             </VFlex>
-            <VFlex xs12>
+            <VFlex class="xs12 sm6 md4 px-2">
               <AssigneeSelect
                 v-model="editAssignment.assignee"
                 label="Assignee"
               />
             </VFlex>
-            <VFlex v-if="['INITIAL_CALL', 'RETURN_VISIT', 'BIBLE_STUDY'].includes(editAssignment.type)" xs12>
+            <VFlex v-if="['INITIAL_CALL', 'RETURN_VISIT', 'BIBLE_STUDY'].includes(editAssignment.type)" class="xs12 sm6 md4 px-2">
               <AssigneeSelect
                 v-model="editAssignment.assistant"
                 label="Assistant"
               />
             </VFlex>
-            <VFlex v-if="!(['CHAIRMAN', 'PRAYER', 'READER'].includes(editAssignment.type))" xs12>
+            <VFlex v-if="!(['CHAIRMAN', 'PRAYER', 'READER'].includes(editAssignment.type))" class="xs12 sm6 md4 px-2">
               <VTextField
                 v-model="editAssignment.time"
                 label="Time"
