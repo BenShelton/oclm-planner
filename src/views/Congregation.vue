@@ -9,7 +9,7 @@
       :loading="loading"
     >
       <template slot="items" slot-scope="props">
-        <tr @click="expandRow(props)">
+        <tr class="pointer" @click="expandRow(props)">
           <td v-text="props.item.name" />
           <td v-text="props.item.gender" />
           <td v-text="props.item.appointment" />
@@ -27,6 +27,9 @@
               <VIcon>edit</VIcon>
             </VBtn>
           </td>
+          <td class="text-xs-center">
+            <VIcon v-text="props.expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
+          </td>
         </tr>
       </template>
       <template slot="expand" slot-scope="props">
@@ -41,6 +44,7 @@
             <BooleanIcon class="px-1" :value="privilege.selected" />
           </VLayout>
         </VLayout>
+        <VDivider />
       </template>
     </VDataTable>
   </VLayout>
@@ -66,7 +70,8 @@ export default {
         { text: 'Appointment', value: 'appointment' },
         { text: 'Language Group', value: 'languageGroup' },
         { text: 'Show On Schedule', value: 'show', align: 'center' },
-        { text: 'Actions', value: '', align: 'center', sortable: false }
+        { text: 'Actions', value: '', align: 'center', sortable: false },
+        { text: 'Privileges', value: '', align: 'center', sortable: false }
       ],
       rowsPerPageItems: [20, 50, 100, { text: 'All', value: -1 }]
     }
