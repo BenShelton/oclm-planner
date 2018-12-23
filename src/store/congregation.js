@@ -3,6 +3,12 @@ const state = {
   loading: true
 }
 
+const getters = {
+  members: ({ members }) => members,
+  loading: ({ loading }) => loading,
+  activeMembers: ({ members }) => members.filter(m => m.show)
+}
+
 const actions = {
   load ({ commit }) {
     commit('START_LOADING')
@@ -30,6 +36,7 @@ const mutations = {
 export default {
   namespaced: true,
   state,
+  getters,
   actions,
   mutations
 }
@@ -44,7 +51,7 @@ const testMembers = [
     show: true,
     privileges: {
       chairman: true,
-      talk: true,
+      highlights: true,
       gems: true,
       items: true,
       bookStudy: true,

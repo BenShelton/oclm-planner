@@ -1,0 +1,2 @@
+name,abbreviation,gender,languageGroup,show,privileges.bibleReading,privileges.initialCall,privileges.initialCallAssist,privileges.returnVisit,privileges.returnVisitAssist,privileges.bibleStudy,privileges.bibleStudyAssist,privileges.studentTalk,privileges.chairman,appointment,privileges.chairman,privileges.highlights,privileges.gems,privileges.items,privileges.bookStudy,privileges.reader,privileges.prayer
+Ben Jones,Be. Jones,Male,English,Y,Y,Y,Y,Y,Y,Y,Y,Y,,Brother,,,,,,Y,Y

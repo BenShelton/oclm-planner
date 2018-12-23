@@ -15,6 +15,14 @@ const actions = {
         return week
       })
   },
+  scrapeWeek ({ commit }, { weekID }) {
+    return api.schedule.scrape({ weekID })
+      .then(res => {
+        const week = res.data.result
+        commit('LOAD_WEEK', week)
+        return week
+      })
+  },
   updateAssignment ({ commit }, { weekID, name, assignment }) {
     return api.schedule.updateAssignment({ weekID, name, assignment })
       .then(res => {

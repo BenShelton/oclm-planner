@@ -1,15 +1,39 @@
 <template>
-  <VLayout fill-height justify-center class="px-2">
-    <VFlex
-      v-for="week in visibleWeeks"
-      :key="week.weekDate"
-      class="ma-2 xs12 sm6 md4 lg3 xl2 grow"
-    >
-      <ScheduleWeek
-        :week-date="week.weekDate"
-        :current="week.current"
-      />
-    </VFlex>
+  <VLayout fill-height column>
+    <VLayout class="elevation-1 mx-2">
+      <VBtn icon @click="shiftCurrentWeek(-4)">
+        <VIcon>skip_previous</VIcon>
+      </VBtn>
+      <VBtn class="flip" icon @click="shiftCurrentWeek(-1)">
+        <VIcon>play_arrow</VIcon>
+      </VBtn>
+      <VSpacer />
+      <VDialog v-model="dateDialog" lazy width="290px">
+        <VBtn slot="activator" color="primary" @click="dateDialog = true">
+          Select Week
+        </VBtn>
+        <VDatePicker v-model="currentWeek" :allowed-dates="allowedDates" @input="dateDialog = false" />
+      </VDialog>
+      <VSpacer />
+      <VBtn icon @click="shiftCurrentWeek(1)">
+        <VIcon>play_arrow</VIcon>
+      </VBtn>
+      <VBtn icon @click="shiftCurrentWeek(4)">
+        <VIcon>skip_next</VIcon>
+      </VBtn>
+    </VLayout>
+    <VLayout justify-center fill-height>
+      <VFlex
+        v-for="week in visibleWeeks"
+        :key="week.weekDate"
+        class="ma-2 xs12 sm6 md4 lg3 xl2"
+      >
+        <ScheduleWeek
+          :week-date="week.weekDate"
+          :current="week.current"
+        />
+      </VFlex>
+    </VLayout>
   </VLayout>
 </template>
 
@@ -23,7 +47,8 @@ export default {
 
   data () {
     return {
-      currentWeek: this.weekStart(new Date())
+      currentWeek: this.weekStart(new Date()),
+      dateDialog: false
     }
   },
 
@@ -66,6 +91,9 @@ export default {
   },
 
   methods: {
+    allowedDates (date) {
+      return new Date(date).getDay() === 1
+    },
     weekStart (date) {
       const outputDate = new Date(date)
       const daysSinceMonday = outputDate.getDay() - 1
@@ -75,8 +103,11 @@ export default {
     addWeek (date, weeks) {
       const outputDate = new Date(date)
       const days = weeks * 7
-      outputDate.setDate(outputDate.getDate() + days)
+      outputDate.setUTCDate(outputDate.getUTCDate() + days)
       return this.getDateString(outputDate)
+    },
+    shiftCurrentWeek (weeks) {
+      this.currentWeek = this.addWeek(this.currentWeek, weeks)
     },
     getDateString (date) {
       return date.toISOString().split('T')[0]
@@ -84,3 +115,8 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+.flip
+  transform scaleX(-1)
+</style>

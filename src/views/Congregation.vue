@@ -9,7 +9,7 @@
       :loading="loading"
     >
       <template slot="items" slot-scope="props">
-        <tr @click="expandRow(props)">
+        <tr class="pointer" @click="expandRow(props)">
           <td v-text="props.item.name" />
           <td v-text="props.item.gender" />
           <td v-text="props.item.appointment" />
@@ -27,6 +27,9 @@
               <VIcon>edit</VIcon>
             </VBtn>
           </td>
+          <td class="text-xs-center">
+            <VIcon v-text="props.expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
+          </td>
         </tr>
       </template>
       <template slot="expand" slot-scope="props">
@@ -41,41 +44,23 @@
             <BooleanIcon class="px-1" :value="privilege.selected" />
           </VLayout>
         </VLayout>
+        <VDivider />
       </template>
     </VDataTable>
   </VLayout>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 
 import BooleanIcon from '@/components/BooleanIcon'
 
-const PRIVILEGES = [
-  { name: 'Chairman', key: 'chairman' },
-  { name: 'Talk', key: 'talk' },
-  { name: 'Gems', key: 'gems' },
-  { name: 'Items', key: 'items' },
-  { name: 'Book Study', key: 'bookStudy' },
-  { name: 'Reader', key: 'reader' },
-  { name: 'Prayer', key: 'prayer' },
-  { name: 'Initial Call', key: 'initialCall' },
-  { name: 'Initial Call Assistant', key: 'initialCallAssist' },
-  { name: 'Return Visit', key: 'returnVisit' },
-  { name: 'Return Visit Assistant', key: 'returnVisitAssist' },
-  { name: 'Bible Study', key: 'bibleStudy' },
-  { name: 'Bible Study Assistant', key: 'bibleStudyAssist' },
-  { name: 'Student Talk', key: 'studentTalk' }
-]
+import { PRIVILEGES } from '@/constants'
 
 export default {
   name: 'Congregation',
 
   components: { BooleanIcon },
-
-  mounted () {
-    this.loadCongregation()
-  },
 
   data () {
     return {
@@ -85,23 +70,21 @@ export default {
         { text: 'Appointment', value: 'appointment' },
         { text: 'Language Group', value: 'languageGroup' },
         { text: 'Show On Schedule', value: 'show', align: 'center' },
-        { text: 'Actions', value: '', align: 'center', sortable: false }
+        { text: 'Actions', value: '', align: 'center', sortable: false },
+        { text: 'Privileges', value: '', align: 'center', sortable: false }
       ],
       rowsPerPageItems: [20, 50, 100, { text: 'All', value: -1 }]
     }
   },
 
   computed: {
-    ...mapState({
-      members: state => state.congregation.members,
-      loading: state => state.congregation.loading
+    ...mapGetters({
+      members: 'congregation/members',
+      loading: 'congregation/loading'
     })
   },
 
   methods: {
-    ...mapActions({
-      loadCongregation: 'congregation/load'
-    }),
     expandRow (props) {
       props.expanded = !props.expanded
     },

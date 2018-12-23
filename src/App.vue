@@ -27,3 +27,7 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+@import './stylus/custom.styl'
+</style>
