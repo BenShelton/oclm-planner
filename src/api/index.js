@@ -15,6 +15,9 @@ export default {
     login: ({ password }) => api.post('/auth/login', { password }),
     logout: () => api.get('/auth/logout')
   },
+  congregation: {
+    members: () => api.get('/congregation/members')
+  },
   schedule: {
     week: ({ date }) => api.get(`/schedule/week/${date}`),
     scrape: ({ weekID }) => api.put(`/schedule/scrape/`, { weekID }),
