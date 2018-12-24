@@ -26,7 +26,7 @@ const columns = [
   { name: 'privileges.chairman', boolean: true },
   { name: 'privileges.highlights', boolean: true },
   { name: 'privileges.gems', boolean: true },
-  { name: 'privileges.items', boolean: true },
+  { name: 'privileges.serviceTalk', boolean: true },
   { name: 'privileges.bookStudy', boolean: true },
   { name: 'privileges.reader', boolean: true },
   { name: 'privileges.prayer', boolean: true },

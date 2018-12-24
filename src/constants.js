@@ -16,7 +16,7 @@ export const PRIVILEGES = [
   { name: 'Chairman', key: 'chairman' },
   { name: 'Highlights', key: 'highlights' },
   { name: 'Gems', key: 'gems' },
-  { name: 'Items', key: 'items' },
+  { name: 'Service Talk', key: 'serviceTalk' },
   { name: 'Book Study', key: 'bookStudy' },
   { name: 'Reader', key: 'reader' },
   { name: 'Prayer', key: 'prayer' },
