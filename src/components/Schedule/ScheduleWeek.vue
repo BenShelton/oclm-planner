@@ -89,51 +89,66 @@
     <VDialog
       v-model="editDialog"
       lazy
+      max-width="900px"
     >
       <VCard>
         <VCardTitle>
           <span class="headline" v-text="editTitle" />
         </VCardTitle>
         <VCardText>
-          <VLayout wrap>
-            <VFlex v-if="editName.includes('studentTalk')" xs12>
-              <VSelect
-                v-model="editAssignment.type"
-                label="Type"
-                :items="[
-                  { text: 'Ministry Video', value: 'MINISTRY_VIDEO' },
-                  { text: 'Initial Call', value: 'INITIAL_CALL' },
-                  { text: 'Return Visit', value: 'RETURN_VISIT' },
-                  { text: 'Bible Study', value: 'BIBLE_STUDY' },
-                  { text: 'Talk', value: 'STUDENT_TALK' }
-                ]"
-              />
-            </VFlex>
-            <VFlex v-if="!(['CHAIRMAN', 'PRAYER', 'GEMS', 'READER'].includes(editAssignment.type))" class="xs12 sm6 md4 px-2">
-              <VTextField
-                v-model="editAssignment.title"
-                label="Title"
-              />
-            </VFlex>
-            <VFlex class="xs12 sm6 md4 px-2">
-              <AssigneeSelect
-                v-model="editAssignment.assignee"
-                label="Assignee"
-              />
-            </VFlex>
-            <VFlex v-if="['INITIAL_CALL', 'RETURN_VISIT', 'BIBLE_STUDY'].includes(editAssignment.type)" class="xs12 sm6 md4 px-2">
-              <AssigneeSelect
-                v-model="editAssignment.assistant"
-                label="Assistant"
-              />
-            </VFlex>
-            <VFlex v-if="!(['CHAIRMAN', 'PRAYER', 'READER'].includes(editAssignment.type))" class="xs12 sm6 md4 px-2">
-              <VTextField
-                v-model="editAssignment.time"
-                label="Time"
-              />
-            </VFlex>
-          </VLayout>
+          <VContainer grid-list-md>
+            <VLayout wrap>
+              <VFlex
+                v-if="editName.includes('studentTalk')"
+                xs12
+                md6
+                sm4
+              >
+                <VSelect
+                  v-model="editAssignment.type"
+                  label="Type"
+                  :items="[
+                    { text: 'Ministry Video', value: 'MINISTRY_VIDEO' },
+                    { text: 'Initial Call', value: 'INITIAL_CALL' },
+                    { text: 'Return Visit', value: 'RETURN_VISIT' },
+                    { text: 'Bible Study', value: 'BIBLE_STUDY' },
+                    { text: 'Talk', value: 'STUDENT_TALK' }
+                  ]"
+                />
+              </VFlex>
+              <VFlex
+                v-if="!(['CHAIRMAN', 'PRAYER', 'GEMS', 'READER'].includes(editAssignment.type))"
+                xs12
+                md6
+                sm4
+              >
+                <VTextField v-model="editAssignment.title" label="Title" />
+              </VFlex>
+              <VFlex
+                xs12
+                md6
+                sm4
+              >
+                <AssigneeSelect v-model="editAssignment.assignee" label="Assignee" />
+              </VFlex>
+              <VFlex
+                v-if="['INITIAL_CALL', 'RETURN_VISIT', 'BIBLE_STUDY'].includes(editAssignment.type)"
+                xs12
+                md6
+                sm4
+              >
+                <AssigneeSelect v-model="editAssignment.assistant" label="Assistant" />
+              </VFlex>
+              <VFlex
+                v-if="!(['CHAIRMAN', 'PRAYER', 'READER'].includes(editAssignment.type))"
+                xs12
+                md6
+                sm4
+              >
+                <VTextField v-model="editAssignment.time" label="Time" />
+              </VFlex>
+            </VLayout>
+          </VContainer>
         </VCardText>
         <VCardActions>
           <VSpacer />
@@ -270,7 +285,7 @@ export default {
       this.editName = name
       const { displayName, details } = this.assignments[name]
       this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
-      const assignment = { ...details }
+      const assignment = { assignee: '', ...details }
       if (!assignment.type) assignment.type = ASSIGNMENT_TYPE_MAP[name]
       this.editAssignment = assignment
       this.editDialog = true

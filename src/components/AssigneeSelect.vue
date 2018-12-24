@@ -6,6 +6,8 @@
     :label="label"
     :loading="loading"
     :items="items"
+    :value="value"
+    @input="onInput"
   />
 </template>
 
@@ -27,6 +29,12 @@ export default {
     }),
     items () {
       return this.activeMembers
+    }
+  },
+
+  methods: {
+    onInput (val) {
+      this.$emit('input', val)
     }
   }
 }

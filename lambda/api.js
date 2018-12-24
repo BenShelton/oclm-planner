@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const serverless = require('serverless-http')
 
 const auth = require('../database/auth')
+const congregation = require('../database/congregation')
 const schedule = require('../database/schedule')
 
 // Initialize express app
@@ -49,13 +50,19 @@ router.get('/auth/logout', (req, res) => {
     .catch(handleErrors(res))
 })
 
+router.get('/congregation/members', (req, res) => {
+  congregation.getMembers()
+    .then(result => res.status(200).json({ result }))
+    .catch(handleErrors(res))
+})
+
 router.get('/schedule/week/:date', (req, res) => {
   const { date } = req.params
   if (!date) return res.status(400).json({ message: 'No date provided' })
   if (!(/^\d{4}-\d{2}-\d{2}$/.test(date))) return res.status(400).json({ message: 'Date should be in yyyy-mm-dd format' })
   if (new Date(Date.parse(date)).getDay() !== 1) return res.status(400).json({ message: 'Date must be a Monday' })
   schedule.getWeek({ date })
-    .then(result => res.json({ result }))
+    .then(result => res.status(200).json({ result }))
     .catch(handleErrors(res))
 })
 
