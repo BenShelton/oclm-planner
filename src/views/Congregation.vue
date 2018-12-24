@@ -3,6 +3,8 @@
     <VDataTable
       class="elevation-1"
       expand
+      item-key="_id"
+      no-data-text="No Members Found"
       :headers="headers"
       :rows-per-page-items="rowsPerPageItems"
       :items="members"
