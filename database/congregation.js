@@ -1,4 +1,3 @@
-import assert from 'assert'
 import setup from './setup'
 
 const getCollection = new Promise(resolve => {
@@ -10,8 +9,6 @@ const getCollection = new Promise(resolve => {
 export const getMembers = async () => {
   const coll = await getCollection
   const members = await coll.find().toArray()
-  console.log(members)
-  assert(members.length, 'No Members Found')
   return members
 }
 
