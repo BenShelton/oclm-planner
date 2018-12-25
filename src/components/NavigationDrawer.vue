@@ -30,6 +30,7 @@ export default {
       items: [
         { title: 'Home', icon: 'home', link: { name: routes.HOME } },
         { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE } },
+        { title: 'Export', icon: 'picture_as_pdf', link: { name: routes.EXPORT } },
         { title: 'Congregation', icon: 'people', link: { name: routes.CONGREGATION } },
         { title: 'Help', icon: 'help', link: { name: routes.HELP } }
       ]
