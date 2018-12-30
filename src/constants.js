@@ -34,3 +34,9 @@ export const COLORS = {
   MINISTRY: '#C18626',
   LIVING: '#961526'
 }
+
+export const APPOINTMENTS = ['None', 'Brother', 'Sister', 'Ministerial Servant', 'Elder']
+
+export const GENDERS = ['Male', 'Female']
+
+export const LANGUAGE_GROUPS = ['English', 'Portuguese']
