@@ -1,5 +1,7 @@
 import axios from 'axios'
 import store from '@/store'
+import router from '@/router'
+import routes from '@/router/routes'
 
 const api = axios.create({
   baseURL: '/.netlify/functions/api'
@@ -8,6 +10,15 @@ const api = axios.create({
 api.interceptors.request.use(config => {
   config.headers.authorization = store.state.auth.token
   return config
+})
+
+api.interceptors.response.use(r => r, err => {
+  if (err.response.status === 403) {
+    store.commit('auth/CLEAR_TOKEN')
+    store.commit('alert/UPDATE_ALERT', { text: 'Login has expired, please login again', color: 'error' })
+    router.push({ name: routes.LOGIN })
+  }
+  return Promise.reject(err)
 })
 
 export default {
