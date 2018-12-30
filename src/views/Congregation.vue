@@ -1,6 +1,6 @@
 <template>
   <VLayout column fill-height>
-    <VLayout class="mb-3">
+    <VLayout shrink class="mb-3">
       <VSpacer />
       <VDialog v-model="editDialog" max-width="900px">
         <VBtn slot="activator" color="primary">
@@ -15,19 +15,41 @@
             <VContainer grid-list-lg>
               <VLayout wrap>
                 <VFlex xs12 sm6 md4>
-                  <VTextField v-model="editMember.name" label="Name" />
+                  <VTextField v-model="editMember.name" required label="Name" />
                 </VFlex>
                 <VFlex xs12 sm6 md4>
-                  <VTextField v-model="editMember.gender" label="Gender" />
+                  <VTextField v-model="editMember.abbreviation" required label="Abbreviation" />
                 </VFlex>
                 <VFlex xs12 sm6 md4>
-                  <VTextField v-model="editMember.appointment" label="Appointment" />
+                  <VSelect v-model="editMember.gender" label="Gender" :items="GENDERS" />
                 </VFlex>
                 <VFlex xs12 sm6 md4>
-                  <VTextField v-model="editMember.languageGroup" label="Language Group" />
+                  <VSelect v-model="editMember.appointment" label="Appointment" :items="APPOINTMENTS" />
+                </VFlex>
+                <VFlex xs12 sm6 md4>
+                  <VSelect v-model="editMember.languageGroup" label="Language Group" :items="LANGUAGE_GROUPS" />
                 </VFlex>
                 <VFlex xs12 sm6 md4>
                   <VCheckbox v-model="editMember.show" label="Show On Schedule" />
+                </VFlex>
+              </VLayout>
+              <VDivider />
+              <p class="mt-3 mb-0 subheading">
+                Privileges
+              </p>
+              <VLayout wrap>
+                <VFlex
+                  v-for="privilege in PRIVILEGES"
+                  :key="privilege.key"
+                  xs12
+                  sm6
+                  md4
+                >
+                  <VCheckbox
+                    v-model="editMember.privileges[privilege.key]"
+                    hide-details
+                    :label="privilege.name"
+                  />
                 </VFlex>
               </VLayout>
             </VContainer>
@@ -35,7 +57,7 @@
 
           <VCardActions>
             <VSpacer />
-            <VBtn color="blue darken-1" flat @click="onCancel">
+            <VBtn color="blue darken-1" flat @click="closeEditor">
               Cancel
             </VBtn>
             <VBtn color="blue darken-1" flat @click="onSave">
@@ -108,11 +130,16 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 
 import BooleanIcon from '@/components/BooleanIcon'
 
-import { PRIVILEGES } from '@/constants'
+import {
+  GENDERS,
+  APPOINTMENTS,
+  LANGUAGE_GROUPS,
+  PRIVILEGES
+} from '@/constants'
 
 export default {
   name: 'Congregation',
@@ -121,6 +148,10 @@ export default {
 
   data () {
     return {
+      GENDERS,
+      APPOINTMENTS,
+      LANGUAGE_GROUPS,
+      PRIVILEGES,
       headers: [
         { text: 'Name', value: 'name' },
         { text: 'Abbreviation', value: 'abbreviation' },
@@ -136,9 +167,10 @@ export default {
       editTitle: 'Add New Congregation Member',
       editMember: {
         name: '',
-        gender: 'Male',
-        appointment: '',
-        languageGroup: 'English',
+        abbreviation: '',
+        gender: GENDERS[0],
+        appointment: APPOINTMENTS[0],
+        languageGroup: LANGUAGE_GROUPS[0],
         show: true,
         privileges: {}
       }
@@ -153,6 +185,9 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      addMember: 'congregation/add'
+    }),
     ...mapMutations({
       alert: 'alert/UPDATE_ALERT'
     }),
@@ -165,11 +200,32 @@ export default {
     onDelete (props) {
       this.alert({ text: 'Deleting members is not currently available', color: 'error' })
     },
-    onCancel () {
+    closeEditor () {
       this.editDialog = false
+      Object.assign(this.editMember, {
+        name: '',
+        abbreviation: '',
+        gender: GENDERS[0],
+        appointment: APPOINTMENTS[0],
+        languageGroup: LANGUAGE_GROUPS[0],
+        show: true,
+        privileges: {}
+      })
     },
     onSave () {
-      this.alert({ text: 'Adding members is not currently available', color: 'error' })
+      if (!this.editMember.name || !this.editMember.abbreviation) {
+        this.alert({ text: 'Name and Abbreviation are required', color: 'error' })
+        return
+      }
+      this.addMember(this.editMember)
+        .then(() => {
+          this.alert({ text: `${this.editMember.name} was successfully added`, color: 'success' })
+          this.closeEditor()
+        })
+        .catch(err => {
+          this.alert({ text: 'An error occured when adding this member', color: 'error' })
+          console.error(err)
+        })
     },
     prettyPrivileges (privileges) {
       if (!privileges) return []
