@@ -27,7 +27,8 @@ export default {
     logout: () => api.get('/auth/logout')
   },
   congregation: {
-    members: () => api.get('/congregation/members')
+    members: () => api.get('/congregation/members'),
+    addMember: ({ name, abbreviation, appointment, gender, languageGroup, privileges, show }) => api.post('/congregation/addMember', { name, abbreviation, appointment, gender, languageGroup, privileges, show })
   },
   schedule: {
     week: ({ date }) => api.get(`/schedule/week/${date}`),

@@ -5,6 +5,7 @@ const serverless = require('serverless-http')
 const auth = require('../database/auth')
 const congregation = require('../database/congregation')
 const schedule = require('../database/schedule')
+const { APPOINTMENTS, GENDERS, LANGUAGE_GROUPS } = require('../src/constants')
 
 // Initialize express app
 const app = express()
@@ -52,6 +53,20 @@ router.get('/auth/logout', (req, res) => {
 
 router.get('/congregation/members', (req, res) => {
   congregation.getMembers()
+    .then(result => res.status(200).json({ result }))
+    .catch(handleErrors(res))
+})
+
+router.post('/congregation/addMember', (req, res) => {
+  const { name, abbreviation, appointment, gender, languageGroup, privileges, show } = req.body
+  if (!name || !abbreviation) return res.status(400).json({ message: 'Name & Abbreviation are required' })
+  if (!APPOINTMENTS.includes(appointment)) return res.status(400).json({ message: 'Appointment must be one of the following: ' + APPOINTMENTS.join(', ') })
+  if (!GENDERS.includes(gender)) return res.status(400).json({ message: 'Gender must be one of the following: ' + GENDERS.join(', ') })
+  if (!LANGUAGE_GROUPS.includes(languageGroup)) return res.status(400).json({ message: 'Language Group must be one of the following: ' + LANGUAGE_GROUPS.join(', ') })
+  if (!privileges || typeof privileges !== 'object') return res.status(400).json({ message: 'Privileges must be an object' })
+  if (typeof show !== 'boolean') return res.status(400).json({ message: 'Show must be a boolean' })
+  const member = { name, abbreviation, appointment, gender, languageGroup, privileges, show }
+  congregation.addMember(member)
     .then(result => res.status(200).json({ result }))
     .catch(handleErrors(res))
 })
