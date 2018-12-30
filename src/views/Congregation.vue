@@ -1,6 +1,16 @@
 <template>
   <VLayout column fill-height>
-    <VLayout shrink class="mb-3">
+    <VLayout shrink class="mb-4">
+      <VFlex xs6 md4>
+        <VTextField
+          v-model="search"
+          single-line
+          hide-details
+          clearable
+          prepend-icon="search"
+          label="Search"
+        />
+      </VFlex>
       <VSpacer />
       <VDialog v-model="editDialog" max-width="900px">
         <VBtn slot="activator" color="primary">
@@ -77,6 +87,7 @@
       :rows-per-page-items="rowsPerPageItems"
       :items="members"
       :loading="loading"
+      :search="search"
     >
       <template slot="items" slot-scope="props">
         <tr class="pointer" @click="expandRow(props)">
@@ -163,6 +174,7 @@ export default {
         { text: 'Actions', value: '', align: 'center', sortable: false }
       ],
       rowsPerPageItems: [20, 50, 100, { text: 'All', value: -1 }],
+      search: '',
       editDialog: false,
       editTitle: 'Add New Congregation Member',
       editMember: {
