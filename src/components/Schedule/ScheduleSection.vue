@@ -2,7 +2,7 @@
   <div>
     <VSubheader
       class="schedule-section white--text"
-      :class="color"
+      :style="{ backgroundColor }"
       @click="toggleShow"
     >
       <span v-text="title" />
@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import { COLORS } from '@/constants'
+
 export default {
   name: 'ScheduleSection',
 
@@ -26,6 +28,12 @@ export default {
   data () {
     return {
       show: true
+    }
+  },
+
+  computed: {
+    backgroundColor () {
+      return COLORS[this.color] || this.color
     }
   },
 

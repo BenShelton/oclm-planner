@@ -63,20 +63,20 @@
       <ScheduleAssignment :assignment="assignments.chairman" @edit="onEdit" />
       <ScheduleAssignment :assignment="assignments.openingPrayer" @edit="onEdit" />
 
-      <ScheduleSection title="TREASURES FROM GOD'S WORD" color="grey darken-2">
+      <ScheduleSection title="TREASURES FROM GOD'S WORD" color="TREASURES">
         <ScheduleAssignment :assignment="assignments.highlights" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.gems" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.bibleReading" @edit="onEdit" />
       </ScheduleSection>
 
-      <ScheduleSection title="APPLY YOURSELF TO THE FIELD MINISTRY" color="yellow darken-3">
+      <ScheduleSection title="APPLY YOURSELF TO THE FIELD MINISTRY" color="MINISTRY">
         <ScheduleAssignment :assignment="assignments.studentTalk1" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.studentTalk2" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.studentTalk3" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.studentTalk4" @edit="onEdit" />
       </ScheduleSection>
 
-      <ScheduleSection title="LIVING AS CHRISTIANS" color="red darken-2">
+      <ScheduleSection title="LIVING AS CHRISTIANS" color="LIVING">
         <ScheduleAssignment :assignment="assignments.serviceTalk1" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.serviceTalk2" @edit="onEdit" />
         <ScheduleAssignment :assignment="assignments.congregationBibleStudy" @edit="onEdit" />

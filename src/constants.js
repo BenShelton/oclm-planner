@@ -28,3 +28,9 @@ export const PRIVILEGES = [
   { name: 'Bible Study Assistant', key: 'bibleStudyAssist' },
   { name: 'Student Talk', key: 'studentTalk' }
 ]
+
+export const COLORS = {
+  TREASURES: '#5A6A70',
+  MINISTRY: '#C18626',
+  LIVING: '#961526'
+}
