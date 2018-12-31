@@ -22,17 +22,17 @@ export default function scrapeWOL (date) {
           $('p', '#section4').first().text().trim(),
           $('p', '#section4').last().text().trim()
         ],
-        'assignments.chairman': { type: 'CHAIRMAN' },
-        'assignments.openingPrayer': { type: 'PRAYER' },
-        'assignments.gems': { type: 'GEMS', time: '8 min.' },
-        'assignments.reader': { type: 'READER' },
-        'assignments.closingPrayer': { type: 'PRAYER' }
+        'assignments.chairman': { type: 'chairman' },
+        'assignments.openingPrayer': { type: 'prayer' },
+        'assignments.gems': { type: 'gems', time: '8 min.' },
+        'assignments.reader': { type: 'reader' },
+        'assignments.closingPrayer': { type: 'prayer' }
       }
 
       // Bible Highlights
       const highlightsText = $('p', '#section2').first().text().trim()
       update['assignments.highlights'] = {
-        type: 'HIGHLIGHTS',
+        type: 'highlights',
         title: highlightsText.replace(/: \(.*\)$/, ''),
         time: timeRegex.exec(highlightsText)[1]
       }
@@ -41,7 +41,7 @@ export default function scrapeWOL (date) {
       const bibleReadingP = $('p', '#section2').last()
       const bibleReadingText = bibleReadingP.text().trim()
       update['assignments.bibleReading'] = {
-        type: 'BIBLE_READING',
+        type: 'bibleReading',
         title: bibleReadingP.find('a.b').text().trim(),
         time: timeRegex.exec(bibleReadingText)[1],
         studyPoint: studyPointRegex.exec(bibleReadingText)[1]
@@ -52,18 +52,18 @@ export default function scrapeWOL (date) {
         const elemText = $(elem).text().trim()
         const title = titleRegex.exec(elemText)[1]
         let type = ''
-        if (title.includes('Apply Yourself') || title.includes('Video')) type = 'VIDEO'
-        else if (title === 'Initial Call') type = 'INITIAL_CALL'
-        else if (title === 'Return Visit') type = 'RETURN_VISIT'
-        else if (title === 'Bible Study') type = 'BIBLE_STUDY'
-        else if (title === 'Talk') type = 'STUDENT_TALK'
+        if (title.includes('Apply Yourself') || title.includes('Video')) type = 'ministryVideo'
+        else if (title.includes('Initial Call')) type = 'initialCall'
+        else if (title.includes('Return Visit')) type = 'returnVisit'
+        else if (title.includes('Bible Study')) type = 'bibleStudy'
+        else if (title.includes('Talk')) type = 'studentTalk'
         const updatePath = `assignments.studentTalk${i + 1}`
         update[updatePath] = {
           type,
           title,
           time: timeRegex.exec(elemText)[1]
         }
-        if (type && type !== 'VIDEO') update[updatePath].studyPoint = studyPointRegex.exec(elemText)[1]
+        if (type && type !== 'ministryVideo') update[updatePath].studyPoint = studyPointRegex.exec(elemText)[1]
       })
 
       // Service Talks & CBS
@@ -73,7 +73,7 @@ export default function scrapeWOL (date) {
         const title = titleRegex.exec(elemText)[1]
         if (title === 'Congregation Bible Study') {
           update['assignments.congregationBibleStudy'] = {
-            type: 'CONGREGATION_BIBLE_STUDY',
+            type: 'congregationBibleStudy',
             title,
             time: timeRegex.exec(elemText)[1]
           }
@@ -81,7 +81,7 @@ export default function scrapeWOL (date) {
         } else {
           const updatePath = `assignments.serviceTalk${i}`
           update[updatePath] = {
-            type: 'SERVICE_TALK',
+            type: 'serviceTalk',
             title,
             time: timeRegex.exec(elemText)[1]
           }
