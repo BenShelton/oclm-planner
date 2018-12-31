@@ -1,3 +1,4 @@
+import { ObjectID } from 'mongodb'
 import assert from 'assert'
 import setup from './setup'
 
@@ -19,6 +20,15 @@ export const addMember = async member => {
   const newMember = newMemberResult && newMemberResult.ops && newMemberResult.ops[0]
   assert.notStrictEqual(null, newMember, 'Adding New Member was unsuccessful')
   return newMember
+}
+
+export const updateMember = async ({ memberID, member }) => {
+  const coll = await getCollection
+  const query = { _id: ObjectID(memberID) }
+  const update = { $set: member }
+  const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
+  assert.notStrictEqual(null, value, 404)
+  return value
 }
 
 export const bulkAddMembers = async members => {
