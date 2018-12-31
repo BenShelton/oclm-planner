@@ -29,7 +29,8 @@ export default {
   congregation: {
     members: () => api.get('/congregation/members'),
     addMember: ({ name, abbreviation, appointment, gender, languageGroup, privileges, show }) => api.post('/congregation/addMember', { name, abbreviation, appointment, gender, languageGroup, privileges, show }),
-    updateMember: ({ memberID, member }) => api.post('/congregation/updateMember', { memberID, member })
+    updateMember: ({ memberID, member }) => api.post('/congregation/updateMember', { memberID, member }),
+    deleteMember: ({ memberID }) => api.delete(`/congregation/deleteMember/${memberID}`)
   },
   schedule: {
     week: ({ date }) => api.get(`/schedule/week/${date}`),

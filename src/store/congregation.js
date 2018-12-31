@@ -28,6 +28,12 @@ const actions = {
     commit('START_LOADING')
     return api.congregation.updateMember({ memberID, member })
       .then(res => commit('UPDATE_MEMBER', res.data.result))
+  },
+
+  delete ({ commit }, { memberID }) {
+    commit('START_LOADING')
+    return api.congregation.deleteMember({ memberID })
+      .then(() => commit('DELETE_MEMBER', memberID))
   }
 }
 
@@ -43,6 +49,11 @@ const mutations = {
   UPDATE_MEMBER (state, payload) {
     const existingMember = state.members.find(m => m._id === payload._id)
     Object.assign(existingMember, payload)
+    state.loading = false
+  },
+  DELETE_MEMBER (state, payload) {
+    const existingMemberIndex = state.members.findIndex(m => m._id === payload)
+    state.members.splice(existingMemberIndex, 1)
     state.loading = false
   },
   START_LOADING (state) {

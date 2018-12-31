@@ -200,7 +200,8 @@ export default {
   methods: {
     ...mapActions({
       addMember: 'congregation/add',
-      updateMember: 'congregation/update'
+      updateMember: 'congregation/update',
+      deleteMember: 'congregation/delete'
     }),
     ...mapMutations({
       alert: 'alert/UPDATE_ALERT'
@@ -244,8 +245,19 @@ export default {
       this.editTitle = 'Edit Existing Congregation Member'
       this.editDialog = true
     },
-    onDelete (props) {
-      this.alert({ text: 'Deleting members is not currently available', color: 'error' })
+    // TODO: When deleting we need to remove the member's assignments too, so disabling this for now
+    onDelete ({ _id: memberID, name }) {
+      this.alert({ text: 'Deleting members is not fully supported, disable Show on Schedule instead', color: 'error' })
+      // if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
+      // this.deleteMember({ memberID })
+      //   .then(() => {
+      //     this.alert({ text: `${name} was successfully deleted`, color: 'success' })
+      //     this.closeEditor()
+      //   })
+      //   .catch(err => {
+      //     this.alert({ text: 'An error occured whilst deleting this member', color: 'error' })
+      //     console.error(err)
+      //   })
     },
     onSave () {
       if (!this.editMember.name || !this.editMember.abbreviation) {
@@ -259,7 +271,7 @@ export default {
             this.closeEditor()
           })
           .catch(err => {
-            this.alert({ text: 'An error occured when updating this member', color: 'error' })
+            this.alert({ text: 'An error occured whilst updating this member', color: 'error' })
             console.error(err)
           })
       } else {
@@ -269,7 +281,7 @@ export default {
             this.closeEditor()
           })
           .catch(err => {
-            this.alert({ text: 'An error occured when adding this member', color: 'error' })
+            this.alert({ text: 'An error occured whilst adding this member', color: 'error' })
             console.error(err)
           })
       }
