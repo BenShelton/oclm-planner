@@ -90,6 +90,14 @@ router.post('/congregation/updateMember', (req, res) => {
     .catch(handleErrors(res))
 })
 
+router.delete('/congregation/deleteMember/:memberID', (req, res) => {
+  const { memberID } = req.params
+  if (!memberID) return res.status(400).json({ message: 'No MemberID provided' })
+  congregation.deleteMember({ memberID })
+    .then(() => res.status(200).json({ message: 'Member Successfully Deleted' }))
+    .catch(handleErrors(res))
+})
+
 router.get('/schedule/week/:date', (req, res) => {
   const { date } = req.params
   if (!date) return res.status(400).json({ message: 'No date provided' })

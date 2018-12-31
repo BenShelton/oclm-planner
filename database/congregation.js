@@ -31,6 +31,14 @@ export const updateMember = async ({ memberID, member }) => {
   return value
 }
 
+// TODO: We also need to remove all assignments that a member is assigned to
+export const deleteMember = async ({ memberID }) => {
+  const coll = await getCollection
+  const query = { _id: ObjectID(memberID) }
+  const { deletedCount } = await coll.deleteOne(query)
+  assert.strictEqual(deletedCount, 1, 404)
+}
+
 export const bulkAddMembers = async members => {
   const coll = await getCollection
   await coll.insertMany(members)
