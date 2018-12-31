@@ -12,10 +12,10 @@
         />
       </VFlex>
       <VSpacer />
+      <VBtn color="primary" @click="onAdd">
+        Add New Member
+      </VBtn>
       <VDialog v-model="editDialog" max-width="900px">
-        <VBtn slot="activator" color="primary">
-          Add New Member
-        </VBtn>
         <VCard>
           <VCardTitle>
             <span class="headline" v-text="editTitle" />
@@ -107,7 +107,7 @@
               flat
               round
               icon
-              @click.stop="onEdit(props)"
+              @click.stop="onEdit(props.item)"
             >
               <VIcon>edit</VIcon>
             </VBtn>
@@ -115,7 +115,7 @@
               flat
               round
               icon
-              @click.stop="onDelete(props)"
+              @click.stop="onDelete(props.item)"
             >
               <VIcon>delete</VIcon>
             </VBtn>
@@ -176,7 +176,8 @@ export default {
       rowsPerPageItems: [20, 50, 100, { text: 'All', value: -1 }],
       search: '',
       editDialog: false,
-      editTitle: 'Add New Congregation Member',
+      editID: null,
+      editTitle: '',
       editMember: {
         name: '',
         abbreviation: '',
@@ -198,7 +199,8 @@ export default {
 
   methods: {
     ...mapActions({
-      addMember: 'congregation/add'
+      addMember: 'congregation/add',
+      updateMember: 'congregation/update'
     }),
     ...mapMutations({
       alert: 'alert/UPDATE_ALERT'
@@ -206,14 +208,15 @@ export default {
     expandRow (props) {
       props.expanded = !props.expanded
     },
-    onEdit (props) {
-      this.alert({ text: 'Editing members is not currently available', color: 'error' })
-    },
-    onDelete (props) {
-      this.alert({ text: 'Deleting members is not currently available', color: 'error' })
-    },
     closeEditor () {
       this.editDialog = false
+    },
+    prettyPrivileges (privileges) {
+      if (!privileges) return []
+      return PRIVILEGES.map(({ name, key }) => ({ name, selected: !!privileges[key] }))
+    },
+    onAdd () {
+      this.editID = null
       Object.assign(this.editMember, {
         name: '',
         abbreviation: '',
@@ -223,25 +226,53 @@ export default {
         show: true,
         privileges: {}
       })
+      this.editTitle = 'Add New Congregation Member'
+      this.editDialog = true
+    },
+    onEdit (member) {
+      this.editID = member._id
+      const { name, abbreviation, gender, appointment, languageGroup, show, privileges } = member
+      Object.assign(this.editMember, {
+        name,
+        abbreviation,
+        gender,
+        appointment,
+        languageGroup,
+        show,
+        privileges: { ...privileges }
+      })
+      this.editTitle = 'Edit Existing Congregation Member'
+      this.editDialog = true
+    },
+    onDelete (props) {
+      this.alert({ text: 'Deleting members is not currently available', color: 'error' })
     },
     onSave () {
       if (!this.editMember.name || !this.editMember.abbreviation) {
         this.alert({ text: 'Name and Abbreviation are required', color: 'error' })
         return
       }
-      this.addMember(this.editMember)
-        .then(() => {
-          this.alert({ text: `${this.editMember.name} was successfully added`, color: 'success' })
-          this.closeEditor()
-        })
-        .catch(err => {
-          this.alert({ text: 'An error occured when adding this member', color: 'error' })
-          console.error(err)
-        })
-    },
-    prettyPrivileges (privileges) {
-      if (!privileges) return []
-      return PRIVILEGES.map(({ name, key }) => ({ name, selected: !!privileges[key] }))
+      if (this.editID) {
+        this.updateMember({ memberID: this.editID, member: this.editMember })
+          .then(() => {
+            this.alert({ text: `${this.editMember.name} was successfully updated`, color: 'success' })
+            this.closeEditor()
+          })
+          .catch(err => {
+            this.alert({ text: 'An error occured when updating this member', color: 'error' })
+            console.error(err)
+          })
+      } else {
+        this.addMember(this.editMember)
+          .then(() => {
+            this.alert({ text: `${this.editMember.name} was successfully added`, color: 'success' })
+            this.closeEditor()
+          })
+          .catch(err => {
+            this.alert({ text: 'An error occured when adding this member', color: 'error' })
+            console.error(err)
+          })
+      }
     }
   }
 }

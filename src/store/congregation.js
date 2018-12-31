@@ -22,6 +22,12 @@ const actions = {
     commit('START_LOADING')
     return api.congregation.addMember(payload)
       .then(res => commit('ADD_MEMBER', res.data.result))
+  },
+
+  update ({ commit }, { memberID, member }) {
+    commit('START_LOADING')
+    return api.congregation.updateMember({ memberID, member })
+      .then(res => commit('UPDATE_MEMBER', res.data.result))
   }
 }
 
@@ -32,6 +38,11 @@ const mutations = {
   },
   ADD_MEMBER (state, payload) {
     state.members.push(payload)
+    state.loading = false
+  },
+  UPDATE_MEMBER (state, payload) {
+    const existingMember = state.members.find(m => m._id === payload._id)
+    Object.assign(existingMember, payload)
     state.loading = false
   },
   START_LOADING (state) {
