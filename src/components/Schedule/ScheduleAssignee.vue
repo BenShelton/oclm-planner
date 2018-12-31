@@ -4,11 +4,13 @@
     small
     :color="color"
   >
-    {{ assignee || 'Assignee Required' }}
+    {{ assigneeName }}
   </VChip>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'ScheduleAssignee',
 
@@ -17,8 +19,19 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      loading: 'congregation/loading',
+      idMap: 'congregation/idMap'
+    }),
+    assigneeName () {
+      if (!this.assignee) return 'Assignee Required'
+      if (this.loading) return 'Loading...'
+      const mappedMember = this.idMap[this.assignee]
+      if (!mappedMember) return 'DELETED'
+      return mappedMember.name
+    },
     color () {
-      return this.assignee ? '' : 'error'
+      return !this.assignee || this.assigneeName === 'DELETED' ? 'error' : ''
     }
   }
 }

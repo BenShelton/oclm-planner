@@ -8,7 +8,8 @@ const state = {
 const getters = {
   members: ({ members }) => members,
   loading: ({ loading }) => loading,
-  activeMembers: ({ members }) => members.filter(m => m.show)
+  activeMembers: ({ members }) => members.filter(m => m.show),
+  idMap: ({ members }) => members.reduce((acc, { _id, name }) => Object.assign(acc, { [_id]: { name } }), {})
 }
 
 const actions = {

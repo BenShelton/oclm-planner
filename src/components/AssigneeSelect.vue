@@ -1,7 +1,7 @@
 <template>
   <VSelect
     item-text="name"
-    item-value="name"
+    item-value="_id"
     no-data-text="No Assignees Available"
     :label="label"
     :loading="loading"
