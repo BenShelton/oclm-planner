@@ -5,6 +5,7 @@
     no-data-text="No Assignees Available"
     :label="label"
     :loading="loading"
+    :disabled="disabled"
     :items="items"
     :value="value"
     @input="onInput"
@@ -14,12 +15,15 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import { PRIVILEGES } from '@/constants'
+
 export default {
   name: 'AssigneeSelect',
 
   props: {
     value: { type: String, default: '' },
-    label: { type: String, required: true }
+    label: { type: String, required: true },
+    type: { type: String, default: '' }
   },
 
   computed: {
@@ -27,8 +31,14 @@ export default {
       activeMembers: 'congregation/activeMembers',
       loading: 'congregation/loading'
     }),
+    disabled () {
+      const { type } = this
+      return !(PRIVILEGES.some(p => p.key === type))
+    },
     items () {
-      return this.activeMembers
+      const { disabled, activeMembers, type } = this
+      if (disabled) return []
+      return activeMembers.filter(m => m.privileges[type])
     }
   },
 
