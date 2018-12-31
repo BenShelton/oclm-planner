@@ -285,7 +285,7 @@ export default {
       this.editName = name
       const { displayName, details } = this.assignments[name]
       this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
-      const assignment = { assignee: '', ...details }
+      const assignment = { ...details }
       if (!assignment.type) assignment.type = ASSIGNMENT_TYPE_MAP[name]
       this.editAssignment = assignment
       this.editDialog = true

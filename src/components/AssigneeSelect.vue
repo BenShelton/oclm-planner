@@ -18,7 +18,7 @@ export default {
   name: 'AssigneeSelect',
 
   props: {
-    value: { type: String, required: true },
+    value: { type: String, default: '' },
     label: { type: String, required: true }
   },
 
