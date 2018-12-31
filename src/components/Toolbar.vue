@@ -43,6 +43,8 @@ export default {
           return 'Login'
         case routes.SCHEDULE:
           return 'Schedule'
+        case routes.EXPORT:
+          return 'Export'
         case routes.CONGREGATION:
           return 'Congregation'
         case routes.HELP:

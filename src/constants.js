@@ -17,9 +17,11 @@ export const PRIVILEGES = [
   { name: 'Highlights', key: 'highlights' },
   { name: 'Gems', key: 'gems' },
   { name: 'Service Talk', key: 'serviceTalk' },
-  { name: 'Book Study', key: 'bookStudy' },
+  { name: 'Congregation Bible Study', key: 'congregationBibleStudy' },
   { name: 'Reader', key: 'reader' },
   { name: 'Prayer', key: 'prayer' },
+  { name: 'Bible Reading', key: 'bibleReading' },
+  { name: 'Ministry Video', key: 'ministryVideo' },
   { name: 'Initial Call', key: 'initialCall' },
   { name: 'Initial Call Assistant', key: 'initialCallAssist' },
   { name: 'Return Visit', key: 'returnVisit' },
@@ -28,3 +30,15 @@ export const PRIVILEGES = [
   { name: 'Bible Study Assistant', key: 'bibleStudyAssist' },
   { name: 'Student Talk', key: 'studentTalk' }
 ]
+
+export const COLORS = {
+  TREASURES: '#5A6A70',
+  MINISTRY: '#C18626',
+  LIVING: '#961526'
+}
+
+export const APPOINTMENTS = ['None', 'Brother', 'Sister', 'Ministerial Servant', 'Elder']
+
+export const GENDERS = ['Male', 'Female']
+
+export const LANGUAGE_GROUPS = ['English', 'Portuguese']

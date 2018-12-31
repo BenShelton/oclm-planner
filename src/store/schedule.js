@@ -18,9 +18,9 @@ const actions = {
   scrapeWeek ({ commit }, { weekID }) {
     return api.schedule.scrape({ weekID })
       .then(res => {
-        const week = res.data.result
-        commit('LOAD_WEEK', week)
-        return week
+        const scrapedWeek = res.data.result
+        commit('UPDATE_WEEK', scrapedWeek)
+        return scrapedWeek
       })
   },
   updateAssignment ({ commit }, { weekID, name, assignment }) {

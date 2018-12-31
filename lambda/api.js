@@ -5,12 +5,15 @@ const serverless = require('serverless-http')
 const auth = require('../database/auth')
 const congregation = require('../database/congregation')
 const schedule = require('../database/schedule')
+const { APPOINTMENTS, GENDERS, LANGUAGE_GROUPS } = require('../src/constants')
 
 // Initialize express app
 const app = express()
 app.use(bodyParser.json())
 
 const router = express.Router()
+
+const returnResult = res => result => res.status(200).json({ result })
 
 const handleErrors = res => error => {
   console.error('Error Message: ' + error.message)
@@ -28,7 +31,7 @@ router.post('/auth/login', (req, res) => {
   const { password } = req.body
   if (!password) return res.status(400).json({ message: 'No password provided' })
   auth.createToken({ password })
-    .then(result => res.status(200).json({ result }))
+    .then(returnResult(res))
     .catch(handleErrors(res))
 })
 
@@ -52,7 +55,46 @@ router.get('/auth/logout', (req, res) => {
 
 router.get('/congregation/members', (req, res) => {
   congregation.getMembers()
-    .then(result => res.status(200).json({ result }))
+    .then(returnResult(res))
+    .catch(handleErrors(res))
+})
+
+const validateMember = member => {
+  const { name, abbreviation, appointment, gender, languageGroup, privileges, show } = member
+  if (!name || !abbreviation) return 'Name & Abbreviation are required'
+  if (!APPOINTMENTS.includes(appointment)) return 'Appointment must be one of the following: ' + APPOINTMENTS.join(', ')
+  if (!GENDERS.includes(gender)) return 'Gender must be one of the following: ' + GENDERS.join(', ')
+  if (!LANGUAGE_GROUPS.includes(languageGroup)) return 'Language Group must be one of the following: ' + LANGUAGE_GROUPS.join(', ')
+  if (!privileges || typeof privileges !== 'object') return 'Privileges must be an object'
+  if (typeof show !== 'boolean') return 'Show must be a boolean'
+  return null
+}
+
+router.post('/congregation/addMember', (req, res) => {
+  const { name, abbreviation, appointment, gender, languageGroup, privileges, show } = req.body
+  const member = { name, abbreviation, appointment, gender, languageGroup, privileges, show }
+  const validationError = validateMember(member)
+  if (validationError) return res.status(400).json({ message: validationError })
+  congregation.addMember(member)
+    .then(returnResult(res))
+    .catch(handleErrors(res))
+})
+
+router.post('/congregation/updateMember', (req, res) => {
+  const { memberID, member } = req.body
+  if (!memberID || !member) return res.status(400).json({ message: 'MemberID & Member are required' })
+  const validationError = validateMember(member)
+  if (validationError) return res.status(400).json({ message: 'Invalid Member: ' + validationError })
+  congregation.updateMember({ memberID, member })
+    .then(returnResult(res))
+    .catch(handleErrors(res))
+})
+
+router.delete('/congregation/deleteMember/:memberID', (req, res) => {
+  const { memberID } = req.params
+  if (!memberID) return res.status(400).json({ message: 'No MemberID provided' })
+  congregation.deleteMember({ memberID })
+    .then(() => res.status(200).json({ message: 'Member Successfully Deleted' }))
     .catch(handleErrors(res))
 })
 
@@ -62,7 +104,7 @@ router.get('/schedule/week/:date', (req, res) => {
   if (!(/^\d{4}-\d{2}-\d{2}$/.test(date))) return res.status(400).json({ message: 'Date should be in yyyy-mm-dd format' })
   if (new Date(Date.parse(date)).getDay() !== 1) return res.status(400).json({ message: 'Date must be a Monday' })
   schedule.getWeek({ date })
-    .then(result => res.status(200).json({ result }))
+    .then(returnResult(res))
     .catch(handleErrors(res))
 })
 
@@ -70,7 +112,7 @@ router.put('/schedule/scrape', (req, res) => {
   const { weekID } = req.body
   if (!weekID) return res.status(400).json({ message: 'weekID is required' })
   schedule.scrapeWeek({ weekID })
-    .then(result => res.json({ result }))
+    .then(returnResult(res))
     .catch(handleErrors(res))
 })
 
@@ -80,7 +122,7 @@ router.put('/schedule/updateAssignment', (req, res) => {
     return res.status(400).json({ message: 'Required Fields are: weekID, name, assignment' })
   }
   schedule.updateAssignment({ weekID, name, assignment })
-    .then(result => res.json({ result }))
+    .then(returnResult(res))
     .catch(handleErrors(res))
 })
 

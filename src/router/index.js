@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Home from '@/views/Home.vue'
 import Login from '@/views/Login.vue'
 import Schedule from '@/views/Schedule.vue'
+import Export from '@/views/Export.vue'
 import Congregation from '@/views/Congregation.vue'
 import Help from '@/views/Help.vue'
 
@@ -32,6 +33,11 @@ const router = new Router({
       path: '/schedule',
       name: routes.SCHEDULE,
       component: Schedule
+    },
+    {
+      path: '/export',
+      name: routes.EXPORT,
+      component: Export
     },
     {
       path: '/congregation',

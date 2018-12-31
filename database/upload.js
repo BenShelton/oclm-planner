@@ -2,6 +2,7 @@ import parse from 'csv-parse/lib/sync'
 import fs from 'fs'
 import assert from 'assert'
 import { bulkAddMembers } from './congregation'
+import { APPOINTMENTS, GENDERS, LANGUAGE_GROUPS } from '../src/constants'
 
 const filename = process.argv[2]
 if (!filename) throw new Error('No file argument provided')
@@ -19,18 +20,19 @@ console.log('File Loaded, Validating...')
 const columns = [
   { name: 'name', noDuplicates: true },
   { name: 'abbreviation', noDuplicates: true },
-  { name: 'appointment', allowedValues: ['Brother', 'Sister', 'Ministerial Servant', 'Elder', ''] },
-  { name: 'gender', allowedValues: ['Male', 'Female'] },
-  { name: 'languageGroup', allowedValues: ['English', 'Portuguese'] },
+  { name: 'appointment', allowedValues: APPOINTMENTS },
+  { name: 'gender', allowedValues: GENDERS },
+  { name: 'languageGroup', allowedValues: LANGUAGE_GROUPS },
   { name: 'show', boolean: true },
   { name: 'privileges.chairman', boolean: true },
   { name: 'privileges.highlights', boolean: true },
   { name: 'privileges.gems', boolean: true },
   { name: 'privileges.serviceTalk', boolean: true },
-  { name: 'privileges.bookStudy', boolean: true },
+  { name: 'privileges.congregationBibleStudy', boolean: true },
   { name: 'privileges.reader', boolean: true },
   { name: 'privileges.prayer', boolean: true },
   { name: 'privileges.bibleReading', boolean: true },
+  { name: 'privileges.ministryVideo', boolean: true },
   { name: 'privileges.initialCall', boolean: true },
   { name: 'privileges.initialCallAssist', boolean: true },
   { name: 'privileges.returnVisit', boolean: true },

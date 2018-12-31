@@ -10,7 +10,7 @@
           <template v-else>
             <VListTileSubTitle>
               <ScheduleAssignee :assignee="assignment.details.assignee" />
-              <ScheduleAssignee v-if="hasAssistant" :assignee="assignment.details.assistant" />
+              <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant" />
             </VListTileSubTitle>
             <VListTileSubTitle v-text="assignment.details.title" />
           </template>
