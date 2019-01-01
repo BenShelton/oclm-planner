@@ -26,9 +26,12 @@ const actions = {
   updateAssignment ({ commit }, { weekID, name, assignment }) {
     return api.schedule.updateAssignment({ weekID, name, assignment })
       .then(res => {
-        const newWeek = res.data.result
-        commit('UPDATE_WEEK', newWeek)
-        return newWeek
+        const { week, members } = res.data.result
+        commit('UPDATE_WEEK', week)
+        for (const member of members) {
+          commit('congregation/UPDATE_MEMBER', member, { root: true })
+        }
+        return week
       })
   }
 }
