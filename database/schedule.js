@@ -48,7 +48,7 @@ export const updateAssignment = async ({ weekID, name, assignment }) => {
     for (const field of assigneeFields) {
       const memberID = previousAssignment[field]
       if (memberID) {
-        const member = await removeAssignment({ memberID, assignment: { weekID, type: previousAssignment.type, weekDate: week.date } })
+        const member = await removeAssignment({ memberID, assignment: { type: previousAssignment.type, date: week.date } })
         updatedMembers.push(member)
       }
     }
@@ -65,7 +65,7 @@ export const updateAssignment = async ({ weekID, name, assignment }) => {
   for (const field of assigneeFields) {
     const memberID = value.assignments[name][field]
     if (memberID) {
-      const member = await addAssignment({ memberID, assignment: { weekID, type: assignment.type, weekDate: value.date } })
+      const member = await addAssignment({ memberID, assignment: { type: assignment.type, date: value.date } })
       updatedMembers.push(member)
     }
   }
