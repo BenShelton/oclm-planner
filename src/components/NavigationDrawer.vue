@@ -8,11 +8,16 @@
         :to="item.link"
       >
         <VListTileAction>
-          <VIcon>{{ item.icon }}</VIcon>
+          <VIcon v-text="item.icon" />
         </VListTileAction>
         <VListTileContent>
-          <VListTileTitle>{{ item.title }}</VListTileTitle>
+          <VListTileTitle v-text="item.title" />
         </VListTileContent>
+        <VListTileAction v-if="item.label">
+          <VChip small :color="item.label.color">
+            {{ item.label.text }}
+          </VChip>
+        </VListTileAction>
       </VListTile>
     </VList>
   </VNavigationDrawer>
@@ -28,11 +33,11 @@ export default {
   data () {
     return {
       items: [
-        { title: 'Home', icon: 'home', link: { name: routes.HOME } },
-        { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE } },
-        { title: 'Export', icon: 'picture_as_pdf', link: { name: routes.EXPORT } },
-        { title: 'Congregation', icon: 'people', link: { name: routes.CONGREGATION } },
-        { title: 'Help', icon: 'help', link: { name: routes.HELP } }
+        { title: 'Home', icon: 'home', link: { name: routes.HOME }, label: { text: 'Stable', color: 'green' } },
+        { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE }, label: { text: 'Stable', color: 'green' } },
+        { title: 'Export', icon: 'picture_as_pdf', link: { name: routes.EXPORT }, label: { text: 'Incomplete', color: 'yellow' } },
+        { title: 'Congregation', icon: 'people', link: { name: routes.CONGREGATION }, label: { text: 'Stable', color: 'green' } },
+        { title: 'Help', icon: 'help', link: { name: routes.HELP }, label: { text: 'Incomplete', color: 'yellow' } }
       ]
     }
   },

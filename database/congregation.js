@@ -39,6 +39,24 @@ export const deleteMember = async ({ memberID }) => {
   assert.strictEqual(deletedCount, 1, 404)
 }
 
+export const addAssignment = async ({ memberID, assignment }) => {
+  const coll = await getCollection
+  const query = { _id: ObjectID(memberID) }
+  const update = { $addToSet: { assignments: assignment } }
+  const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
+  assert.notStrictEqual(null, value, 404)
+  return value
+}
+
+export const removeAssignment = async ({ memberID, assignment }) => {
+  const coll = await getCollection
+  const query = { _id: ObjectID(memberID) }
+  const update = { $pull: { assignments: assignment } }
+  const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
+  assert.notStrictEqual(null, value, 404)
+  return value
+}
+
 export const bulkAddMembers = async members => {
   const coll = await getCollection
   await coll.insertMany(members)

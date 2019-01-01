@@ -4,7 +4,9 @@
       Welcome to OCLM Planner
     </h1>
     <h2>What's New?</h2>
-    <p>Everything! Be sure to check out the Help page for some quick hints and tips. Otherwise enjoy using OCLM Planner!</p>
+    <p>Everything!</p>
+    <p>Click the LOGIN button on the top right to log in</p>
+    <p>If you are logged in, use the navigation menu on the top left to view what's available</p>
   </VLayout>
 </template>
 

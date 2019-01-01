@@ -43,7 +43,7 @@ export default {
     hasAssistant () {
       const { details } = this.assignment
       if (!details) return false
-      return ['INITIAL_CALL', 'RETURN_VISIT', 'BIBLE_STUDY'].includes(details.type)
+      return ['initialCall', 'returnVisit', 'bibleStudy'].includes(details.type)
     }
   },
 
