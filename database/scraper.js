@@ -5,6 +5,7 @@ const transform = body => cheerio.load(body)
 const titleRegex = /^(.*?): /
 const timeRegex = /: \((.*?)\)/
 const studyPointRegex = /\(.*(\d+)\)\*?$/
+const paragraphSelector = 'p.su'
 
 export default function scrapeWOL (date) {
   const uri = `https://wol.jw.org/en/wol/dt/r1/lp-e/${date.replace(/-/g, '/')}`
@@ -19,8 +20,8 @@ export default function scrapeWOL (date) {
         bibleReading: $('#p2').text(),
         songs: [
           $('#p3').text().trim(),
-          $('p', '#section4').first().text().trim(),
-          $('p', '#section4').last().text().trim()
+          $(paragraphSelector, '#section4').first().text().trim(),
+          $(paragraphSelector, '#section4').last().text().trim()
         ],
         'assignments.chairman': { type: 'chairman' },
         'assignments.openingPrayer': { type: 'prayer' },
@@ -30,7 +31,7 @@ export default function scrapeWOL (date) {
       }
 
       // Bible Highlights
-      const highlightsText = $('p', '#section2').first().text().trim()
+      const highlightsText = $(paragraphSelector, '#section2').first().text().trim()
       update['assignments.highlights'] = {
         type: 'highlights',
         title: highlightsText.replace(/: \(.*\)$/, ''),
@@ -38,7 +39,7 @@ export default function scrapeWOL (date) {
       }
 
       // Bible Reading
-      const bibleReadingP = $('p', '#section2').last()
+      const bibleReadingP = $(paragraphSelector, '#section2').last()
       const bibleReadingText = bibleReadingP.text().trim()
       update['assignments.bibleReading'] = {
         type: 'bibleReading',
@@ -48,7 +49,7 @@ export default function scrapeWOL (date) {
       }
 
       // Student Talks
-      $('p', '#section3').each((i, elem) => {
+      $(paragraphSelector, '#section3').each((i, elem) => {
         const elemText = $(elem).text().trim()
         const title = titleRegex.exec(elemText)[1]
         let type = ''
@@ -67,7 +68,7 @@ export default function scrapeWOL (date) {
       })
 
       // Service Talks & CBS
-      $('p', '#section4').each((i, elem) => {
+      $(paragraphSelector, '#section4').each((i, elem) => {
         if (i === 0) return // ignore opening song
         const elemText = $(elem).text().trim()
         const title = titleRegex.exec(elemText)[1]
