@@ -5,6 +5,7 @@ const transform = body => cheerio.load(body)
 const titleRegex = /^(.*?): /
 const timeRegex = /: \((.*?)\)/
 const studyPointRegex = /\(.*(\d+)\)\*?$/
+const paragraphSelector = 'p.su'
 
 export default function scrapeWOL (date) {
   const uri = `https://wol.jw.org/en/wol/dt/r1/lp-e/${date.replace(/-/g, '/')}`
@@ -19,36 +20,35 @@ export default function scrapeWOL (date) {
         bibleReading: $('#p2').text(),
         songs: [
           $('#p3').text().trim(),
-          $('p', '#section4').first().text().trim(),
-          $('p', '#section4').last().text().trim()
+          $(paragraphSelector, '#section4').first().text().trim(),
+          $(paragraphSelector, '#section4').last().text().trim()
         ],
-        'assignments.chairman': { type: 'chairman' },
-        'assignments.openingPrayer': { type: 'prayer' },
-        'assignments.gems': { type: 'gems', time: '8 min.' },
-        'assignments.reader': { type: 'reader' },
-        'assignments.closingPrayer': { type: 'prayer' }
+        'assignments.chairman.type': 'chairman',
+        'assignments.openingPrayer.type': 'prayer',
+        'assignments.gems.type': 'gems',
+        'assignments.gems.time': '8 min.',
+        'assignments.reader.type': 'reader',
+        'assignments.closingPrayer.type': 'prayer'
       }
 
       // Bible Highlights
-      const highlightsText = $('p', '#section2').first().text().trim()
-      update['assignments.highlights'] = {
-        type: 'highlights',
-        title: highlightsText.replace(/: \(.*\)$/, ''),
-        time: timeRegex.exec(highlightsText)[1]
-      }
+      const highlightsText = $(paragraphSelector, '#section2').first().text().trim()
+      const highlightsPath = 'assignments.highlights.'
+      update[highlightsPath + 'type'] = 'highlights'
+      update[highlightsPath + 'title'] = highlightsText.replace(/: \(.*\)$/, '')
+      update[highlightsPath + 'time'] = timeRegex.exec(highlightsText)[1]
 
       // Bible Reading
-      const bibleReadingP = $('p', '#section2').last()
+      const bibleReadingP = $(paragraphSelector, '#section2').last()
       const bibleReadingText = bibleReadingP.text().trim()
-      update['assignments.bibleReading'] = {
-        type: 'bibleReading',
-        title: bibleReadingP.find('a.b').text().trim(),
-        time: timeRegex.exec(bibleReadingText)[1],
-        studyPoint: studyPointRegex.exec(bibleReadingText)[1]
-      }
+      const bibleReadingPath = 'assignments.bibleReading.'
+      update[bibleReadingPath + 'type'] = 'bibleReading'
+      update[bibleReadingPath + 'title'] = bibleReadingP.find('a.b').text().trim()
+      update[bibleReadingPath + 'time'] = timeRegex.exec(bibleReadingText)[1]
+      update[bibleReadingPath + 'studyPoint'] = studyPointRegex.exec(bibleReadingText)[1]
 
       // Student Talks
-      $('p', '#section3').each((i, elem) => {
+      $(paragraphSelector, '#section3').each((i, elem) => {
         const elemText = $(elem).text().trim()
         const title = titleRegex.exec(elemText)[1]
         let type = ''
@@ -57,34 +57,29 @@ export default function scrapeWOL (date) {
         else if (title.includes('Return Visit')) type = 'returnVisit'
         else if (title.includes('Bible Study')) type = 'bibleStudy'
         else if (title.includes('Talk')) type = 'studentTalk'
-        const updatePath = `assignments.studentTalk${i + 1}`
-        update[updatePath] = {
-          type,
-          title,
-          time: timeRegex.exec(elemText)[1]
-        }
-        if (type && type !== 'ministryVideo') update[updatePath].studyPoint = studyPointRegex.exec(elemText)[1]
+        const studentTalkPath = `assignments.studentTalk${i + 1}.`
+        update[studentTalkPath + 'type'] = type
+        update[studentTalkPath + 'title'] = title
+        update[studentTalkPath + 'time'] = timeRegex.exec(elemText)[1]
+        if (type && type !== 'ministryVideo') update[studentTalkPath + 'studyPoint'] = studyPointRegex.exec(elemText)[1]
       })
 
       // Service Talks & CBS
-      $('p', '#section4').each((i, elem) => {
+      $(paragraphSelector, '#section4').each((i, elem) => {
         if (i === 0) return // ignore opening song
         const elemText = $(elem).text().trim()
         const title = titleRegex.exec(elemText)[1]
         if (title === 'Congregation Bible Study') {
-          update['assignments.congregationBibleStudy'] = {
-            type: 'congregationBibleStudy',
-            title,
-            time: timeRegex.exec(elemText)[1]
-          }
-          return false
+          const congregationBibleStudyPath = 'assignments.congregationBibleStudy.'
+          update[congregationBibleStudyPath + 'type'] = 'congregationBibleStudy'
+          update[congregationBibleStudyPath + 'title'] = title
+          update[congregationBibleStudyPath + 'time'] = timeRegex.exec(elemText)[1]
+          return false // stop loop
         } else {
-          const updatePath = `assignments.serviceTalk${i}`
-          update[updatePath] = {
-            type: 'serviceTalk',
-            title,
-            time: timeRegex.exec(elemText)[1]
-          }
+          const serviceTalkPath = `assignments.serviceTalk${i}.`
+          update[serviceTalkPath + 'type'] = 'serviceTalk'
+          update[serviceTalkPath + 'title'] = title
+          update[serviceTalkPath + 'time'] = timeRegex.exec(elemText)[1]
         }
       })
 

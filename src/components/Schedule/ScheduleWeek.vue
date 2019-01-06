@@ -2,6 +2,21 @@
   <VCard>
     <VToolbar :color="toolbarColor">
       <VToolbarTitle v-text="prettyDate" />
+      <VSpacer />
+      <VMenu offset-y>
+        <VBtn
+          slot="activator"
+          flat
+          icon
+        >
+          <VIcon>settings</VIcon>
+        </VBtn>
+        <VList>
+          <VListTile @click="onRedownload">
+            <VListTileTitle>Redownload</VListTileTitle>
+          </VListTile>
+        </VList>
+      </Vmenu>
     </VToolbar>
 
     <!-- Loading Week Display -->
@@ -176,7 +191,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapMutations } from 'vuex'
 
 import ScheduleSection from '@/components/Schedule/ScheduleSection'
 import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment'
@@ -271,6 +286,20 @@ export default {
       scrapeWeek: 'schedule/scrapeWeek',
       updateAssignment: 'schedule/updateAssignment'
     }),
+    ...mapMutations({
+      alert: 'alert/UPDATE_ALERT'
+    }),
+    onRedownload () {
+      this.scrapeWeek({ weekID: this.week._id })
+        .then(week => {
+          this.week = week
+          this.alert({ text: 'Week successfully redownloaded', color: 'success' })
+        })
+        .catch(err => {
+          this.alert({ text: 'Week could not be redownloaded', color: 'error' })
+          console.error(err)
+        })
+    },
     onScrape () {
       this.scrapeLoading = true
       this.scrapeWeek({ weekID: this.week._id })
