@@ -1,10 +1,33 @@
 <template>
-  <VLayout column fill-height>
-    <p>Coming soon...</p>
-    <VBtn @click="generatePDF">
-      Generate
-    </VBtn>
-    <iframe ref="pdfPreview" :style="{ height: '100%' }" />
+  <VLayout column>
+    <p>Select a month/year below and click the buttons to generate a schedule.</p>
+    <VLayout wrap shrink justify-center>
+      <VSelect
+        v-model="month"
+        class="mx-4"
+        label="Month"
+        :items="months"
+      />
+      <VSelect
+        v-model="year"
+        class="mx-4"
+        label="Year"
+        :items="years"
+      />
+    </VLayout>
+    <VLayout wrap class="px-3">
+      <VBtn color="primary" @click="previewSchedule">
+        Preview Schedule
+        <VIcon right dark>
+          find_in_page
+        </VIcon>
+      </VBtn>
+    </VLayout>
+    <PDFPreview
+      v-model="showPreview"
+      :pdf="pdf"
+      :error="generationError"
+    />
   </VLayout>
 </template>
 
@@ -12,6 +35,7 @@
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
+import PDFPreview from '@/components/PDFPreview'
 import { COLORS } from '@/constants'
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
@@ -19,20 +43,47 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs
 export default {
   name: 'Export',
 
-  mounted () {
-    this.generatePDF()
+  components: {
+    PDFPreview
   },
 
   data () {
+    const today = new Date()
     return {
-      month: ''
+      month: (today.getMonth() + 1).toString().padStart(2, '0'),
+      months: [
+        { text: 'January', value: '01' },
+        { text: 'February', value: '02' },
+        { text: 'March', value: '03' },
+        { text: 'April', value: '04' },
+        { text: 'May', value: '05' },
+        { text: 'June', value: '06' },
+        { text: 'July', value: '07' },
+        { text: 'August', value: '08' },
+        { text: 'September', value: '09' },
+        { text: 'October', value: '10' },
+        { text: 'November', value: '11' },
+        { text: 'December', value: '12' }
+      ],
+      year: today.getFullYear().toString(),
+      years: ['2019'],
+      pdf: null,
+      showPreview: false,
+      generationError: false
     }
   },
 
   methods: {
-    generatePDF () {
-      const weeks = [1, 2, 3, 4, 5]
-
+    previewSchedule () {
+      this.showPreview = true
+      Promise.resolve([1, 2, 3, 4, 5])
+        .then(this.generateSchedule)
+        .catch(err => {
+          this.generationError = true
+          console.error(err)
+        })
+    },
+    generateSchedule (weeks) {
       const stack = []
       const docDefinition = {
         pageSize: 'A4',
@@ -67,12 +118,7 @@ export default {
           fontSize: 14,
           bold: true
         })
-        stack.push({
-          text: 'Time Off',
-          bold: true,
-          decoration: 'underline',
-          alignment: 'right'
-        })
+        stack.push({ text: 'Time Off', bold: true, decoration: 'underline', alignment: 'right' })
         stack.push(this.createTable(COLORS.TREASURES, [
           ['7:00', 'Song 96', 'Prayer:', 'Ben Jones', '7:05'],
           ['7:05', 'Opening Comments', 'Chairman:', 'Other Brother', '7:08']
@@ -95,10 +141,7 @@ export default {
         stack.push(this.createSeparator())
       })
 
-      pdfMake.createPdf(docDefinition).getDataUrl(dataUrl => {
-        const previewFrame = this.$refs.pdfPreview
-        previewFrame.src = dataUrl
-      })
+      this.pdf = pdfMake.createPdf(docDefinition)
     },
 
     createSubheader (text, fillColor) {
