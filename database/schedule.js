@@ -27,7 +27,6 @@ export const scrapeWeek = async ({ weekID }) => {
   const query = { _id: ObjectID(weekID) }
   const week = await coll.findOne(query)
   assert.notStrictEqual(null, week, 'Week ID does not exist')
-  assert.notStrictEqual(true, week.scraped, 'Week has already been scraped')
   const update = { $set: await scrapeWOL(week.date) }
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
   assert.notStrictEqual(null, value, 'Update not successful')
