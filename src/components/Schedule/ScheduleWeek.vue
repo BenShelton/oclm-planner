@@ -114,6 +114,21 @@
           <VContainer grid-list-md>
             <VLayout wrap>
               <VFlex
+                xs12
+                md6
+                sm4
+              >
+                <AssigneeSelect v-model="editAssignment.assignee" label="Assignee" :type="editAssignment.type" />
+              </VFlex>
+              <VFlex
+                v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)"
+                xs12
+                md6
+                sm4
+              >
+                <AssigneeSelect v-model="editAssignment.assistant" label="Assistant" :type="editAssignment.type + 'Assist'" />
+              </VFlex>
+              <VFlex
                 v-if="editName.includes('studentTalk')"
                 xs12
                 md6
@@ -138,21 +153,6 @@
                 sm4
               >
                 <VTextField v-model="editAssignment.title" label="Title" />
-              </VFlex>
-              <VFlex
-                xs12
-                md6
-                sm4
-              >
-                <AssigneeSelect v-model="editAssignment.assignee" label="Assignee" :type="editAssignment.type" />
-              </VFlex>
-              <VFlex
-                v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)"
-                xs12
-                md6
-                sm4
-              >
-                <AssigneeSelect v-model="editAssignment.assistant" label="Assistant" :type="editAssignment.type + 'Assist'" />
               </VFlex>
               <VFlex
                 v-if="!(['chairman', 'prayer', 'reader'].includes(editAssignment.type))"
