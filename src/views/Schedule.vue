@@ -38,12 +38,19 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 import ScheduleWeek from '@/components/Schedule/ScheduleWeek'
 
 export default {
   name: 'Schedule',
 
   components: { ScheduleWeek },
+
+  beforeRouteLeave (to, from, next) {
+    this.clearWeeks()
+    next()
+  },
 
   data () {
     return {
@@ -91,6 +98,9 @@ export default {
   },
 
   methods: {
+    ...mapMutations({
+      clearWeeks: 'schedule/CLEAR_WEEKS'
+    }),
     allowedDates (date) {
       return new Date(date).getDay() === 1
     },

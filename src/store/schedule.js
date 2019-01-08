@@ -43,6 +43,9 @@ const mutations = {
   UPDATE_WEEK (state, payload) {
     const prevIndex = state.weeks.find(w => w._id === payload._id)
     state.weeks.splice(prevIndex, 1, payload)
+  },
+  CLEAR_WEEKS (state) {
+    Object.assign(state, { weeks: [] })
   }
 }
 
