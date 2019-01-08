@@ -1,7 +1,12 @@
 import api from '@/api'
 
 const state = {
-  weeks: []
+  weeks: [],
+  selectedAssignee: ''
+}
+
+const getters = {
+  selectedAssignee: state => state.selectedAssignee
 }
 
 const actions = {
@@ -46,12 +51,16 @@ const mutations = {
   },
   CLEAR_WEEKS (state) {
     Object.assign(state, { weeks: [] })
+  },
+  UPDATE_SELECTED_ASSIGNEE (state, payload) {
+    Object.assign(state, { selectedAssignee: payload })
   }
 }
 
 export default {
   namespaced: true,
   state,
+  getters,
   actions,
   mutations
 }
