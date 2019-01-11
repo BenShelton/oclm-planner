@@ -22,6 +22,26 @@ export const getWeek = async ({ date }) => {
   return newWeek
 }
 
+export const getMonth = async ({ month }) => {
+  const coll = await getCollection
+  // calculate the number of weeks in that month
+  let weekCount = 0
+  const checkDate = new Date(month + '-01')
+  const checkMonth = checkDate.getMonth()
+  const daysUntilMonday = (7 - (checkDate.getDay() - 1)) % 7
+  checkDate.setDate(checkDate.getDate() + daysUntilMonday)
+  while (checkDate.getMonth() === checkMonth) {
+    weekCount++
+    checkDate.setDate(checkDate.getDate() + 7)
+  }
+  assert([4, 5].includes(weekCount), 'Month should always have 4 or 5 weeks')
+  // search for those weeks
+  const query = { date: { $regex: '^' + month } }
+  const weeks = await coll.find(query).toArray()
+  assert.strictEqual(weekCount, weeks.length, 'Month did not return the expected number of weeks')
+  return weeks
+}
+
 export const scrapeWeek = async ({ weekID }) => {
   const coll = await getCollection
   const query = { _id: ObjectID(weekID) }

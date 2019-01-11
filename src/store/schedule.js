@@ -20,6 +20,10 @@ const actions = {
         return week
       })
   },
+  loadMonth (store, { month }) {
+    return api.schedule.month({ month })
+      .then(res => res.data.result)
+  },
   scrapeWeek ({ commit }, { weekID }) {
     return api.schedule.scrape({ weekID })
       .then(res => {
