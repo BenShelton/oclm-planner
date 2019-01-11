@@ -2,20 +2,24 @@
   <VLayout column>
     <p>Select a month/year below and click the buttons to generate a schedule.</p>
     <VLayout wrap shrink justify-center>
-      <VSelect
-        v-model="month"
-        class="mx-4"
-        label="Month"
-        :items="months"
-      />
-      <VSelect
-        v-model="year"
-        class="mx-4"
-        label="Year"
-        :items="years"
-      />
+      <VFlex xs12 sm6 md4>
+        <VSelect
+          v-model="month"
+          class="mx-4"
+          label="Month"
+          :items="months"
+        />
+      </VFlex>
+      <VFlex xs12 sm6 md4>
+        <VSelect
+          v-model="year"
+          class="mx-4"
+          label="Year"
+          :items="years"
+        />
+      </VFlex>
     </VLayout>
-    <VLayout wrap class="px-3">
+    <VLayout wrap justify-center class="px-3">
       <VBtn color="primary" @click="previewSchedule">
         Preview Schedule
         <VIcon right dark>
@@ -32,6 +36,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
@@ -67,6 +72,7 @@ export default {
       ],
       year: today.getFullYear().toString(),
       years: ['2019'],
+      previewedMonth: null,
       pdf: null,
       showPreview: false,
       generationError: false
@@ -74,12 +80,23 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      loadMonth: 'schedule/loadMonth'
+    }),
     previewSchedule () {
+      this.generationError = false
       this.showPreview = true
-      Promise.resolve([1, 2, 3, 4, 5])
-        .then(this.generateSchedule)
+      const month = this.year + '-' + this.month
+      if (this.previewedMonth === month) return
+      this.pdf = null
+      this.loadMonth({ month })
+        .then(weeks => {
+          this.generateSchedule(weeks)
+          this.previewedMonth = month
+        })
         .catch(err => {
           this.generationError = true
+          this.previewedMonth = null
           console.error(err)
         })
     },
