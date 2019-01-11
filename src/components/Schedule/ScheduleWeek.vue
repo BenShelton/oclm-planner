@@ -3,7 +3,7 @@
     <VToolbar :color="toolbarColor">
       <VToolbarTitle v-text="prettyDate" />
       <VSpacer />
-      <VMenu offset-y>
+      <VMenu v-if="week && week.scraped" offset-y>
         <VBtn
           slot="activator"
           flat
@@ -114,6 +114,21 @@
           <VContainer grid-list-md>
             <VLayout wrap>
               <VFlex
+                xs12
+                md6
+                sm4
+              >
+                <AssigneeSelect v-model="editAssignment.assignee" label="Assignee" :type="editAssignment.type" />
+              </VFlex>
+              <VFlex
+                v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)"
+                xs12
+                md6
+                sm4
+              >
+                <AssigneeSelect v-model="editAssignment.assistant" label="Assistant" :type="editAssignment.type + 'Assist'" />
+              </VFlex>
+              <VFlex
                 v-if="editName.includes('studentTalk')"
                 xs12
                 md6
@@ -140,21 +155,6 @@
                 <VTextField v-model="editAssignment.title" label="Title" />
               </VFlex>
               <VFlex
-                xs12
-                md6
-                sm4
-              >
-                <AssigneeSelect v-model="editAssignment.assignee" label="Assignee" :type="editAssignment.type" />
-              </VFlex>
-              <VFlex
-                v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)"
-                xs12
-                md6
-                sm4
-              >
-                <AssigneeSelect v-model="editAssignment.assistant" label="Assistant" :type="editAssignment.type + 'Assist'" />
-              </VFlex>
-              <VFlex
                 v-if="!(['chairman', 'prayer', 'reader'].includes(editAssignment.type))"
                 xs12
                 md6
@@ -163,6 +163,20 @@
                 <VTextField v-model="editAssignment.time" label="Time" />
               </VFlex>
             </VLayout>
+            <VAlert
+              :value="editAssignment.text !== 'N/A'"
+              color="info"
+              icon="info"
+              outline
+            >
+              <span class="font-weight-bold">
+                Downloaded Text From WOL:
+              </span>
+              <span v-if="!editAssignment.text" class="error--text">
+                Text was not downloaded for this assignment, it may have been manually added
+              </span>
+              <span v-else v-text="editAssignment.text" />
+            </VAlert>
           </VContainer>
         </VCardText>
         <VCardActions>

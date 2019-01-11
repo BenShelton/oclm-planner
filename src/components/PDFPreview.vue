@@ -1,15 +1,38 @@
 <template>
   <VDialog v-model="value" persistent fullscreen>
     <VLayout column fill-height class="pa-4 white">
-      <p class="headline">
-        Preview
-      </p>
-      <iframe :src="dataUrl" class="my-3" />
-      <VLayout justify-end>
-        <VBtn @click="onClose">
-          Close
-        </VBtn>
+      <VFlex shrink>
+        <p class="headline">
+          Preview
+        </p>
+      </VFlex>
+
+      <VLayout v-if="error" column align-center>
+        <VIcon large color="error" class="py-5">
+          warning
+        </VIcon>
+        <p class="error--text">
+          This month could not be fully loaded, please check that all weeks have been filled in on the schedule
+        </p>
       </VLayout>
+      <VLayout v-else-if="!dataUrl" column align-center>
+        <VProgressCircular indeterminate color="primary" class="py-5" />
+        <p>Generating schedule, please wait...</p>
+      </VLayout>
+      <object
+        v-else
+        class="my-3"
+        type="application/pdf"
+        :data="dataUrl"
+      />
+
+      <VFlex shrink>
+        <VLayout justify-end>
+          <VBtn @click="onClose">
+            Close
+          </VBtn>
+        </VLayout>
+      </VFlex>
     </VLayout>
   </VDialog>
 </template>
@@ -32,7 +55,10 @@ export default {
 
   watch: {
     pdf (val) {
-      if (!val) return
+      if (!val) {
+        this.dataUrl = null
+        return
+      }
       val.getDataUrl(dataUrl => { this.dataUrl = dataUrl })
     }
   },
@@ -46,6 +72,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-iframe
+object
   height 100%
 </style>

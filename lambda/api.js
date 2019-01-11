@@ -108,6 +108,15 @@ router.get('/schedule/week/:date', (req, res) => {
     .catch(handleErrors(res))
 })
 
+router.get('/schedule/month/:month', (req, res) => {
+  const { month } = req.params
+  if (!month) return res.status(400).json({ message: 'No month provided' })
+  if (!(/^\d{4}-\d{2}$/.test(month))) return res.status(400).json({ message: 'Month should be in yyyy-mm format' })
+  schedule.getMonth({ month })
+    .then(returnResult(res))
+    .catch(handleErrors(res))
+})
+
 router.put('/schedule/scrape', (req, res) => {
   const { weekID } = req.body
   if (!weekID) return res.status(400).json({ message: 'weekID is required' })

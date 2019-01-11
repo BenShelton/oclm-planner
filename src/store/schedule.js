@@ -1,7 +1,12 @@
 import api from '@/api'
 
 const state = {
-  weeks: []
+  weeks: [],
+  selectedAssignee: ''
+}
+
+const getters = {
+  selectedAssignee: state => state.selectedAssignee
 }
 
 const actions = {
@@ -14,6 +19,10 @@ const actions = {
         commit('LOAD_WEEK', week)
         return week
       })
+  },
+  loadMonth (store, { month }) {
+    return api.schedule.month({ month })
+      .then(res => res.data.result)
   },
   scrapeWeek ({ commit }, { weekID }) {
     return api.schedule.scrape({ weekID })
@@ -43,12 +52,19 @@ const mutations = {
   UPDATE_WEEK (state, payload) {
     const prevIndex = state.weeks.find(w => w._id === payload._id)
     state.weeks.splice(prevIndex, 1, payload)
+  },
+  CLEAR_WEEKS (state) {
+    Object.assign(state, { weeks: [] })
+  },
+  UPDATE_SELECTED_ASSIGNEE (state, payload) {
+    Object.assign(state, { selectedAssignee: payload })
   }
 }
 
 export default {
   namespaced: true,
   state,
+  getters,
   actions,
   mutations
 }
