@@ -19,7 +19,12 @@
         <VProgressCircular indeterminate color="primary" class="py-5" />
         <p>Generating schedule, please wait...</p>
       </VLayout>
-      <iframe v-else :src="dataUrl" class="my-3" />
+      <object
+        v-else
+        class="my-3"
+        type="application/pdf"
+        :data="dataUrl"
+      />
 
       <VFlex shrink>
         <VLayout justify-end>
@@ -67,6 +72,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-iframe
+object
   height 100%
 </style>
