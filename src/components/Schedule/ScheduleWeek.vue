@@ -3,7 +3,7 @@
     <VToolbar :color="toolbarColor">
       <VToolbarTitle v-text="prettyDate" />
       <VSpacer />
-      <VMenu offset-y>
+      <VMenu v-if="week && week.scraped" offset-y>
         <VBtn
           slot="activator"
           flat
@@ -163,6 +163,20 @@
                 <VTextField v-model="editAssignment.time" label="Time" />
               </VFlex>
             </VLayout>
+            <VAlert
+              :value="editAssignment.text !== 'N/A'"
+              color="info"
+              icon="info"
+              outline
+            >
+              <span class="font-weight-bold">
+                Downloaded Text From WOL:
+              </span>
+              <span v-if="!editAssignment.text" class="error--text">
+                Text was not downloaded for this assignment, it may have been manually added
+              </span>
+              <span v-else v-text="editAssignment.text" />
+            </VAlert>
           </VContainer>
         </VCardText>
         <VCardActions>
