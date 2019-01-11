@@ -6,6 +6,9 @@ const titleRegex = /^(.*?): /
 const timeRegex = /: \((.*?)\)/
 const studyPointRegex = /\(.*(\d+)\)\*?$/
 const paragraphSelector = 'p.su'
+const bookAbbreviations = {
+  jy: 'Jesus - The Way'
+}
 
 export default function scrapeWOL (date) {
   const uri = `https://wol.jw.org/en/wol/dt/r1/lp-e/${date.replace(/-/g, '/')}`
@@ -17,23 +20,29 @@ export default function scrapeWOL (date) {
       // Load as much static information as possible
       const update = {
         scraped: true,
-        bibleReading: $('#p2').text(),
+        weeklyBibleReading: $('#p2').text(),
         songs: [
           $('#p3').text().trim(),
           $(paragraphSelector, '#section4').first().text().trim(),
           $(paragraphSelector, '#section4').last().text().trim()
         ],
+        'assignments.chairman.text': 'N/A',
         'assignments.chairman.type': 'chairman',
+        'assignments.openingPrayer.text': 'N/A',
         'assignments.openingPrayer.type': 'prayer',
+        'assignments.gems.text': 'N/A',
         'assignments.gems.type': 'gems',
         'assignments.gems.time': '8 min.',
+        'assignments.reader.text': 'N/A',
         'assignments.reader.type': 'reader',
+        'assignments.closingPrayer.text': 'N/A',
         'assignments.closingPrayer.type': 'prayer'
       }
 
       // Bible Highlights
       const highlightsText = $(paragraphSelector, '#section2').first().text().trim()
       const highlightsPath = 'assignments.highlights.'
+      update[highlightsPath + 'text'] = highlightsText
       update[highlightsPath + 'type'] = 'highlights'
       update[highlightsPath + 'title'] = highlightsText.replace(/: \(.*\)$/, '')
       update[highlightsPath + 'time'] = timeRegex.exec(highlightsText)[1]
@@ -42,6 +51,7 @@ export default function scrapeWOL (date) {
       const bibleReadingP = $(paragraphSelector, '#section2').last()
       const bibleReadingText = bibleReadingP.text().trim()
       const bibleReadingPath = 'assignments.bibleReading.'
+      update[bibleReadingPath + 'text'] = bibleReadingText
       update[bibleReadingPath + 'type'] = 'bibleReading'
       update[bibleReadingPath + 'title'] = bibleReadingP.find('a.b').text().trim()
       update[bibleReadingPath + 'time'] = timeRegex.exec(bibleReadingText)[1]
@@ -58,6 +68,7 @@ export default function scrapeWOL (date) {
         else if (title.includes('Bible Study')) type = 'bibleStudy'
         else if (title.includes('Talk')) type = 'studentTalk'
         const studentTalkPath = `assignments.studentTalk${i + 1}.`
+        update[studentTalkPath + 'text'] = elemText
         update[studentTalkPath + 'type'] = type
         update[studentTalkPath + 'title'] = title
         update[studentTalkPath + 'time'] = timeRegex.exec(elemText)[1]
@@ -71,12 +82,17 @@ export default function scrapeWOL (date) {
         const title = titleRegex.exec(elemText)[1]
         if (title === 'Congregation Bible Study') {
           const congregationBibleStudyPath = 'assignments.congregationBibleStudy.'
+          const bookInfo = /\) (.*)$/.exec(elemText)[1].trim()
+          const bookAbbreviation = /^(\w+)/.exec(bookInfo)[1]
+          const bookTitle = bookAbbreviations[bookAbbreviation] || bookAbbreviation
+          update[congregationBibleStudyPath + 'text'] = elemText
           update[congregationBibleStudyPath + 'type'] = 'congregationBibleStudy'
-          update[congregationBibleStudyPath + 'title'] = title
+          update[congregationBibleStudyPath + 'title'] = bookInfo.replace(bookAbbreviation, bookTitle)
           update[congregationBibleStudyPath + 'time'] = timeRegex.exec(elemText)[1]
           return false // stop loop
         } else {
           const serviceTalkPath = `assignments.serviceTalk${i}.`
+          update[serviceTalkPath + 'text'] = elemText
           update[serviceTalkPath + 'type'] = 'serviceTalk'
           update[serviceTalkPath + 'title'] = title
           update[serviceTalkPath + 'time'] = timeRegex.exec(elemText)[1]
