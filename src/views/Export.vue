@@ -109,12 +109,12 @@ export default {
       const { title, time } = assignment
       return `${title} (${time})`
     },
-    getAssigneeName (assignment, includeAssistant) {
+    getAssigneeName (assignment) {
       const assignee = this.idMap[assignment.assignee]
       let name = assignee ? assignee.name : '-'
-      if (includeAssistant) {
+      if (['initialCall', 'returnVisit', 'bibleStudy'].includes(assignment.type)) {
         const assistant = this.idMap[assignment.assistant]
-        name += `/${assistant ? assistant.name : '-'}`
+        name += ` / ${assistant ? assistant.name : '-'}`
       }
       return name
     },
@@ -138,6 +138,11 @@ export default {
     generateSchedule (weeks) {
       const stack = []
       const docDefinition = {
+        info: {
+          title: `OCLM Schedule ${this.month}-${this.year}`,
+          author: 'OCLM Planner',
+          subject: 'OCLM Schedule'
+        },
         pageSize: 'A4',
         pageMargins: [36, 62, 36, 44],
         pageBreakBefore: ({ id }) => id === 'PageStartSeparator',
@@ -181,6 +186,8 @@ export default {
           reader,
           closingPrayer
         } = assignments
+
+        // Week Title & Information
         if (index > 0 && index % 2 === 0) stack.push(this.createSeparator(true))
         const [, month, day] = date.split('-')
         const titleDay = day.charAt(0) === '0' ? day.charAt(1) : day
@@ -191,26 +198,42 @@ export default {
           bold: true
         })
         stack.push({ text: 'Time Off', bold: true, decoration: 'underline', alignment: 'right' })
+
+        // Introduction Section
         stack.push(this.createTable(COLORS.TREASURES, [
           [this.setTime('7:00'), songs[0], 'Prayer:', this.getAssigneeName(openingPrayer), this.addTime(5)],
           [this.time, 'Opening Comments (3 min.)', 'Chairman:', this.getAssigneeName(chairman), this.addTime(3)]
         ]))
+
+        // TREASURES Section
         stack.push(this.createSubheader('TREASURES FROM GOD\'S WORD', COLORS.TREASURES))
+        const bibleReadingTitle = `Bible Reading (${bibleReading.time}): ${bibleReading.title}`
         stack.push(this.createTable(COLORS.MINISTRY, [
           [this.time, this.getAssignmentTitle(highlights), null, this.getAssigneeName(highlights), this.addTime(highlights.time)],
           [this.time, 'Digging for Spiritual Gems (10 min.)', null, this.getAssigneeName(gems), this.addTime(gems.time)],
-          [this.time, this.getAssignmentTitle(bibleReading), null, this.getAssigneeName(bibleReading), this.addTime(bibleReading.time)]
+          [this.time, bibleReadingTitle, null, this.getAssigneeName(bibleReading), this.addTime(bibleReading.time)]
         ]))
+
+        // MINISTRY Section
         stack.push(this.createSubheader('APPLY YOURSELF TO THE FIELD MINISTRY', COLORS.MINISTRY))
-        stack.push(this.createTable(COLORS.MINISTRY, [
-          null,
-          null,
-          null,
-          null
-        ]))
+        const ministryTableRows = []
+        for (let i = 1; i <= 4; i++) {
+          const studentTalk = assignments['studentTalk' + i]
+          if (!studentTalk) {
+            ministryTableRows.push(null)
+            continue
+          }
+          let assigneeTitle = 'Student/Assistant:'
+          if (studentTalk.type === 'ministryVideo') assigneeTitle = ''
+          if (studentTalk.type === 'studentTalk') assigneeTitle = 'Student:'
+          ministryTableRows.push([this.time, this.getAssignmentTitle(studentTalk), assigneeTitle, this.getAssigneeName(studentTalk), this.addTime(studentTalk.time)])
+        }
+        stack.push(this.createTable(COLORS.MINISTRY, ministryTableRows, true))
+
+        // LIVING Section
         stack.push(this.createSubheader('LIVING AS CHRISTIANS', COLORS.LIVING))
         const livingTableRows = [
-          [this.time, songs[1], null, null, this.addTime(5)],
+          [this.setTime('7:47'), songs[1], null, null, this.addTime(5)],
           [this.time, this.getAssignmentTitle(serviceTalk1), null, this.getAssigneeName(serviceTalk1), this.addTime(serviceTalk1.time)],
           null
         ]
@@ -254,24 +277,28 @@ export default {
       }
     },
 
-    createTable (markerColor, rows) {
+    createTable (markerColor, rows, expandAssigneeName) {
       const body = []
       for (const row of rows) {
         const bodyRow = []
         body.push(bodyRow)
         if (!row) {
-          bodyRow.push({ text: '', colSpan: 6 })
+          bodyRow.push({ text: '', colSpan: 7 })
           continue
         }
         const [timeOn, title, assigneeTitle, assigneeName, timeOff] = row
         bodyRow.push(
           { text: timeOn },
           { text: '•', fontSize: 24, color: markerColor, margin: [0, -8] },
-          { text: title, paddingLeft: 0 },
-          { text: assigneeTitle, fontSize: 8, color: '#6F6F6F', alignment: 'right', margin: [0, 1, 0, 0] },
-          { text: assigneeName },
-          { text: timeOff, alignment: 'right' }
+          { text: title, paddingLeft: 0, colSpan: expandAssigneeName ? 1 : 2 }
         )
+        if (!expandAssigneeName) bodyRow.push({ text: '' })
+        bodyRow.push(
+          { text: assigneeTitle, fontSize: 8, color: '#6F6F6F', alignment: 'right', margin: [0, 1, 0, 0] },
+          { text: assigneeName, colSpan: expandAssigneeName ? 2 : 1 }
+        )
+        if (expandAssigneeName) bodyRow.push({ text: '' })
+        bodyRow.push({ text: timeOff, alignment: 'right' })
       }
       return {
         margin: [0, 2, 0, 8],
@@ -283,7 +310,7 @@ export default {
           paddingBottom: () => 1
         },
         table: {
-          widths: [20, 6, '*', 36, 72, 20],
+          widths: [20, 6, 234, 36, 72, 72, 20],
           body
         }
       }
