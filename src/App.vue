@@ -8,7 +8,6 @@
       </VContainer>
       <Alert />
     </VContent>
-    <VFooter app />
   </VApp>
 </template>
 
