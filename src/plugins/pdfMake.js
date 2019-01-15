@@ -27,20 +27,24 @@ function addTime (minutes) {
   return time
 }
 
+function getAssigneeName (assignee) {
+  if (!assignee) return '-'
+  const idMap = store.getters['congregation/idMap']
+  const mappedAssignee = idMap[assignee]
+  return mappedAssignee ? mappedAssignee.name : '-'
+}
+
 function getAssignmentTitle (assignment) {
   const { title, time } = assignment
   return `${title} (${time})`
 }
 
-function getAssigneeName (assignment) {
-  const idMap = store.getters['congregation/idMap']
-  const assignee = idMap[assignment.assignee]
-  let name = assignee ? assignee.name : '-'
+function getScheduleAssignees (assignment) {
+  let assignees = getAssigneeName(assignment.assignee)
   if (['initialCall', 'returnVisit', 'bibleStudy'].includes(assignment.type)) {
-    const assistant = idMap[assignment.assistant]
-    name += ` / ${assistant ? assistant.name : '-'}`
+    assignees += ' / ' + getAssigneeName(assignment.assistant)
   }
-  return name
+  return assignees
 }
 
 function createScheduleSubheader (text, fillColor) {
@@ -172,17 +176,17 @@ export function generateSchedule (weeks, month) {
 
     // Introduction Section
     stack.push(createScheduleTable(COLORS.TREASURES, [
-      [setTime('7:00'), songs[0], 'Prayer:', getAssigneeName(openingPrayer), addTime(5)],
-      [timer, 'Opening Comments (3 min.)', 'Chairman:', getAssigneeName(chairman), addTime(3)]
+      [setTime('7:00'), songs[0], 'Prayer:', getScheduleAssignees(openingPrayer), addTime(5)],
+      [timer, 'Opening Comments (3 min.)', 'Chairman:', getScheduleAssignees(chairman), addTime(3)]
     ]))
 
     // TREASURES Section
     stack.push(createScheduleSubheader('TREASURES FROM GOD\'S WORD', COLORS.TREASURES))
     const bibleReadingTitle = `Bible Reading (${bibleReading.time}): ${bibleReading.title}`
     stack.push(createScheduleTable(COLORS.MINISTRY, [
-      [timer, getAssignmentTitle(highlights), null, getAssigneeName(highlights), addTime(highlights.time)],
-      [timer, 'Digging for Spiritual Gems (10 min.)', null, getAssigneeName(gems), addTime(gems.time)],
-      [timer, bibleReadingTitle, null, getAssigneeName(bibleReading), addTime(bibleReading.time)]
+      [timer, getAssignmentTitle(highlights), null, getScheduleAssignees(highlights), addTime(highlights.time)],
+      [timer, 'Digging for Spiritual Gems (10 min.)', null, getScheduleAssignees(gems), addTime(gems.time)],
+      [timer, bibleReadingTitle, null, getScheduleAssignees(bibleReading), addTime(bibleReading.time)]
     ]))
 
     // MINISTRY Section
@@ -197,7 +201,7 @@ export function generateSchedule (weeks, month) {
       let assigneeTitle = 'Student/Assistant:'
       if (studentTalk.type === 'ministryVideo') assigneeTitle = ''
       if (studentTalk.type === 'studentTalk') assigneeTitle = 'Student:'
-      ministryTableRows.push([timer, getAssignmentTitle(studentTalk), assigneeTitle, getAssigneeName(studentTalk), addTime(studentTalk.time)])
+      ministryTableRows.push([timer, getAssignmentTitle(studentTalk), assigneeTitle, getScheduleAssignees(studentTalk), addTime(studentTalk.time)])
     }
     stack.push(createScheduleTable(COLORS.MINISTRY, ministryTableRows, true))
 
@@ -205,15 +209,15 @@ export function generateSchedule (weeks, month) {
     stack.push(createScheduleSubheader('LIVING AS CHRISTIANS', COLORS.LIVING))
     const livingTableRows = [
       [setTime('7:47'), songs[1], null, null, addTime(5)],
-      [timer, getAssignmentTitle(serviceTalk1), null, getAssigneeName(serviceTalk1), addTime(serviceTalk1.time)],
+      [timer, getAssignmentTitle(serviceTalk1), null, getScheduleAssignees(serviceTalk1), addTime(serviceTalk1.time)],
       null
     ]
-    if (serviceTalk2) livingTableRows[2] = [timer, getAssignmentTitle(serviceTalk2), null, getAssigneeName(serviceTalk2), addTime(serviceTalk2.time)]
+    if (serviceTalk2) livingTableRows[2] = [timer, getAssignmentTitle(serviceTalk2), null, getScheduleAssignees(serviceTalk2), addTime(serviceTalk2.time)]
     livingTableRows.push(
-      [timer, 'Congregation Bible Study (30 min.)', 'Conductor:', getAssigneeName(congregationBibleStudy), addTime(30)],
-      [null, congregationBibleStudy.title, 'Reader:', getAssigneeName(reader), null],
-      [timer, 'Review/Preview/Announcements (3 min.)', 'Chairman:', getAssigneeName(chairman), addTime(3)],
-      [timer, songs[2], 'Prayer:', getAssigneeName(closingPrayer), addTime(5)]
+      [timer, 'Congregation Bible Study (30 min.)', 'Conductor:', getScheduleAssignees(congregationBibleStudy), addTime(30)],
+      [null, congregationBibleStudy.title, 'Reader:', getScheduleAssignees(reader), null],
+      [timer, 'Review/Preview/Announcements (3 min.)', 'Chairman:', getScheduleAssignees(chairman), addTime(3)],
+      [timer, songs[2], 'Prayer:', getScheduleAssignees(closingPrayer), addTime(5)]
     )
     const livingTable = createScheduleTable(COLORS.LIVING, livingTableRows)
     Object.assign(livingTable.table.body[3][1], { rowSpan: 2 })
@@ -224,24 +228,155 @@ export function generateSchedule (weeks, month) {
   return pdfMake.createPdf(docDefinition)
 }
 
+function createSlip (assignment, date) {
+  const { title, type, assignee, assistant } = assignment || {}
+  return {
+    width: '50%',
+    margin: [32, 40, 32, 52],
+    stack: [
+      {
+        text: 'OUR CHRISTIAN LIFE AND MINISTRY MEETING ASSIGNMENT',
+        fontSize: 14,
+        alignment: 'center',
+        bold: true,
+        margin: [0, 0, 0, 12]
+      },
+      {
+        bold: true,
+        fontSize: 12,
+        stack: [
+          { text: 'Name: ' + getAssigneeName(assignee), margin: [0, 0, 0, 8] },
+          { text: 'Assistant: ' + getAssigneeName(assistant), margin: [0, 0, 0, 8] },
+          { text: 'Date: ' + date, margin: [0, 0, 0, 8] }
+        ]
+      },
+      {
+        fontSize: 10,
+        margin: [0, 8, 0, 16],
+        columns: [
+          {
+            width: '55%',
+            stack: [
+              { text: 'Assignment:', bold: true, margin: [0, 0, 0, 1] },
+              createAssignmentCheckbox('Bible reading', type === 'bibleReading'),
+              createAssignmentCheckbox('Initial call', type === 'initialCall'),
+              createAssignmentCheckbox('First return visit', title === 'First Return Visit'),
+              createAssignmentCheckbox('Second return visit', title === 'Second Return Visit'),
+              { text: 'To be given in:', bold: true, margin: [0, 4, 0, 1] },
+              createAssignmentCheckbox('Main hall', !!assignment),
+              createAssignmentCheckbox('Auxiliary classroom 1'),
+              createAssignmentCheckbox('Auxiliary classroom 2')
+            ]
+          },
+          {
+            width: '45%',
+            margin: [0, 12, 0, 0],
+            stack: [
+              createAssignmentCheckbox('Bible study', type === 'bibleStudy'),
+              createAssignmentCheckbox('Talk', type === 'studentTalk'),
+              createAssignmentCheckbox('Other: ..................')
+            ]
+          }
+        ]
+      },
+      {
+        fontSize: 9,
+        alignment: 'justify',
+        text: [
+          { text: 'Note to student: ', bold: true },
+          { text: 'The source material and study point for your assignment can be found in the ' },
+          { text: 'Life and Ministry Meeting Workbook. ', italics: true },
+          { text: 'Please work on the listed study point, which is discussed in the ' },
+          { text: 'Teaching ', italics: true },
+          { text: 'brochure. You should ' },
+          { text: 'bring your brochure, either printed or electronic, to the Life and Ministry Meeting.', bold: true }
+        ]
+      },
+      {
+        text: 'S-89-E      10/18',
+        fontSize: 10,
+        margin: [0, 8, 0, 0]
+      }
+    ]
+  }
+}
+
+function createAssignmentCheckbox (title, checked) {
+  const checkbox = {
+    width: 28,
+    canvas: [{ type: 'rect', x: 12, y: 2, w: 8, h: 8, lineWidth: 1 }]
+  }
+  if (checked) {
+    checkbox.canvas.push(
+      { type: 'line', x1: 14, y1: 5, x2: 15, y2: 8, lineWidth: 1 },
+      { type: 'line', x1: 15, y1: 8, x2: 18, y2: 4, lineWidth: 1 }
+    )
+  }
+  return {
+    columns: [
+      checkbox,
+      { text: title }
+    ]
+  }
+}
+
 export function generateAssignmentSlips (weeks, month) {
-  const stack = []
+  // variables for the cutting lines
+  const pageWidth = 595
+  const pageHeight = 842
+  const midX = pageWidth / 2
+  const midY = pageHeight / 2
+  const lineLength = 36
+
+  const content = []
   const docDefinition = {
     info: {
       title: 'Assignment Slips ' + month,
       author: 'OCLM Planner',
       subject: 'Assignment Slips'
     },
+    pageMargins: [0, 0, 0, 0],
     pageSize: 'A4',
-    defaultStyle: {
-      noWrap: true
+    pageBreakBefore: ({ id }) => id === 'TopSlips',
+    background: {
+      canvas: [
+        // we don't go all the way to the edge otherwise it can overflow and not show anything
+        { type: 'line', x1: 1, y1: midY, x2: lineLength, y2: midY, lineWidth: 0.5 }, // left
+        { type: 'line', x1: midX, y1: 1, x2: midX, y2: lineLength, lineWidth: 0.5 }, // top
+        { type: 'line', x1: pageWidth - lineLength, y1: midY, x2: pageWidth - 1, y2: midY, lineWidth: 0.5 }, // right
+        { type: 'line', x1: midX, y1: pageHeight - lineLength, x2: midX, y2: pageHeight - 1, lineWidth: 0.5 } // bottom
+      ]
     },
-    content: [
-      { margin: [8, 0], stack }
-    ]
+    content
   }
 
-  stack.push('Test Slip')
+  const slips = []
+  const VALID_TYPES = ['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
+  for (const week of weeks) {
+    const { assignments } = week
+    for (let i = 0; i <= 4; i++) {
+      // treat index 0 as the bibleReading, else extract a student talk
+      const talk = i === 0 ? assignments.bibleReading : assignments['studentTalk' + i]
+      if (!talk || !(VALID_TYPES.includes(talk.type))) continue
+      slips.push(createSlip(talk, week.date))
+    }
+  }
+
+  // complete the last page so there aren't blank slips
+  while (slips.length % 4 !== 0) {
+    slips.push(createSlip())
+  }
+
+  // arrange the slips
+  let slipPageNum = 1
+  while (slips.length) {
+    const slipPage = slips.splice(0, 4)
+    content.push(
+      { columns: [slipPage[0], slipPage[1]], id: slipPageNum !== 1 ? 'TopSlips' : '' },
+      { columns: [slipPage[2], slipPage[3]] }
+    )
+    slipPageNum++
+  }
 
   return pdfMake.createPdf(docDefinition)
 }
