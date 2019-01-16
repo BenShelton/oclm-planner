@@ -245,19 +245,17 @@ export default {
       this.editTitle = 'Edit Existing Congregation Member'
       this.editDialog = true
     },
-    // TODO: When deleting we need to remove the member's assignments too, so disabling this for now
     onDelete ({ _id: memberID, name }) {
-      this.alert({ text: 'Deleting members is not fully supported, disable Show on Schedule instead', color: 'error' })
-      // if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
-      // this.deleteMember({ memberID })
-      //   .then(() => {
-      //     this.alert({ text: `${name} was successfully deleted`, color: 'success' })
-      //     this.closeEditor()
-      //   })
-      //   .catch(err => {
-      //     this.alert({ text: 'An error occured whilst deleting this member', color: 'error' })
-      //     console.error(err)
-      //   })
+      if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
+      this.deleteMember({ memberID })
+        .then(() => {
+          this.alert({ text: `${name} was successfully deleted`, color: 'success' })
+          this.closeEditor()
+        })
+        .catch(err => {
+          this.alert({ text: 'An error occured whilst deleting this member', color: 'error' })
+          console.error(err)
+        })
     },
     onSave () {
       if (!this.editMember.name || !this.editMember.abbreviation) {

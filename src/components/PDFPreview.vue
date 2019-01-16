@@ -21,13 +21,24 @@
       </VLayout>
       <object
         v-else
-        class="my-3"
+        class="my-3 elevation-1"
         type="application/pdf"
         :data="dataUrl"
       />
 
       <VFlex shrink>
         <VLayout justify-end>
+          <VBtn
+            color="primary"
+            :disabled="!dataUrl"
+            :href="dataUrl"
+            :download="downloadTitle"
+          >
+            Download
+            <VIcon right dark>
+              cloud_download
+            </VIcon>
+          </VBtn>
           <VBtn @click="onClose">
             Close
           </VBtn>
@@ -50,6 +61,13 @@ export default {
   data () {
     return {
       dataUrl: null
+    }
+  },
+
+  computed: {
+    downloadTitle () {
+      if (!this.pdf) return ''
+      return this.pdf.docDefinition.info.title
     }
   },
 
