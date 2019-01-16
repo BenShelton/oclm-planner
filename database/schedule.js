@@ -37,7 +37,7 @@ export const getMonth = async ({ month }) => {
   assert([4, 5].includes(weekCount), 'Month should always have 4 or 5 weeks')
   // search for those weeks
   const query = { date: { $regex: '^' + month } }
-  const weeks = await coll.find(query).toArray()
+  const weeks = await coll.find(query).sort({ date: 1 }).toArray()
   assert.strictEqual(weekCount, weeks.length, 'Month did not return the expected number of weeks')
   return weeks
 }
