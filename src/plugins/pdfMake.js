@@ -27,11 +27,11 @@ function addTime (minutes) {
   return time
 }
 
-function getAssigneeName (assignee) {
-  if (!assignee) return '-'
+function getAssigneeName (assignee, defaultValue = '') {
+  if (!assignee) return defaultValue
   const idMap = store.getters['congregation/idMap']
   const mappedAssignee = idMap[assignee]
-  return mappedAssignee ? mappedAssignee.name : '-'
+  return mappedAssignee ? mappedAssignee.name : defaultValue
 }
 
 function getAssignmentTitle (assignment) {
@@ -40,9 +40,9 @@ function getAssignmentTitle (assignment) {
 }
 
 function getScheduleAssignees (assignment) {
-  let assignees = getAssigneeName(assignment.assignee)
+  let assignees = getAssigneeName(assignment.assignee, '-')
   if (['initialCall', 'returnVisit', 'bibleStudy'].includes(assignment.type)) {
-    assignees += ' / ' + getAssigneeName(assignment.assistant)
+    assignees += ' / ' + getAssigneeName(assignment.assistant, '-')
   }
   return assignees
 }
@@ -228,11 +228,13 @@ export function generateSchedule (weeks, month) {
   return pdfMake.createPdf(docDefinition)
 }
 
-function createSlip (assignment, date) {
+function createSlip (assignment, date = '') {
   const { title, type, assignee, assistant } = assignment || {}
+  const [y, m, d] = date.split('-')
+  const prettyDate = [d, MONTHS[Number(m) + 1], y].join(' ')
   return {
     width: '50%',
-    margin: [32, 40, 32, 52],
+    margin: [32, 40, 32, 50],
     stack: [
       {
         text: 'OUR CHRISTIAN LIFE AND MINISTRY MEETING ASSIGNMENT',
@@ -241,15 +243,9 @@ function createSlip (assignment, date) {
         bold: true,
         margin: [0, 0, 0, 12]
       },
-      {
-        bold: true,
-        fontSize: 12,
-        stack: [
-          { text: 'Name: ' + getAssigneeName(assignee), margin: [0, 0, 0, 8] },
-          { text: 'Assistant: ' + getAssigneeName(assistant), margin: [0, 0, 0, 8] },
-          { text: 'Date: ' + date, margin: [0, 0, 0, 8] }
-        ]
-      },
+      createAssignmentInput('Name:', getAssigneeName(assignee)),
+      createAssignmentInput('Assistant:', getAssigneeName(assistant)),
+      createAssignmentInput('Date:', prettyDate),
       {
         fontSize: 10,
         margin: [0, 8, 0, 16],
@@ -296,6 +292,38 @@ function createSlip (assignment, date) {
         text: 'S-89-E      10/18',
         fontSize: 10,
         margin: [0, 8, 0, 0]
+      }
+    ]
+  }
+}
+
+function createAssignmentInput (title, content) {
+  return {
+    margin: [0, 0, 0, 8],
+    columns: [
+      {
+        width: 'auto',
+        text: title,
+        bold: true,
+        fontSize: 12,
+        margin: [0, 1, 4, 0]
+      },
+      {
+        width: '*',
+        fontSize: 10,
+        layout: {
+          hLineStyle: () => ({ dash: { length: 2, space: 1 } }),
+          paddingTop: () => 0,
+          paddingBottom: () => 0
+        },
+        table: {
+          heights: 11,
+          widths: ['*'],
+          body: [[{
+            text: content,
+            border: [false, false, false, true]
+          }]]
+        }
       }
     ]
   }
