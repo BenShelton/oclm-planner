@@ -1,10 +1,27 @@
 <template>
-  <VDialog v-model="value" persistent fullscreen>
+  <VDialog v-model="dialog" content-class="fill-height">
     <VLayout column fill-height class="pa-4 white">
       <VFlex shrink>
-        <p class="headline">
-          Preview
-        </p>
+        <VLayout align-center wrap>
+          <p class="headline ma-0">
+            Preview
+          </p>
+          <VSpacer />
+          <VBtn
+            color="primary"
+            :disabled="!dataUrl"
+            :href="dataUrl"
+            :download="downloadTitle"
+          >
+            Download
+            <VIcon right dark>
+              cloud_download
+            </VIcon>
+          </VBtn>
+          <VBtn icon @click="onClose">
+            <VIcon>close</VIcon>
+          </VBtn>
+        </VLayout>
       </VFlex>
 
       <VLayout v-if="error" column align-center>
@@ -19,31 +36,9 @@
         <VProgressCircular indeterminate color="primary" class="py-5" />
         <p>Generating schedule, please wait...</p>
       </VLayout>
-      <object
-        v-else
-        class="my-3 elevation-1"
-        type="application/pdf"
-        :data="dataUrl"
-      />
-
-      <VFlex shrink>
-        <VLayout justify-end>
-          <VBtn
-            color="primary"
-            :disabled="!dataUrl"
-            :href="dataUrl"
-            :download="downloadTitle"
-          >
-            Download
-            <VIcon right dark>
-              cloud_download
-            </VIcon>
-          </VBtn>
-          <VBtn @click="onClose">
-            Close
-          </VBtn>
-        </VLayout>
-      </VFlex>
+      <VLayout v-else fill-height class="object-wrapper my-3 elevation-1">
+        <object :data="dataUrl" />
+      </VLayout>
     </VLayout>
   </VDialog>
 </template>
@@ -65,6 +60,14 @@ export default {
   },
 
   computed: {
+    dialog: {
+      get () {
+        return this.value
+      },
+      set (val) {
+        if (!val) this.onClose()
+      }
+    },
     downloadTitle () {
       if (!this.pdf) return ''
       return this.pdf.docDefinition.info.title
@@ -90,6 +93,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.object-wrapper
+  overflow scroll
 object
-  height 100%
+  width 100%
+  min-height 100%
 </style>
