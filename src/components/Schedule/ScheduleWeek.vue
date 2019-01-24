@@ -155,6 +155,14 @@
                 <VTextField v-model="editAssignment.title" label="Title" />
               </VFlex>
               <VFlex
+                v-if="['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(editAssignment.type)"
+                xs12
+                md6
+                sm4
+              >
+                <VTextField v-model="editAssignment.studyPoint" label="Study Point" />
+              </VFlex>
+              <VFlex
                 v-if="!(['chairman', 'prayer', 'reader'].includes(editAssignment.type))"
                 xs12
                 md6
