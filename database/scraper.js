@@ -4,7 +4,7 @@ import cheerio from 'cheerio'
 const transform = body => cheerio.load(body)
 const titleRegex = /^(.*?): /
 const timeRegex = /: \((.*?)\)/
-const studyPointRegex = /\(.*(\d+)\)\*?$/
+const studyPointRegex = /\(.*?(\d+)\)\*?$/
 const paragraphSelector = 'p.su'
 const bookAbbreviations = {
   jy: 'Jesus - The Way'
