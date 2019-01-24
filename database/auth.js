@@ -14,7 +14,7 @@ const getCollection = new Promise(resolve => {
 export const createToken = async ({ password }) => {
   assert.strictEqual(password, PASSWORD, 401)
   const _id = new ObjectID()
-  const token = jwt.sign({ _id }, JWT_SECRET, { expiresIn: '7d' })
+  const token = jwt.sign({ _id }, JWT_SECRET, { expiresIn: '60d' })
   const coll = await getCollection
   await coll.insertOne({ _id })
   return token
