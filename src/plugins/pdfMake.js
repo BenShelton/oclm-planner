@@ -229,12 +229,12 @@ export function generateSchedule (weeks, month) {
 }
 
 function createSlip (assignment, date = '') {
-  const { title, type, assignee, assistant } = assignment || {}
+  const { title, type, assignee, assistant, studyPoint } = assignment || {}
   const [y, m, d] = date.split('-')
   const prettyDate = [d, MONTHS[Number(m) + 1], y].join(' ')
   return {
     width: '50%',
-    margin: [32, 40, 32, 50],
+    margin: [32, 32, 32, 32],
     stack: [
       {
         text: 'OUR CHRISTIAN LIFE AND MINISTRY MEETING ASSIGNMENT',
@@ -246,6 +246,7 @@ function createSlip (assignment, date = '') {
       createAssignmentInput('Name:', getAssigneeName(assignee)),
       createAssignmentInput('Assistant:', getAssigneeName(assistant)),
       createAssignmentInput('Date:', prettyDate),
+      createAssignmentInput('Study Point:', studyPoint),
       {
         fontSize: 10,
         margin: [0, 8, 0, 16],
