@@ -3,6 +3,9 @@ import assert from 'assert'
 import setup from './setup'
 import scrapeWOL from './scraper'
 import { addAssignment, removeAssignment } from './congregation'
+import { WEEK_TYPES } from '../src/constants'
+
+const ASSIGNEE_FIELDS = ['assignee', 'assistant']
 
 const getCollection = new Promise(resolve => {
   setup
@@ -54,7 +57,6 @@ export const scrapeWeek = async ({ weekID }) => {
 }
 
 export const updateAssignment = async ({ weekID, name, assignment }) => {
-  const assigneeFields = ['assignee', 'assistant']
   const coll = await getCollection
   const query = { _id: ObjectID(weekID) }
 
@@ -64,7 +66,7 @@ export const updateAssignment = async ({ weekID, name, assignment }) => {
   assert.notStrictEqual(null, week, 404)
   const previousAssignment = week.assignments[name]
   if (previousAssignment) {
-    for (const field of assigneeFields) {
+    for (const field of ASSIGNEE_FIELDS) {
       const memberID = previousAssignment[field]
       if (memberID) {
         const member = await removeAssignment({ memberID, assignment: { type: previousAssignment.type, date: week.date } })
@@ -81,7 +83,7 @@ export const updateAssignment = async ({ weekID, name, assignment }) => {
   assert.notStrictEqual(null, value, 404)
 
   // Add newly assigned members
-  for (const field of assigneeFields) {
+  for (const field of ASSIGNEE_FIELDS) {
     const memberID = value.assignments[name][field]
     if (memberID) {
       const member = await addAssignment({ memberID, assignment: { type: assignment.type, date: value.date } })
@@ -90,5 +92,40 @@ export const updateAssignment = async ({ weekID, name, assignment }) => {
   }
 
   // Return assignment
+  return { week: value, members: updatedMembers }
+}
+
+export const updateWeekType = async ({ weekID, type }) => {
+  const coll = await getCollection
+  const query = { _id: ObjectID(weekID) }
+
+  // Check the previous week didn't already have the same type
+  const week = await coll.findOne(query)
+  assert.notStrictEqual(null, week, 404)
+  assert.notStrictEqual(type, week.type, 400)
+
+  // Remove existing assigned members if necessary
+  const updatedMembers = []
+  switch (type) {
+    case WEEK_TYPES.assembly.value:
+      // do something
+      // const previousAssignment = week.assignments[name]
+      // if (previousAssignment) {
+      //   for (const field of ASSIGNEE_FIELDS) {
+      //     const memberID = previousAssignment[field]
+      //     if (memberID) {
+      //       const member = await removeAssignment({ memberID, assignment: { type: previousAssignment.type, date: week.date } })
+      //       updatedMembers.push(member)
+      //     }
+      //   }
+      // }
+  }
+
+  // Update Type
+  const update = { $set: { type } }
+  const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
+  assert.notStrictEqual(null, value, 404)
+
+  // Return week and any removed assigned members
   return { week: value, members: updatedMembers }
 }

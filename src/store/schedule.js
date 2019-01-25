@@ -49,6 +49,17 @@ const actions = {
         }
         return week
       })
+  },
+  updateWeekType ({ commit }, { weekID, type }) {
+    return api.schedule.updateWeekType({ weekID, type })
+      .then(res => {
+        const { week, members } = res.data.result
+        commit('UPDATE_WEEK', week)
+        for (const member of members) {
+          commit('congregation/UPDATE_MEMBER', member, { root: true })
+        }
+        return week
+      })
   }
 }
 

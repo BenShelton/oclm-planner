@@ -5,7 +5,7 @@ const serverless = require('serverless-http')
 const auth = require('../database/auth')
 const congregation = require('../database/congregation')
 const schedule = require('../database/schedule')
-const { APPOINTMENTS, GENDERS, LANGUAGE_GROUPS } = require('../src/constants')
+const { APPOINTMENTS, GENDERS, LANGUAGE_GROUPS, WEEK_TYPES } = require('../src/constants')
 
 // Initialize express app
 const app = express()
@@ -131,6 +131,15 @@ router.put('/schedule/updateAssignment', (req, res) => {
     return res.status(400).json({ message: 'Required Fields are: weekID, name, assignment' })
   }
   schedule.updateAssignment({ weekID, name, assignment })
+    .then(returnResult(res))
+    .catch(handleErrors(res))
+})
+
+router.put('/schedule/updateWeekType', (req, res) => {
+  const { weekID, type } = req.body
+  if (!weekID || type === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, type' })
+  if (!(Object.values(WEEK_TYPES).some(t => t.value === type))) return res.status(400).json({ message: 'Invalid Type' })
+  schedule.updateWeekType({ weekID, type })
     .then(returnResult(res))
     .catch(handleErrors(res))
 })
