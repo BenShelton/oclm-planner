@@ -95,6 +95,18 @@
       </VLayout>
     </VLayout>
 
+    <!-- Assembly Week Display -->
+    <VLayout v-else-if="week.type === WEEK_TYPES.assembly.value" justify-center class="pa-3">
+      <VLayout column align-center>
+        <VIcon large color="primary">
+          group
+        </VIcon>
+        <p class="headline text-xs-center primary--text mt-3">
+          Assembly Week
+        </p>
+      </VLayout>
+    </VLayout>
+
     <!-- Assignment Display -->
     <VList
       v-else
