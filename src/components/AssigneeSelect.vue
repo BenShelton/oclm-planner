@@ -1,5 +1,6 @@
 <template>
   <VSelect
+    clearable
     item-text="name"
     item-value="_id"
     no-data-text="No Assignees Available"

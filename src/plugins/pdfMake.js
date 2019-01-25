@@ -2,7 +2,7 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 import store from '@/store'
-import { COLORS } from '@/constants'
+import { COLORS, WEEK_TYPES } from '@/constants'
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
@@ -148,7 +148,7 @@ export function generateSchedule (weeks, month) {
 
   stack.push(createScheduleSeparator(false))
   weeks.forEach((week, index) => {
-    const { date, weeklyBibleReading, songs, assignments } = week
+    const { type, date, weeklyBibleReading, songs, assignments } = week
     const {
       openingPrayer,
       chairman,
@@ -172,6 +172,15 @@ export function generateSchedule (weeks, month) {
       fontSize: 14,
       bold: true
     })
+
+    // Just add a block of text for assembly weeks
+    if (type === WEEK_TYPES.assembly.value) {
+      stack.push({ text: 'No Meeting', fontSize: 32, bold: true, alignment: 'center', margin: [0, 132, 0, 12] })
+      stack.push({ text: 'Assembly Week', fontSize: 18, alignment: 'center', margin: [0, 0, 0, 132] })
+      stack.push(createScheduleSeparator())
+      return
+    }
+
     stack.push({ text: 'Time Off', bold: true, decoration: 'underline', alignment: 'right' })
 
     // Introduction Section

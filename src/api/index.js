@@ -36,6 +36,7 @@ export default {
     week: ({ date }) => api.get(`/schedule/week/${date}`),
     month: ({ month }) => api.get(`/schedule/month/${month}`),
     scrape: ({ weekID }) => api.put(`/schedule/scrape/`, { weekID }),
-    updateAssignment: ({ weekID, name, assignment }) => api.put(`/schedule/updateAssignment`, { weekID, name, assignment })
+    updateAssignment: ({ weekID, name, assignment }) => api.put(`/schedule/updateAssignment`, { weekID, name, assignment }),
+    updateWeekType: ({ weekID, type }) => api.put(`/schedule/updateWeekType`, { weekID, type })
   }
 }

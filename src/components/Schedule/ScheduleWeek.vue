@@ -3,24 +3,51 @@
     <VToolbar :color="toolbarColor">
       <VToolbarTitle v-text="prettyDate" />
       <VSpacer />
-      <VMenu v-if="week && week.scraped" offset-y>
-        <VBtn
-          slot="activator"
-          flat
-          icon
-        >
+      <VMenu
+        v-if="week.loaded"
+        v-model="settingsMenu"
+        lazy
+        left
+        offset-y
+        :close-on-content-click="false"
+      >
+        <VBtn slot="activator" flat icon>
           <VIcon>settings</VIcon>
         </VBtn>
-        <VList>
-          <VListTile @click="onRedownload">
-            <VListTileTitle>Redownload</VListTileTitle>
-          </VListTile>
-        </VList>
+        <VCard class="pa-3">
+          <VBtn
+            color="primary"
+            :loading="scrapeLoading"
+            :disabled="scrapeLoading"
+            @click="onScrape"
+          >
+            Redownload
+            <VIcon right>
+              cloud_download
+            </VIcon>
+          </VBtn>
+          <VDivider class="mt-3" />
+          <VRadioGroup
+            v-model="weekType"
+            hide-details
+            label="Week Type"
+            :disabled="weekTypeLoading"
+          >
+            <VRadio
+              v-for="type in WEEK_TYPES"
+              :key="type.value"
+              class="ml-3"
+              :ripple="false"
+              :label="type.label"
+              :value="type.value"
+            />
+          </VRadioGroup>
+        </VCard>
       </Vmenu>
     </VToolbar>
 
     <!-- Loading Week Display -->
-    <VLayout v-if="!week" justify-center class="pa-3">
+    <VLayout v-if="!week.loaded" justify-center class="pa-3">
       <VLayout v-if="loadError" column align-center>
         <VIcon color="red">
           warning
@@ -64,6 +91,18 @@
         </VIcon>
         <p class="pt-3 text-xs-center error--text">
           There was an error scraping this week's data (most likely because the information isn't available yet on WOL) if you believe this is a mistake contact support
+        </p>
+      </VLayout>
+    </VLayout>
+
+    <!-- Assembly Week Display -->
+    <VLayout v-else-if="week.type === WEEK_TYPES.assembly.value" justify-center class="pa-3">
+      <VLayout column align-center>
+        <VIcon large color="primary">
+          group
+        </VIcon>
+        <p class="headline text-xs-center primary--text mt-3">
+          Assembly Week
         </p>
       </VLayout>
     </VLayout>
@@ -219,7 +258,7 @@ import ScheduleSection from '@/components/Schedule/ScheduleSection'
 import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment'
 import AssigneeSelect from '@/components/AssigneeSelect'
 
-import { ASSIGNMENT_TYPE_MAP } from '@/constants'
+import { ASSIGNMENT_TYPE_MAP, WEEK_TYPES } from '@/constants'
 
 export default {
   name: 'ScheduleWeek',
@@ -241,7 +280,7 @@ export default {
       return
     }
     this.loadWeek({ date: this.weekDate })
-      .then(week => { this.week = week })
+      .then(this.loadLocalWeek)
       .catch(err => {
         this.loadError = true
         console.error(err)
@@ -250,10 +289,13 @@ export default {
 
   data () {
     return {
-      week: null,
+      WEEK_TYPES,
+      week: { type: 0, loaded: false },
       loadError: false,
       scrapeLoading: false,
       scrapeError: false,
+      settingsMenu: false,
+      weekTypeLoading: false,
       editDialog: false,
       editName: '',
       editTitle: '',
@@ -263,6 +305,35 @@ export default {
   },
 
   computed: {
+    weekType: {
+      get () {
+        return this.week.type || 0
+      },
+      set (val) {
+        const prev = this.weekType
+        this.week.type = val
+        // wait for the animation to finish
+        setTimeout(() => {
+          if (!window.confirm('Are you sure you want to change the week type? All items may be unassigned.')) {
+            this.week.type = prev
+            return
+          }
+          this.weekTypeLoading = true
+          this.updateWeekType({ weekID: this.week._id, type: val })
+            .then(this.loadLocalWeek)
+            .then(() => {
+              this.alert({ text: 'Week Type successfully updated', color: 'success' })
+              this.settingsMenu = false
+            })
+            .catch(err => {
+              this.week.type = prev
+              this.alert({ text: 'Week Type could not be toggled', color: 'error' })
+              console.error(err)
+            })
+            .finally(() => { this.weekTypeLoading = false })
+        }, 100)
+      }
+    },
     toolbarColor () {
       return this.current ? 'primary' : 'grey'
     },
@@ -306,28 +377,23 @@ export default {
     ...mapActions({
       loadWeek: 'schedule/loadWeek',
       scrapeWeek: 'schedule/scrapeWeek',
-      updateAssignment: 'schedule/updateAssignment'
+      updateAssignment: 'schedule/updateAssignment',
+      updateWeekType: 'schedule/updateWeekType'
     }),
     ...mapMutations({
       alert: 'alert/UPDATE_ALERT'
     }),
-    onRedownload () {
-      this.scrapeWeek({ weekID: this.week._id })
-        .then(week => {
-          this.week = week
-          this.alert({ text: 'Week successfully redownloaded', color: 'success' })
-        })
-        .catch(err => {
-          this.alert({ text: 'Week could not be redownloaded', color: 'error' })
-          console.error(err)
-        })
+    loadLocalWeek (week) {
+      this.week = Object.assign({}, { loaded: true }, week)
     },
     onScrape () {
       this.scrapeLoading = true
       this.scrapeWeek({ weekID: this.week._id })
-        .then(week => { this.week = week })
+        .then(this.loadLocalWeek)
+        .then(() => this.alert({ text: 'Week successfully downloaded', color: 'success' }))
         .catch(err => {
           this.scrapeError = true
+          this.alert({ text: 'Week could not be downloaded', color: 'error' })
           console.error(err)
         })
         .finally(() => { this.scrapeLoading = false })
@@ -351,10 +417,8 @@ export default {
         name: this.editName,
         assignment: this.editAssignment
       })
-        .then(week => {
-          this.week = week
-          this.closeEditor()
-        })
+        .then(this.loadLocalWeek)
+        .then(this.closeEditor)
         .catch(err => {
           console.error(err)
         })

@@ -42,3 +42,9 @@ export const APPOINTMENTS = ['None', 'Brother', 'Sister', 'Ministerial Servant',
 export const GENDERS = ['Male', 'Female']
 
 export const LANGUAGE_GROUPS = ['English', 'Portuguese']
+
+export const WEEK_TYPES = {
+  normal: { label: 'Normal', value: 0 },
+  assembly: { label: 'Assembly', value: 1 },
+  coVisit: { label: 'CO Visit', value: 2 }
+}
