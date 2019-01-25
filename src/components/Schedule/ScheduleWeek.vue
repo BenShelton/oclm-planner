@@ -309,9 +309,13 @@ export default {
           this.weekTypeLoading = true
           this.updateWeekType({ weekID: this.week._id, type: val })
             .then(this.loadLocalWeek)
+            .then(() => {
+              this.alert({ text: 'Week Type successfully updated', color: 'success' })
+              this.settingsMenu = false
+            })
             .catch(err => {
               this.week.type = prev
-              this.alert({ text: 'Assembly could not be toggled', color: 'error' })
+              this.alert({ text: 'Week Type could not be toggled', color: 'error' })
               console.error(err)
             })
             .finally(() => { this.weekTypeLoading = false })
@@ -368,7 +372,7 @@ export default {
       alert: 'alert/UPDATE_ALERT'
     }),
     loadLocalWeek (week) {
-      Object.assign(this.week, { loaded: true }, week)
+      this.week = Object.assign({}, { loaded: true }, week)
     },
     onScrape () {
       this.scrapeLoading = true

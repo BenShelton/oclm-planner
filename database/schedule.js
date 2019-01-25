@@ -105,24 +105,27 @@ export const updateWeekType = async ({ weekID, type }) => {
   assert.notStrictEqual(type, week.type, 400)
 
   // Remove existing assigned members if necessary
+  const update = { $set: {} }
   const updatedMembers = []
   switch (type) {
     case WEEK_TYPES.assembly.value:
-      // do something
-      // const previousAssignment = week.assignments[name]
-      // if (previousAssignment) {
-      //   for (const field of ASSIGNEE_FIELDS) {
-      //     const memberID = previousAssignment[field]
-      //     if (memberID) {
-      //       const member = await removeAssignment({ memberID, assignment: { type: previousAssignment.type, date: week.date } })
-      //       updatedMembers.push(member)
-      //     }
-      //   }
-      // }
+      for (const [k, v] of Object.entries(week.assignments || {})) {
+        if (v) {
+          for (const field of ASSIGNEE_FIELDS) {
+            const memberID = v[field]
+            if (memberID) {
+              const member = await removeAssignment({ memberID, assignment: { type: v.type, date: week.date } })
+              updatedMembers.push(member)
+              const assignmentPath = `assignments.${k}.${field}`
+              update.$set[assignmentPath] = null
+            }
+          }
+        }
+      }
   }
 
   // Update Type
-  const update = { $set: { type } }
+  Object.assign(update.$set, { type })
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
   assert.notStrictEqual(null, value, 404)
 
