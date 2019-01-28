@@ -15,14 +15,15 @@ export default function scrapeWOL (date) {
   return rp({ uri, transform })
     .then($ => {
       // Check schedule is online first
-      if (!$('#p2').text()) throw new Error('Week not yet available')
+      const weeklyBibleReading = $('#p2', 'header').text()
+      if (!weeklyBibleReading) throw new Error('Week not yet available')
 
       // Load as much static information as possible
       const update = {
         scraped: true,
-        weeklyBibleReading: $('#p2').text(),
+        weeklyBibleReading,
         songs: [
-          $('#p3').text().trim(),
+          $('#p3', '#section1').text().trim(),
           $(paragraphSelector, '#section4').first().text().trim(),
           $(paragraphSelector, '#section4').last().text().trim()
         ],
