@@ -109,6 +109,7 @@ export const updateWeekType = async ({ weekID, type }) => {
   const updatedMembers = []
   switch (type) {
     case WEEK_TYPES.assembly.value:
+    case WEEK_TYPES.memorial.value:
       for (const [k, v] of Object.entries(week.assignments || {})) {
         if (v) {
           for (const field of ASSIGNEE_FIELDS) {
