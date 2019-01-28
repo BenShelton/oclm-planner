@@ -167,16 +167,15 @@ export function generateSchedule (weeks, month) {
     const [, month, day] = date.split('-')
     const titleDay = day.charAt(0) === '0' ? day.charAt(1) : day
     const titleMonth = MONTHS[+month - 1]
-    stack.push({
-      text: `${titleDay} ${titleMonth} | WEEKLY BIBLE READING: ${weeklyBibleReading}`,
-      fontSize: 14,
-      bold: true
-    })
+    let titleText = `${titleDay} ${titleMonth}`
+    if (weeklyBibleReading) titleText += ` | WEEKLY BIBLE READING: ${weeklyBibleReading}`
+    stack.push({ text: titleText, fontSize: 14, bold: true })
 
     // Just add a block of text for assembly weeks
-    if (type === WEEK_TYPES.assembly.value) {
+    if (type === WEEK_TYPES.assembly.value || type === WEEK_TYPES.memorial.value) {
+      const blockText = type === WEEK_TYPES.assembly.value ? 'Assembly Week' : 'Memorial Week'
       stack.push({ text: 'No Meeting', fontSize: 32, bold: true, alignment: 'center', margin: [0, 132, 0, 12] })
-      stack.push({ text: 'Assembly Week', fontSize: 18, alignment: 'center', margin: [0, 0, 0, 132] })
+      stack.push({ text: blockText, fontSize: 18, alignment: 'center', margin: [0, 0, 0, 132] })
       stack.push(createScheduleSeparator())
       return
     }
