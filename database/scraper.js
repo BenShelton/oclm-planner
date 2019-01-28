@@ -15,7 +15,7 @@ export default function scrapeWOL (date) {
   return rp({ uri, transform })
     .then($ => {
       // Check schedule is online first
-      const weeklyBibleReading = $('#p2', 'header').text()
+      const weeklyBibleReading = $('#p2 strong', 'header').text()
       if (!weeklyBibleReading) throw new Error('Week not yet available')
 
       // Load as much static information as possible
