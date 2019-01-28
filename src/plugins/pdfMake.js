@@ -390,7 +390,8 @@ export function generateAssignmentSlips (weeks, month) {
   const slips = []
   const VALID_TYPES = ['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
   for (const week of weeks) {
-    const { assignments } = week
+    const { type, assignments } = week
+    if (type === WEEK_TYPES.assembly.value || type === WEEK_TYPES.memorial.value) continue
     for (let i = 0; i <= 4; i++) {
       // treat index 0 as the bibleReading, else extract a student talk
       const talk = i === 0 ? assignments.bibleReading : assignments['studentTalk' + i]
