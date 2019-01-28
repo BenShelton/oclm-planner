@@ -59,6 +59,14 @@
       <VProgressCircular v-else indeterminate color="primary" />
     </VLayout>
 
+    <!-- Assembly/Memorial Week Display -->
+    <VLayout v-else-if="week.type === WEEK_TYPES.assembly.value || week.type === WEEK_TYPES.memorial.value" justify-center class="pa-3">
+      <VLayout class="pt-3" column align-center>
+        <VIcon large color="primary" v-text="week.type === WEEK_TYPES.assembly.value ? 'group' : 'public'" />
+        <p class="headline text-xs-center primary--text mt-3" v-text="week.type === WEEK_TYPES.assembly.value ? 'Assembly Week' : 'Memorial Week'" />
+      </VLayout>
+    </VLayout>
+
     <!-- Unscraped Week Display -->
     <VLayout v-else-if="!week.scraped" justify-center class="pa-3">
       <VLayout v-if="week.unavailable" column align-center>
@@ -89,21 +97,11 @@
         <VIcon color="error">
           warning
         </VIcon>
-        <p class="pt-3 text-xs-center error--text">
-          There was an error scraping this week's data (most likely because the information isn't available yet on WOL) if you believe this is a mistake contact support
-        </p>
-      </VLayout>
-    </VLayout>
-
-    <!-- Assembly Week Display -->
-    <VLayout v-else-if="week.type === WEEK_TYPES.assembly.value" justify-center class="pa-3">
-      <VLayout column align-center>
-        <VIcon large color="primary">
-          group
-        </VIcon>
-        <p class="headline text-xs-center primary--text mt-3">
-          Assembly Week
-        </p>
+        <div class="pt-3 text-xs-center error--text">
+          <p>There was an error scraping this week's data</p>
+          <p>This is most likely because the information isn't available yet on WOL, but may also be because of a special week such as the Memorial</p>
+          <p>If you believe this is a mistake please contact support</p>
+        </div>
       </VLayout>
     </VLayout>
 
