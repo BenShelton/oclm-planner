@@ -133,3 +133,21 @@ export const updateWeekType = async ({ weekID, type }) => {
   // Return week and any removed assigned members
   return { week: value, members: updatedMembers }
 }
+
+export const updateCOName = async ({ weekID, name }) => {
+  const coll = await getCollection
+  const query = { _id: ObjectID(weekID) }
+  const update = { $set: { coName: name } }
+  const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
+  assert.notStrictEqual(null, value, 404)
+  return value
+}
+
+export const updateCOTitle = async ({ weekID, title }) => {
+  const coll = await getCollection
+  const query = { _id: ObjectID(weekID) }
+  const update = { $set: { coTitle: title } }
+  const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
+  assert.notStrictEqual(null, value, 404)
+  return value
+}

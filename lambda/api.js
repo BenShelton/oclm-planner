@@ -144,6 +144,22 @@ router.put('/schedule/updateWeekType', (req, res) => {
     .catch(handleErrors(res))
 })
 
+router.put('/schedule/updateCOName', (req, res) => {
+  const { weekID, name } = req.body
+  if (!weekID || name === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, name' })
+  schedule.updateCOName({ weekID, name })
+    .then(returnResult(res))
+    .catch(handleErrors(res))
+})
+
+router.put('/schedule/updateCOTitle', (req, res) => {
+  const { weekID, title } = req.body
+  if (!weekID || title === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, title' })
+  schedule.updateCOTitle({ weekID, title })
+    .then(returnResult(res))
+    .catch(handleErrors(res))
+})
+
 // The lambda function route must match the netlify path
 app.use('/.netlify/functions/api', router)
 app.use((req, res) => {
