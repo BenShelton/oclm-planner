@@ -46,6 +46,6 @@ export const LANGUAGE_GROUPS = ['English', 'Portuguese']
 export const WEEK_TYPES = {
   normal: { label: 'Normal', value: 0 },
   assembly: { label: 'Assembly', value: 1 },
-  coVisit: { label: 'CO Visit', value: 2 },
+  coVisit: { label: 'Circuit Overseer Visit', value: 2 },
   memorial: { label: 'Memorial', value: 3 }
 }

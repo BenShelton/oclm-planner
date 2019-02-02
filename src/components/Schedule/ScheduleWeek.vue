@@ -15,17 +15,19 @@
           <VIcon>settings</VIcon>
         </VBtn>
         <VCard class="pa-3">
-          <VBtn
-            color="primary"
-            :loading="scrapeLoading"
-            :disabled="scrapeLoading"
-            @click="onScrape"
-          >
-            Redownload
-            <VIcon right>
-              cloud_download
-            </VIcon>
-          </VBtn>
+          <VLayout justify-center>
+            <VBtn
+              color="primary"
+              :loading="scrapeLoading"
+              :disabled="scrapeLoading"
+              @click="onScrape"
+            >
+              Redownload
+              <VIcon right>
+                cloud_download
+              </VIcon>
+            </VBtn>
+          </VLayout>
           <VDivider class="mt-3" />
           <VRadioGroup
             v-model="weekType"
@@ -42,6 +44,20 @@
               :value="type.value"
             />
           </VRadioGroup>
+          <template v-if="week.type === WEEK_TYPES.coVisit.value">
+            <VDivider class="my-3" />
+            <label class="v-label theme--light py-2">
+              Circuit Overseer Details
+            </label>
+            <VTextField :value="week.coName" label="Name" @change="onUpdateCOName" />
+            <VTextarea
+              label="Talk Title"
+              :value="week.coTitle"
+              :rows="1"
+              :auto-grow="true"
+              @change="onUpdateCOTitle"
+            />
+          </template>
         </VCard>
       </Vmenu>
     </VToolbar>
@@ -106,36 +122,40 @@
     </VLayout>
 
     <!-- Assignment Display -->
-    <VList
-      v-else
-      two-line
-      subheader
-      class="pa-0"
-    >
-      <ScheduleAssignment :assignment="assignments.chairman" @edit="onEdit" />
-      <ScheduleAssignment :assignment="assignments.openingPrayer" @edit="onEdit" />
+    <template v-else>
+      <div v-if="coVisit" class="pa-0">
+        <p class="headline text-xs-center primary--text py-2 ma-0">
+          Circuit Overseer Visit
+        </p>
+        <VDivider />
+      </div>
 
-      <ScheduleSection title="TREASURES FROM GOD'S WORD" color="TREASURES">
-        <ScheduleAssignment :assignment="assignments.highlights" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.gems" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.bibleReading" @edit="onEdit" />
-      </ScheduleSection>
+      <VList two-line subheader class="pa-0">
+        <ScheduleAssignment :assignment="assignments.chairman" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.openingPrayer" @edit="onEdit" />
 
-      <ScheduleSection title="APPLY YOURSELF TO THE FIELD MINISTRY" color="MINISTRY">
-        <ScheduleAssignment :assignment="assignments.studentTalk1" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.studentTalk2" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.studentTalk3" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.studentTalk4" @edit="onEdit" />
-      </ScheduleSection>
+        <ScheduleSection title="TREASURES FROM GOD'S WORD" color="TREASURES">
+          <ScheduleAssignment :assignment="assignments.highlights" @edit="onEdit" />
+          <ScheduleAssignment :assignment="assignments.gems" @edit="onEdit" />
+          <ScheduleAssignment :assignment="assignments.bibleReading" @edit="onEdit" />
+        </ScheduleSection>
 
-      <ScheduleSection title="LIVING AS CHRISTIANS" color="LIVING">
-        <ScheduleAssignment :assignment="assignments.serviceTalk1" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.serviceTalk2" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.congregationBibleStudy" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.reader" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.closingPrayer" @edit="onEdit" />
-      </ScheduleSection>
-    </VList>
+        <ScheduleSection title="APPLY YOURSELF TO THE FIELD MINISTRY" color="MINISTRY">
+          <ScheduleAssignment :assignment="assignments.studentTalk1" @edit="onEdit" />
+          <ScheduleAssignment :assignment="assignments.studentTalk2" @edit="onEdit" />
+          <ScheduleAssignment :assignment="assignments.studentTalk3" @edit="onEdit" />
+          <ScheduleAssignment :assignment="assignments.studentTalk4" @edit="onEdit" />
+        </ScheduleSection>
+
+        <ScheduleSection title="LIVING AS CHRISTIANS" color="LIVING">
+          <ScheduleAssignment :assignment="assignments.serviceTalk1" @edit="onEdit" />
+          <ScheduleAssignment :assignment="assignments.serviceTalk2" @edit="onEdit" />
+          <ScheduleAssignment v-if="!coVisit" :assignment="assignments.congregationBibleStudy" @edit="onEdit" />
+          <ScheduleAssignment v-if="!coVisit" :assignment="assignments.reader" @edit="onEdit" />
+          <ScheduleAssignment :assignment="assignments.closingPrayer" @edit="onEdit" />
+        </ScheduleSection>
+      </VList>
+    </template>
 
     <!-- Edit Assignment Dialog -->
     <VDialog
@@ -368,6 +388,9 @@ export default {
           }
         })
       }, {})
+    },
+    coVisit () {
+      return this.weekType === WEEK_TYPES.coVisit.value
     }
   },
 
@@ -376,13 +399,29 @@ export default {
       loadWeek: 'schedule/loadWeek',
       scrapeWeek: 'schedule/scrapeWeek',
       updateAssignment: 'schedule/updateAssignment',
-      updateWeekType: 'schedule/updateWeekType'
+      updateWeekType: 'schedule/updateWeekType',
+      updateCOName: 'schedule/updateCOName',
+      updateCOTitle: 'schedule/updateCOTitle'
     }),
     ...mapMutations({
       alert: 'alert/UPDATE_ALERT'
     }),
     loadLocalWeek (week) {
       this.week = Object.assign({}, { loaded: true }, week)
+    },
+    onUpdateCOName (name) {
+      this.updateCOName({ weekID: this.week._id, name })
+        .then(this.loadLocalWeek)
+        .catch(() => {
+          this.alert({ text: 'Circuit Overseer Name could not be updated.', color: 'error' })
+        })
+    },
+    onUpdateCOTitle (title) {
+      this.updateCOTitle({ weekID: this.week._id, title })
+        .then(this.loadLocalWeek)
+        .catch(() => {
+          this.alert({ text: 'Circuit Overseer Talk Title could not be updated.', color: 'error' })
+        })
     },
     onScrape () {
       this.scrapeLoading = true

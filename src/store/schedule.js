@@ -60,6 +60,22 @@ const actions = {
         }
         return week
       })
+  },
+  updateCOName ({ commit }, { weekID, name }) {
+    return api.schedule.updateCOName({ weekID, name })
+      .then(res => {
+        const week = res.data.result
+        commit('UPDATE_WEEK', week)
+        return week
+      })
+  },
+  updateCOTitle ({ commit }, { weekID, title }) {
+    return api.schedule.updateCOTitle({ weekID, title })
+      .then(res => {
+        const week = res.data.result
+        commit('UPDATE_WEEK', week)
+        return week
+      })
   }
 }
 
