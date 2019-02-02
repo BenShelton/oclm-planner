@@ -15,17 +15,19 @@
           <VIcon>settings</VIcon>
         </VBtn>
         <VCard class="pa-3">
-          <VBtn
-            color="primary"
-            :loading="scrapeLoading"
-            :disabled="scrapeLoading"
-            @click="onScrape"
-          >
-            Redownload
-            <VIcon right>
-              cloud_download
-            </VIcon>
-          </VBtn>
+          <VLayout justify-center>
+            <VBtn
+              color="primary"
+              :loading="scrapeLoading"
+              :disabled="scrapeLoading"
+              @click="onScrape"
+            >
+              Redownload
+              <VIcon right>
+                cloud_download
+              </VIcon>
+            </VBtn>
+          </VLayout>
           <VDivider class="mt-3" />
           <VRadioGroup
             v-model="weekType"
@@ -42,6 +44,20 @@
               :value="type.value"
             />
           </VRadioGroup>
+          <template v-if="week.type === WEEK_TYPES.coVisit.value">
+            <VDivider class="my-3" />
+            <label class="v-label theme--light py-2">
+              Circuit Overseer Details
+            </label>
+            <VTextField :value="week.coName" label="Name" @change="onUpdateCOName" />
+            <VTextarea
+              label="Talk Title"
+              :value="week.coTitle"
+              :rows="1"
+              :auto-grow="true"
+              @change="onUpdateCOTitle"
+            />
+          </template>
         </VCard>
       </Vmenu>
     </VToolbar>
@@ -383,13 +399,29 @@ export default {
       loadWeek: 'schedule/loadWeek',
       scrapeWeek: 'schedule/scrapeWeek',
       updateAssignment: 'schedule/updateAssignment',
-      updateWeekType: 'schedule/updateWeekType'
+      updateWeekType: 'schedule/updateWeekType',
+      updateCOName: 'schedule/updateCOName',
+      updateCOTitle: 'schedule/updateCOTitle'
     }),
     ...mapMutations({
       alert: 'alert/UPDATE_ALERT'
     }),
     loadLocalWeek (week) {
       this.week = Object.assign({}, { loaded: true }, week)
+    },
+    onUpdateCOName (name) {
+      this.updateCOName({ weekID: this.week._id, name })
+        .then(this.loadLocalWeek)
+        .catch(() => {
+          this.alert({ text: 'Circuit Overseer Name could not be updated.', color: 'error' })
+        })
+    },
+    onUpdateCOTitle (title) {
+      this.updateCOTitle({ weekID: this.week._id, title })
+        .then(this.loadLocalWeek)
+        .catch(() => {
+          this.alert({ text: 'Circuit Overseer Talk Title could not be updated.', color: 'error' })
+        })
     },
     onScrape () {
       this.scrapeLoading = true
