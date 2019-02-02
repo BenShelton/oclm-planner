@@ -221,14 +221,22 @@ export function generateSchedule (weeks, month) {
       null
     ]
     if (serviceTalk2) livingTableRows[2] = [timer, getAssignmentTitle(serviceTalk2), null, getScheduleAssignees(serviceTalk2), addTime(serviceTalk2.time)]
-    livingTableRows.push(
-      [timer, 'Congregation Bible Study (30 min.)', 'Conductor:', getScheduleAssignees(congregationBibleStudy), addTime(30)],
-      [null, congregationBibleStudy.title, 'Reader:', getScheduleAssignees(reader), null],
-      [timer, 'Review/Preview/Announcements (3 min.)', 'Chairman:', getScheduleAssignees(chairman), addTime(3)],
-      [timer, songs[2], 'Prayer:', getScheduleAssignees(closingPrayer), addTime(5)]
-    )
+    if (type === WEEK_TYPES.coVisit.value) {
+      livingTableRows.push(
+        [timer, 'Review/Preview/Announcements (3 min.)', 'Chairman:', getScheduleAssignees(chairman), addTime(3)],
+        [timer, week.coTitle + ' (30 min.)', 'Circuit Overseer:', week.coName, addTime(30)],
+        [timer, songs[2], 'Prayer:', getScheduleAssignees(closingPrayer), addTime(5)]
+      )
+    } else {
+      livingTableRows.push(
+        [timer, 'Congregation Bible Study (30 min.)', 'Conductor:', getScheduleAssignees(congregationBibleStudy), addTime(30)],
+        [null, congregationBibleStudy.title, 'Reader:', getScheduleAssignees(reader), null],
+        [timer, 'Review/Preview/Announcements (3 min.)', 'Chairman:', getScheduleAssignees(chairman), addTime(3)],
+        [timer, songs[2], 'Prayer:', getScheduleAssignees(closingPrayer), addTime(5)]
+      )
+    }
     const livingTable = createScheduleTable(COLORS.LIVING, livingTableRows)
-    Object.assign(livingTable.table.body[3][1], { rowSpan: 2 })
+    if (type !== WEEK_TYPES.coVisit.value) Object.assign(livingTable.table.body[3][1], { rowSpan: 2 })
     stack.push(livingTable)
     stack.push(createScheduleSeparator())
   })
