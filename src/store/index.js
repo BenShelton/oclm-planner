@@ -19,6 +19,6 @@ export default new Vuex.Store({
     schedule
   },
   plugins: [createPersistedState({
-    paths: ['auth']
+    paths: ['auth', 'schedule.language']
   })]
 })

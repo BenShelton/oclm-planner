@@ -4,11 +4,13 @@ const state = {
   weeks: [],
   month: [],
   loadedMonth: '',
-  selectedAssignee: ''
+  selectedAssignee: '',
+  language: 'en'
 }
 
 const getters = {
-  selectedAssignee: state => state.selectedAssignee
+  selectedAssignee: state => state.selectedAssignee,
+  language: state => state.language
 }
 
 const actions = {
@@ -95,6 +97,9 @@ const mutations = {
   },
   UPDATE_SELECTED_ASSIGNEE (state, payload) {
     Object.assign(state, { selectedAssignee: payload })
+  },
+  UPDATE_LANGUAGE (state, payload) {
+    Object.assign(state, { language: payload })
   }
 }
 
