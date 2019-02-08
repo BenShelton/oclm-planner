@@ -147,8 +147,11 @@ export function generateSchedule (weeks, month) {
   }
 
   stack.push(createScheduleSeparator(false))
-  weeks.forEach((week, index) => {
-    const { type, date, weeklyBibleReading, songs, assignments } = week
+  const language = store.getters['schedule/language']
+  weeks.forEach((baseWeek, index) => {
+    const { date } = baseWeek
+    const week = baseWeek[language] || {}
+    const { type, weeklyBibleReading, songs, assignments, coTitle, coName } = week
     const {
       openingPrayer,
       chairman,
@@ -224,7 +227,7 @@ export function generateSchedule (weeks, month) {
     if (type === WEEK_TYPES.coVisit.value) {
       livingTableRows.push(
         [timer, 'Review/Preview/Announcements (3 min.)', 'Chairman:', getScheduleAssignees(chairman), addTime(3)],
-        [timer, week.coTitle + ' (30 min.)', 'Circuit Overseer:', week.coName, addTime(30)],
+        [timer, coTitle + ' (30 min.)', 'Circuit Overseer:', coName, addTime(30)],
         [timer, songs[2], 'Prayer:', getScheduleAssignees(closingPrayer), addTime(5)]
       )
     } else {
@@ -397,14 +400,17 @@ export function generateAssignmentSlips (weeks, month) {
 
   const slips = []
   const VALID_TYPES = ['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
-  for (const week of weeks) {
+  const language = store.getters['schedule/language']
+  for (const baseWeek of weeks) {
+    const { date } = baseWeek
+    const week = baseWeek[language] || {}
     const { type, assignments } = week
     if (type === WEEK_TYPES.assembly.value || type === WEEK_TYPES.memorial.value) continue
     for (let i = 0; i <= 4; i++) {
       // treat index 0 as the bibleReading, else extract a student talk
       const talk = i === 0 ? assignments.bibleReading : assignments['studentTalk' + i]
       if (!talk || !(VALID_TYPES.includes(talk.type))) continue
-      slips.push(createSlip(talk, week.date))
+      slips.push(createSlip(talk, date))
     }
   }
 
