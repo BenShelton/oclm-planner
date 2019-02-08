@@ -32,7 +32,6 @@
             :items="items"
           />
           <VBtn
-            flat
             block
             color="error"
             :disabled="loading"

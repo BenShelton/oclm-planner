@@ -4,7 +4,7 @@
       <VToolbarTitle v-text="prettyDate" />
       <VSpacer />
       <VMenu
-        v-if="week.loaded"
+        v-if="localWeek.loaded"
         v-model="settingsMenu"
         lazy
         left
@@ -63,7 +63,7 @@
     </VToolbar>
 
     <!-- Loading Week Display -->
-    <VLayout v-if="!week.loaded" justify-center class="pa-3">
+    <VLayout v-if="!localWeek.loaded" justify-center class="pa-3">
       <VLayout v-if="loadError" column align-center>
         <VIcon color="red">
           warning
@@ -73,6 +73,18 @@
         </p>
       </VLayout>
       <VProgressCircular v-else indeterminate color="primary" />
+    </VLayout>
+
+    <!-- Unavailable Week Display -->
+    <VLayout v-else-if="localWeek.unavailable" justify-center class="pa-3">
+      <VLayout column align-center>
+        <VIcon color="primary">
+          info
+        </VIcon>
+        <p class="pt-3 text-xs-center primary--text">
+          This week date cannot be organised, only weeks from Jan 2019 are available
+        </p>
+      </VLayout>
     </VLayout>
 
     <!-- Assembly/Memorial Week Display -->
@@ -85,15 +97,7 @@
 
     <!-- Unscraped Week Display -->
     <VLayout v-else-if="!week.scraped" justify-center class="pa-3">
-      <VLayout v-if="week.unavailable" column align-center>
-        <VIcon color="primary">
-          info
-        </VIcon>
-        <p class="pt-3 text-xs-center primary--text">
-          This week date cannot be organised, only weeks from Jan 2019 are available
-        </p>
-      </VLayout>
-      <VLayout v-else-if="!scrapeError" column align-center>
+      <VLayout v-if="!scrapeError" column align-center>
         <VIcon color="primary">
           info
         </VIcon>
@@ -270,7 +274,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 
 import ScheduleSection from '@/components/Schedule/ScheduleSection'
 import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment'
@@ -294,7 +298,7 @@ export default {
 
   mounted () {
     if (this.weekDate < '2019-01-07') {
-      this.week = { date: this.weekDate, unavailable: true }
+      Object.assign(this.localWeek, { date: this.weekDate, loaded: true, unavailable: true })
       return
     }
     this.loadWeek({ date: this.weekDate })
@@ -308,7 +312,7 @@ export default {
   data () {
     return {
       WEEK_TYPES,
-      week: { type: 0, loaded: false },
+      localWeek: { _id: null, type: 0, loaded: false },
       loadError: false,
       scrapeLoading: false,
       scrapeError: false,
@@ -323,6 +327,15 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      language: 'schedule/language'
+    }),
+    week () {
+      return this.localWeek[this.language] || {}
+    },
+    weekID () {
+      return this.localWeek._id
+    },
     weekType: {
       get () {
         return this.week.type || 0
@@ -337,7 +350,7 @@ export default {
             return
           }
           this.weekTypeLoading = true
-          this.updateWeekType({ weekID: this.week._id, type: val })
+          this.updateWeekType({ weekID: this.weekID, type: val })
             .then(this.loadLocalWeek)
             .then(() => {
               this.alert({ text: 'Week Type successfully updated', color: 'success' })
@@ -407,17 +420,17 @@ export default {
       alert: 'alert/UPDATE_ALERT'
     }),
     loadLocalWeek (week) {
-      this.week = Object.assign({}, { loaded: true }, week)
+      this.localWeek = Object.assign({}, { loaded: true }, week)
     },
     onUpdateCOName (name) {
-      this.updateCOName({ weekID: this.week._id, name })
+      this.updateCOName({ weekID: this.weekID, name })
         .then(this.loadLocalWeek)
         .catch(() => {
           this.alert({ text: 'Circuit Overseer Name could not be updated.', color: 'error' })
         })
     },
     onUpdateCOTitle (title) {
-      this.updateCOTitle({ weekID: this.week._id, title })
+      this.updateCOTitle({ weekID: this.weekID, title })
         .then(this.loadLocalWeek)
         .catch(() => {
           this.alert({ text: 'Circuit Overseer Talk Title could not be updated.', color: 'error' })
@@ -425,7 +438,7 @@ export default {
     },
     onScrape () {
       this.scrapeLoading = true
-      this.scrapeWeek({ weekID: this.week._id })
+      this.scrapeWeek({ weekID: this.weekID })
         .then(this.loadLocalWeek)
         .then(() => this.alert({ text: 'Week successfully downloaded', color: 'success' }))
         .catch(err => {
@@ -450,7 +463,7 @@ export default {
     saveEditor () {
       this.editLoading = true
       this.updateAssignment({
-        weekID: this.week._id,
+        weekID: this.localWeek._id,
         name: this.editName,
         assignment: this.editAssignment
       })
