@@ -126,7 +126,7 @@ router.put('/schedule/scrape', (req, res) => {
   const { weekID, language } = req.body
   if (!weekID) return res.status(400).json({ message: 'weekID is required' })
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
-  schedule.scrapeWeek({ weekID })
+  schedule.scrapeWeek({ weekID, language })
     .then(returnResult(res))
     .catch(handleErrors(res))
 })
@@ -137,7 +137,7 @@ router.put('/schedule/updateAssignment', (req, res) => {
     return res.status(400).json({ message: 'Required Fields are: weekID, language, name, assignment' })
   }
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
-  schedule.updateAssignment({ weekID, name, assignment })
+  schedule.updateAssignment({ weekID, language, name, assignment })
     .then(returnResult(res))
     .catch(handleErrors(res))
 })
@@ -147,7 +147,7 @@ router.put('/schedule/updateWeekType', (req, res) => {
   if (!weekID || !language || type === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, type' })
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
   if (!(Object.values(WEEK_TYPES).some(t => t.value === type))) return res.status(400).json({ message: 'Invalid Type' })
-  schedule.updateWeekType({ weekID, type })
+  schedule.updateWeekType({ weekID, language, type })
     .then(returnResult(res))
     .catch(handleErrors(res))
 })
@@ -156,7 +156,7 @@ router.put('/schedule/updateCOName', (req, res) => {
   const { weekID, language, name } = req.body
   if (!weekID || !language || name === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, name' })
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
-  schedule.updateCOName({ weekID, name })
+  schedule.updateCOName({ weekID, language, name })
     .then(returnResult(res))
     .catch(handleErrors(res))
 })
@@ -165,7 +165,7 @@ router.put('/schedule/updateCOTitle', (req, res) => {
   const { weekID, language, title } = req.body
   if (!weekID || !language || title === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, title' })
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
-  schedule.updateCOTitle({ weekID, title })
+  schedule.updateCOTitle({ weekID, language, title })
     .then(returnResult(res))
     .catch(handleErrors(res))
 })

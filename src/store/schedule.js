@@ -33,7 +33,8 @@ const actions = {
         return weeks
       })
   },
-  scrapeWeek ({ commit }, { weekID, language }) {
+  scrapeWeek ({ commit, getters }, { weekID }) {
+    const { language } = getters
     return api.schedule.scrape({ weekID, language })
       .then(res => {
         const scrapedWeek = res.data.result
@@ -41,7 +42,8 @@ const actions = {
         return scrapedWeek
       })
   },
-  updateAssignment ({ commit }, { weekID, language, name, assignment }) {
+  updateAssignment ({ commit, getters }, { weekID, name, assignment }) {
+    const { language } = getters
     return api.schedule.updateAssignment({ weekID, language, name, assignment })
       .then(res => {
         const { week, members } = res.data.result
@@ -52,7 +54,8 @@ const actions = {
         return week
       })
   },
-  updateWeekType ({ commit }, { weekID, language, type }) {
+  updateWeekType ({ commit, getters }, { weekID, type }) {
+    const { language } = getters
     return api.schedule.updateWeekType({ weekID, language, type })
       .then(res => {
         const { week, members } = res.data.result
@@ -63,7 +66,8 @@ const actions = {
         return week
       })
   },
-  updateCOName ({ commit }, { weekID, language, name }) {
+  updateCOName ({ commit, getters }, { weekID, name }) {
+    const { language } = getters
     return api.schedule.updateCOName({ weekID, language, name })
       .then(res => {
         const week = res.data.result
@@ -71,7 +75,8 @@ const actions = {
         return week
       })
   },
-  updateCOTitle ({ commit }, { weekID, language, title }) {
+  updateCOTitle ({ commit, getters }, { weekID, title }) {
+    const { language } = getters
     return api.schedule.updateCOTitle({ weekID, language, title })
       .then(res => {
         const week = res.data.result

@@ -90,7 +90,7 @@ export const updateAssignment = async ({ weekID, language, name, assignment }) =
 
   // Add newly assigned members
   for (const field of ASSIGNEE_FIELDS) {
-    const memberID = value.assignments[name][field]
+    const memberID = value[language].assignments[name][field]
     if (memberID) {
       const member = await addAssignment({ memberID, assignment: { type: assignment.type, date: value.date } })
       updatedMembers.push(member)
