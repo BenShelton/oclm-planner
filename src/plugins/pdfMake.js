@@ -150,7 +150,8 @@ export function generateSchedule (weeks, month) {
   const language = store.getters['schedule/language']
   weeks.forEach((baseWeek, index) => {
     const { date } = baseWeek
-    const week = baseWeek[language] || {}
+    const week = baseWeek[language]
+    if (!week) throw new Error('Week not created for the selected language')
     const { type, weeklyBibleReading, songs, assignments, coTitle, coName } = week
     const {
       openingPrayer,
@@ -403,7 +404,8 @@ export function generateAssignmentSlips (weeks, month) {
   const language = store.getters['schedule/language']
   for (const baseWeek of weeks) {
     const { date } = baseWeek
-    const week = baseWeek[language] || {}
+    const week = baseWeek[language]
+    if (!week) throw new Error('Week not created for the selected language')
     const { type, assignments } = week
     if (type === WEEK_TYPES.assembly.value || type === WEEK_TYPES.memorial.value) continue
     for (let i = 0; i <= 4; i++) {
