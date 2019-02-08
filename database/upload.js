@@ -2,7 +2,7 @@ import parse from 'csv-parse/lib/sync'
 import fs from 'fs'
 import assert from 'assert'
 import { bulkAddMembers } from './congregation'
-import { APPOINTMENTS, GENDERS, LANGUAGE_GROUPS } from '../src/constants'
+import { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES } from '../src/constants'
 
 const filename = process.argv[2]
 if (!filename) throw new Error('No file argument provided')
@@ -22,7 +22,7 @@ const columns = [
   { name: 'abbreviation', noDuplicates: true },
   { name: 'appointment', allowedValues: APPOINTMENTS },
   { name: 'gender', allowedValues: GENDERS },
-  { name: 'languageGroup', allowedValues: LANGUAGE_GROUPS },
+  { name: 'languageGroup', allowedValues: SUPPORTED_LANGUAGES.map(({ value }) => value) },
   { name: 'show', boolean: true },
   { name: 'privileges.chairman', boolean: true },
   { name: 'privileges.highlights', boolean: true },

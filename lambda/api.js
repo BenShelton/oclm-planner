@@ -5,7 +5,7 @@ const serverless = require('serverless-http')
 const auth = require('../database/auth')
 const congregation = require('../database/congregation')
 const schedule = require('../database/schedule')
-const { APPOINTMENTS, GENDERS, LANGUAGE_GROUPS, WEEK_TYPES } = require('../src/constants')
+const { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES, WEEK_TYPES } = require('../src/constants')
 
 // Initialize express app
 const app = express()
@@ -59,12 +59,13 @@ router.get('/congregation/members', (req, res) => {
     .catch(handleErrors(res))
 })
 
+const languageCodes = SUPPORTED_LANGUAGES.map(({ value }) => value)
 const validateMember = member => {
   const { name, abbreviation, appointment, gender, languageGroup, privileges, show } = member
   if (!name || !abbreviation) return 'Name & Abbreviation are required'
   if (!APPOINTMENTS.includes(appointment)) return 'Appointment must be one of the following: ' + APPOINTMENTS.join(', ')
   if (!GENDERS.includes(gender)) return 'Gender must be one of the following: ' + GENDERS.join(', ')
-  if (!LANGUAGE_GROUPS.includes(languageGroup)) return 'Language Group must be one of the following: ' + LANGUAGE_GROUPS.join(', ')
+  if (!languageCodes.includes(languageGroup)) return 'Language Group must be one of the following: ' + languageCodes.join(', ')
   if (!privileges || typeof privileges !== 'object') return 'Privileges must be an object'
   if (typeof show !== 'boolean') return 'Show must be a boolean'
   return null

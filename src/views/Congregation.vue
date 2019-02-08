@@ -37,7 +37,7 @@
                   <VSelect v-model="editMember.appointment" label="Appointment" :items="APPOINTMENTS" />
                 </VFlex>
                 <VFlex xs12 sm6 md4>
-                  <VSelect v-model="editMember.languageGroup" label="Language Group" :items="LANGUAGE_GROUPS" />
+                  <VSelect v-model="editMember.languageGroup" label="Language Group" :items="SUPPORTED_LANGUAGES" />
                 </VFlex>
                 <VFlex xs12 sm6 md4>
                   <VCheckbox v-model="editMember.show" label="Show On Schedule" />
@@ -95,7 +95,7 @@
           <td v-text="props.item.abbreviation" />
           <td v-text="props.item.gender" />
           <td v-text="props.item.appointment" />
-          <td v-text="props.item.languageGroup" />
+          <td v-text="languageGroups[props.item.languageGroup]" />
           <td class="text-xs-center">
             <BooleanIcon :value="props.item.show" />
           </td>
@@ -148,7 +148,7 @@ import BooleanIcon from '@/components/BooleanIcon'
 import {
   GENDERS,
   APPOINTMENTS,
-  LANGUAGE_GROUPS,
+  SUPPORTED_LANGUAGES,
   PRIVILEGES
 } from '@/constants'
 
@@ -161,8 +161,9 @@ export default {
     return {
       GENDERS,
       APPOINTMENTS,
-      LANGUAGE_GROUPS,
+      SUPPORTED_LANGUAGES,
       PRIVILEGES,
+      languageGroups: SUPPORTED_LANGUAGES.reduce((acc, { text, value }) => Object.assign(acc, { [value]: text }), {}),
       headers: [
         { text: 'Name', value: 'name' },
         { text: 'Abbreviation', value: 'abbreviation' },
@@ -183,7 +184,7 @@ export default {
         abbreviation: '',
         gender: GENDERS[0],
         appointment: APPOINTMENTS[0],
-        languageGroup: LANGUAGE_GROUPS[0],
+        languageGroup: SUPPORTED_LANGUAGES[0],
         show: true,
         privileges: {}
       }
@@ -223,7 +224,7 @@ export default {
         abbreviation: '',
         gender: GENDERS[0],
         appointment: APPOINTMENTS[0],
-        languageGroup: LANGUAGE_GROUPS[0],
+        languageGroup: SUPPORTED_LANGUAGES[0],
         show: true,
         privileges: {}
       })
