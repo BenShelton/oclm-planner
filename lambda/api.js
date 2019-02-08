@@ -27,6 +27,10 @@ const handleErrors = res => error => {
   }
 }
 
+const validLanguage = language => {
+  return SUPPORTED_LANGUAGES.some(({ value }) => value === language)
+}
+
 router.post('/auth/login', (req, res) => {
   const { password } = req.body
   if (!password) return res.status(400).json({ message: 'No password provided' })
@@ -119,26 +123,29 @@ router.get('/schedule/month/:month', (req, res) => {
 })
 
 router.put('/schedule/scrape', (req, res) => {
-  const { weekID } = req.body
+  const { weekID, language } = req.body
   if (!weekID) return res.status(400).json({ message: 'weekID is required' })
+  if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
   schedule.scrapeWeek({ weekID })
     .then(returnResult(res))
     .catch(handleErrors(res))
 })
 
 router.put('/schedule/updateAssignment', (req, res) => {
-  const { weekID, name, assignment } = req.body
-  if (!weekID || !name || !assignment) {
-    return res.status(400).json({ message: 'Required Fields are: weekID, name, assignment' })
+  const { weekID, language, name, assignment } = req.body
+  if (!weekID || !language || !name || !assignment) {
+    return res.status(400).json({ message: 'Required Fields are: weekID, language, name, assignment' })
   }
+  if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
   schedule.updateAssignment({ weekID, name, assignment })
     .then(returnResult(res))
     .catch(handleErrors(res))
 })
 
 router.put('/schedule/updateWeekType', (req, res) => {
-  const { weekID, type } = req.body
-  if (!weekID || type === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, type' })
+  const { weekID, language, type } = req.body
+  if (!weekID || !language || type === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, type' })
+  if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
   if (!(Object.values(WEEK_TYPES).some(t => t.value === type))) return res.status(400).json({ message: 'Invalid Type' })
   schedule.updateWeekType({ weekID, type })
     .then(returnResult(res))
@@ -146,16 +153,18 @@ router.put('/schedule/updateWeekType', (req, res) => {
 })
 
 router.put('/schedule/updateCOName', (req, res) => {
-  const { weekID, name } = req.body
-  if (!weekID || name === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, name' })
+  const { weekID, language, name } = req.body
+  if (!weekID || !language || name === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, name' })
+  if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
   schedule.updateCOName({ weekID, name })
     .then(returnResult(res))
     .catch(handleErrors(res))
 })
 
 router.put('/schedule/updateCOTitle', (req, res) => {
-  const { weekID, title } = req.body
-  if (!weekID || title === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, title' })
+  const { weekID, language, title } = req.body
+  if (!weekID || !language || title === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, title' })
+  if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
   schedule.updateCOTitle({ weekID, title })
     .then(returnResult(res))
     .catch(handleErrors(res))

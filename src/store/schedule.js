@@ -33,16 +33,16 @@ const actions = {
         return weeks
       })
   },
-  scrapeWeek ({ commit }, { weekID }) {
-    return api.schedule.scrape({ weekID })
+  scrapeWeek ({ commit }, { weekID, language }) {
+    return api.schedule.scrape({ weekID, language })
       .then(res => {
         const scrapedWeek = res.data.result
         commit('UPDATE_WEEK', scrapedWeek)
         return scrapedWeek
       })
   },
-  updateAssignment ({ commit }, { weekID, name, assignment }) {
-    return api.schedule.updateAssignment({ weekID, name, assignment })
+  updateAssignment ({ commit }, { weekID, language, name, assignment }) {
+    return api.schedule.updateAssignment({ weekID, language, name, assignment })
       .then(res => {
         const { week, members } = res.data.result
         commit('UPDATE_WEEK', week)
@@ -52,8 +52,8 @@ const actions = {
         return week
       })
   },
-  updateWeekType ({ commit }, { weekID, type }) {
-    return api.schedule.updateWeekType({ weekID, type })
+  updateWeekType ({ commit }, { weekID, language, type }) {
+    return api.schedule.updateWeekType({ weekID, language, type })
       .then(res => {
         const { week, members } = res.data.result
         commit('UPDATE_WEEK', week)
@@ -63,16 +63,16 @@ const actions = {
         return week
       })
   },
-  updateCOName ({ commit }, { weekID, name }) {
-    return api.schedule.updateCOName({ weekID, name })
+  updateCOName ({ commit }, { weekID, language, name }) {
+    return api.schedule.updateCOName({ weekID, language, name })
       .then(res => {
         const week = res.data.result
         commit('UPDATE_WEEK', week)
         return week
       })
   },
-  updateCOTitle ({ commit }, { weekID, title }) {
-    return api.schedule.updateCOTitle({ weekID, title })
+  updateCOTitle ({ commit }, { weekID, language, title }) {
+    return api.schedule.updateCOTitle({ weekID, language, title })
       .then(res => {
         const week = res.data.result
         commit('UPDATE_WEEK', week)

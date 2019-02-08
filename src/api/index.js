@@ -35,10 +35,10 @@ export default {
   schedule: {
     week: ({ date }) => api.get(`/schedule/week/${date}`),
     month: ({ month }) => api.get(`/schedule/month/${month}`),
-    scrape: ({ weekID }) => api.put(`/schedule/scrape/`, { weekID }),
-    updateAssignment: ({ weekID, name, assignment }) => api.put(`/schedule/updateAssignment`, { weekID, name, assignment }),
-    updateWeekType: ({ weekID, type }) => api.put(`/schedule/updateWeekType`, { weekID, type }),
-    updateCOName: ({ weekID, name }) => api.put(`/schedule/updateCOName`, { weekID, name }),
-    updateCOTitle: ({ weekID, title }) => api.put(`/schedule/updateCOTitle`, { weekID, title })
+    scrape: ({ weekID, language }) => api.put(`/schedule/scrape/`, { weekID, language }),
+    updateAssignment: ({ weekID, language, name, assignment }) => api.put(`/schedule/updateAssignment`, { weekID, language, name, assignment }),
+    updateWeekType: ({ weekID, language, type }) => api.put(`/schedule/updateWeekType`, { weekID, language, type }),
+    updateCOName: ({ weekID, language, name }) => api.put(`/schedule/updateCOName`, { weekID, language, name }),
+    updateCOTitle: ({ weekID, language, title }) => api.put(`/schedule/updateCOTitle`, { weekID, language, title })
   }
 }
