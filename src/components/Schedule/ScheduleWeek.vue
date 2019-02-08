@@ -4,7 +4,7 @@
       <VToolbarTitle v-text="prettyDate" />
       <VSpacer />
       <VMenu
-        v-if="localWeek.loaded"
+        v-if="localWeek.loaded && !localWeek.unavailable"
         v-model="settingsMenu"
         lazy
         left
@@ -312,7 +312,7 @@ export default {
   data () {
     return {
       WEEK_TYPES,
-      localWeek: { _id: null, type: 0, loaded: false },
+      localWeek: { _id: null, loaded: false },
       loadError: false,
       scrapeLoading: false,
       scrapeError: false,
@@ -342,7 +342,7 @@ export default {
       },
       set (val) {
         const prev = this.weekType
-        this.week.type = val
+        this.$set(this.week, 'type', val)
         // wait for the animation to finish
         setTimeout(() => {
           if (!window.confirm('Are you sure you want to change the week type? All items may be unassigned.')) {

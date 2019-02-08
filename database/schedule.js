@@ -151,7 +151,8 @@ export const updateWeekType = async ({ weekID, language, type }) => {
   }
 
   // Update Type
-  Object.assign(update.$set, { type })
+  const updatePath = language + '.type'
+  Object.assign(update.$set, { [updatePath]: type })
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
   assert.notStrictEqual(null, value, 404)
 
