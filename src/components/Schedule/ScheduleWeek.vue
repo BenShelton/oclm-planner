@@ -174,27 +174,13 @@
         <VCardText>
           <VContainer grid-list-md>
             <VLayout wrap>
-              <VFlex
-                xs12
-                md6
-                sm4
-              >
+              <VFlex :class="fieldClass">
                 <AssigneeSelect v-model="editAssignment.assignee" label="Assignee" :type="editAssignment.type" />
               </VFlex>
-              <VFlex
-                v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)"
-                xs12
-                md6
-                sm4
-              >
+              <VFlex v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)" :class="fieldClass">
                 <AssigneeSelect v-model="editAssignment.assistant" label="Assistant" :type="editAssignment.type + 'Assist'" />
               </VFlex>
-              <VFlex
-                v-if="editName.includes('studentTalk')"
-                xs12
-                md6
-                sm4
-              >
+              <VFlex v-if="editName.includes('studentTalk')" :class="fieldClass">
                 <VSelect
                   v-model="editAssignment.type"
                   label="Type"
@@ -207,28 +193,13 @@
                   ]"
                 />
               </VFlex>
-              <VFlex
-                v-if="!(['chairman', 'prayer', 'gems', 'reader'].includes(editAssignment.type))"
-                xs12
-                md6
-                sm4
-              >
+              <VFlex v-if="!(['chairman', 'prayer', 'gems', 'reader'].includes(editAssignment.type))" :class="fieldClass">
                 <VTextField v-model="editAssignment.title" label="Title" />
               </VFlex>
-              <VFlex
-                v-if="['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(editAssignment.type)"
-                xs12
-                md6
-                sm4
-              >
+              <VFlex v-if="['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(editAssignment.type)" :class="fieldClass">
                 <VTextField v-model="editAssignment.studyPoint" label="Study Point" />
               </VFlex>
-              <VFlex
-                v-if="!(['chairman', 'prayer', 'reader'].includes(editAssignment.type))"
-                xs12
-                md6
-                sm4
-              >
+              <VFlex v-if="!(['chairman', 'prayer', 'reader'].includes(editAssignment.type))" :class="fieldClass">
                 <VTextField v-model="editAssignment.time" label="Time" />
               </VFlex>
             </VLayout>
@@ -312,6 +283,7 @@ export default {
   data () {
     return {
       WEEK_TYPES,
+      fieldClass: 'xs12 md6 xl4',
       localWeek: { _id: null, loaded: false },
       loadError: false,
       scrapeLoading: false,
