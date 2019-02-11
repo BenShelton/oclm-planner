@@ -174,11 +174,42 @@
         <VCardText>
           <VContainer grid-list-md>
             <VLayout wrap>
+              <template v-if="language !== 'en'">
+                <VFlex :class="fieldClass">
+                  <VCheckbox
+                    v-model="editAssignment.stream"
+                    label="Listen to Video from JW Streaming"
+                    :disabled="!!editAssignment.inherit"
+                    @change="onSettingChange"
+                  />
+                </VFlex>
+                <VFlex :class="fieldClass">
+                  <VCheckbox
+                    v-model="editAssignment.inherit"
+                    label="Inherit Assignment from English"
+                    :disabled="!!editAssignment.stream"
+                    @change="onSettingChange"
+                  />
+                </VFlex>
+                <VFlex xs12>
+                  <VDivider class="mb-3" />
+                </VFlex>
+              </template>
               <VFlex :class="fieldClass">
-                <AssigneeSelect v-model="editAssignment.assignee" label="Assignee" :type="editAssignment.type" />
+                <AssigneeSelect
+                  v-model="editAssignment.assignee"
+                  label="Assignee"
+                  :type="editAssignment.type"
+                  :disabled="!!(editAssignment.stream || editAssignment.inherit)"
+                />
               </VFlex>
               <VFlex v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)" :class="fieldClass">
-                <AssigneeSelect v-model="editAssignment.assistant" label="Assistant" :type="editAssignment.type + 'Assist'" />
+                <AssigneeSelect
+                  v-model="editAssignment.assistant"
+                  label="Assistant"
+                  :type="editAssignment.type + 'Assist'"
+                  :disabled="!!(editAssignment.stream || editAssignment.inherit)"
+                />
               </VFlex>
               <VFlex v-if="editName.includes('studentTalk')" :class="fieldClass">
                 <VSelect
@@ -373,11 +404,15 @@ export default {
         { name: 'closingPrayer', displayName: 'Closing Prayer' }
       ]
       return assignmentRefs.reduce((acc, { name, displayName }) => {
+        const assignment = assignments[name]
+        const inherit = !!(assignment && assignment.inherit)
+        const details = inherit ? this.localWeek.en.assignments[name] : assignment
         return Object.assign(acc, {
           [name]: {
             name,
             displayName,
-            details: assignments[name]
+            inherit,
+            details
           }
         })
       }, {})
@@ -431,12 +466,19 @@ export default {
     },
     onEdit (name) {
       this.editName = name
-      const { displayName, details } = this.assignments[name]
+      const { displayName, inherit, details } = this.assignments[name]
+      const editDetails = inherit ? this.week.assignments[name] : details
       this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
-      const assignment = { ...details }
+      const assignment = { ...editDetails }
       if (!assignment.type) assignment.type = ASSIGNMENT_TYPE_MAP[name]
       this.editAssignment = assignment
       this.editDialog = true
+    },
+    onSettingChange (val) {
+      if (val) {
+        if (this.editAssignment.assignee) this.editAssignment.assignee = null
+        if (this.editAssignment.assistant) this.editAssignment.assistant = null
+      }
     },
     deleteEditor () {
       this.editLoading = true

@@ -1,14 +1,24 @@
 <template>
   <VHover>
     <div slot-scope="{ hover }">
-      <VListTile class="py-2" :class="{ grey: !assignment.details }">
+      <VListTile class="py-2" :class="{ grey: !assignment.details, 'blue lighten-5': assignment.inherit || assignment.stream }">
         <VListTileContent>
-          <VListTileTitle v-text="assignment.displayName" />
+          <VListTileTitle>
+            <span v-text="assignment.displayName" />
+            <span v-if="assignment.inherit" class="primary--text font-weight-bold">
+              (English)
+            </span>
+          </VListTileTitle>
           <VListTileSubTitle v-if="!assignment.details">
             No Assignment Found
           </VListTileSubTitle>
           <template v-else>
-            <VListTileSubTitle>
+            <VListTileSubTitle v-if="assignment.details.stream">
+              <VChip small color="primary" class="white--text">
+                Streaming
+              </VChip>
+            </VListTileSubTitle>
+            <VListTileSubTitle v-else>
               <ScheduleAssignee :assignee="assignment.details.assignee" />
               <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant" />
             </VListTileSubTitle>

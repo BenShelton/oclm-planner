@@ -7,7 +7,7 @@
       no-data-text="No Assignees Available"
       :label="label"
       :loading="loading"
-      :disabled="disabled"
+      :disabled="inputDisabled"
       :items="items"
       :value="value"
       @input="onInput"
@@ -19,6 +19,7 @@
         small
         outline
         color="primary"
+        :disabled="inputDisabled"
         @click="onToggleLanguage"
       >
         <VIcon small v-text="restrictLanguage ? 'person' : 'group'" />
@@ -39,7 +40,8 @@ export default {
   props: {
     value: { type: String, default: '' },
     label: { type: String, required: true },
-    type: { type: String, default: '' }
+    type: { type: String, default: '' },
+    disabled: { type: Boolean, required: true }
   },
 
   data () {
@@ -54,13 +56,13 @@ export default {
       loading: 'congregation/loading',
       language: 'schedule/language'
     }),
-    disabled () {
-      const { type } = this
-      return !(PRIVILEGES.some(p => p.key === type))
+    inputDisabled () {
+      const { type, disabled } = this
+      return disabled || !(PRIVILEGES.some(p => p.key === type))
     },
     privilegedMembers () {
-      const { disabled, activeMembers, type, language, restrictLanguage } = this
-      if (disabled) return []
+      const { inputDisabled, activeMembers, type, language, restrictLanguage } = this
+      if (inputDisabled) return []
       return activeMembers.filter(({ privileges, languageGroup }) => {
         if (restrictLanguage && languageGroup !== language) return false
         return privileges[type]
