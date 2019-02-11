@@ -128,7 +128,11 @@ router.put('/schedule/scrape', (req, res) => {
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
   schedule.scrapeWeek({ weekID, language })
     .then(returnResult(res))
-    .catch(handleErrors(res))
+    .catch(err => {
+      const errorHandler = handleErrors(res)
+      if (err.status === 404) errorHandler(new Error('404'))
+      else errorHandler(err)
+    })
 })
 
 router.put('/schedule/updateAssignment', (req, res) => {

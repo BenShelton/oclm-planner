@@ -3,7 +3,9 @@ import cheerio from 'cheerio'
 
 const LANGUAGE_OPTIONS = {
   en: {
-    address: 'https://wol.jw.org/en/wol/dt/r1/lp-e/',
+    addressConstructor: date => {
+      return ['https://wol.jw.org/en/wol/dt/r1/lp-e/' + date.replace(/-/g, '/')]
+    },
     inherit: [],
     cbsTitle: 'Congregation Bible Study',
     talkRegexes: {
@@ -18,7 +20,27 @@ const LANGUAGE_OPTIONS = {
     }
   },
   tpo: {
-    address: 'https://wol.jw.org/jw-tpo/wol/dt/r296/lp-tpo/',
+    months: ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
+    addressConstructor: date => {
+      const { months } = LANGUAGE_OPTIONS.tpo
+      const [sY, sM, sD] = date.split('-').map(Number)
+      const endDate = new Date(date)
+      endDate.setUTCDate(endDate.getUTCDate() + 6)
+      const [, eM, eD] = endDate.toISOString().split('T')[0].split('-').map(Number)
+      const workbookMonth = months[sM - 1]
+      const sMonth = workbookMonth.substr(0, 3)
+      const workbookWeeks = []
+      if (sM === eM) {
+        workbookWeeks.push(sD + 'a' + eD + sMonth)
+        workbookWeeks.push(sD + '-' + eD + sMonth)
+        workbookWeeks.push(sD + 'a' + eD + '-' + sMonth)
+        workbookWeeks.push(sD + '-' + eD + '-' + sMonth)
+      } else {
+        const eMonth = months[eM - 1].substr(0, 3)
+        workbookWeeks.push(sD + sMonth + '-' + eD + eMonth)
+      }
+      return workbookWeeks.map(week => `https://www.jw.org/jw-tpo/publicacoes/jw-manual-de-atividades/mwb-${workbookMonth}-${sY}/programa-reuniao-${week}/`)
+    },
     inherit: [
       'chairman',
       'openingPrayer',
@@ -58,15 +80,27 @@ function safeRegex (regex, str) {
 export default function scrapeWOL (date, language) {
   const options = LANGUAGE_OPTIONS[language]
   if (!options) throw new Error('Unsupported language')
-  const { address, inherit, talkRegexes, cbsTitle, bookAbbreviations } = options
-  if (!address || !inherit || !talkRegexes || !cbsTitle || !bookAbbreviations) throw new Error('Language not fully supported')
+  const { addressConstructor, inherit, talkRegexes, cbsTitle, bookAbbreviations } = options
+  if (!addressConstructor || !inherit || !talkRegexes || !cbsTitle || !bookAbbreviations) throw new Error('Language not fully supported')
 
-  const uri = address + date.replace(/-/g, '/')
-  return rp({ uri, transform })
+  // We allow for multiple uris because sometimes the url can change slightly for no obvious reason, so we try them all and catch the first that succeeds
+  const uris = addressConstructor(date)
+  console.log(uris)
+  return Promise.all(uris.map(uri => {
+    return rp({ uri, transform })
+      .then(
+        val => Promise.reject(val),
+        err => Promise.resolve(err)
+      )
+  }))
+    .then(
+      () => { throw new Error('404') },
+      val => Promise.resolve(val)
+    )
     .then($ => {
       // Check schedule is online first
       const weeklyBibleReading = $('#p2 strong', 'header').text()
-      if (!weeklyBibleReading) throw new Error('Week not yet available')
+      if (!weeklyBibleReading) throw new Error('404')
 
       // Load as much static information as possible
       const update = {
@@ -110,7 +144,7 @@ export default function scrapeWOL (date, language) {
       const bibleReadingPath = 'assignments.bibleReading.'
       update[bibleReadingPath + 'text'] = bibleReadingText
       update[bibleReadingPath + 'type'] = 'bibleReading'
-      update[bibleReadingPath + 'title'] = bibleReadingP.find('a.b').text().trim()
+      update[bibleReadingPath + 'title'] = bibleReadingP.find('a.b, a.jsBibleLink').text().trim()
       update[bibleReadingPath + 'time'] = safeRegex(timeRegex, bibleReadingText)
       update[bibleReadingPath + 'studyPoint'] = safeRegex(studyPointRegex, bibleReadingText)
       update[bibleReadingPath + 'inherit'] = inherit.includes('bibleReading')
