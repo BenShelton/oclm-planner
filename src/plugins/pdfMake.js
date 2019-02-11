@@ -15,7 +15,8 @@ function setTime (time) {
 }
 
 function addTime (minutes) {
-  const toAdd = parseInt(/\d+/.exec(minutes)[0])
+  const mins = /\d+/.exec(minutes) || [0]
+  const toAdd = parseInt(mins[0])
   let [h, m] = timer.split(':').map(Number)
   m += toAdd
   if (m > 59) {
@@ -40,6 +41,7 @@ function getAssignmentTitle (assignment) {
 }
 
 function getScheduleAssignees (assignment) {
+  if (assignment.stream) return '(Video Stream)'
   let assignees = getAssigneeName(assignment.assignee, '-')
   if (['initialCall', 'returnVisit', 'bibleStudy'].includes(assignment.type)) {
     assignees += ' / ' + getAssigneeName(assignment.assistant, '-')
@@ -153,6 +155,12 @@ export function generateSchedule (weeks, month) {
     const week = baseWeek[language]
     if (!week) throw new Error('Week not created for the selected language')
     const { type, weeklyBibleReading, songs, assignments, coTitle, coName } = week
+    const assignmentMap = Object.entries(assignments)
+      .reduce((acc, [k, v]) => {
+        if (!v) return acc
+        const a = v.inherit ? baseWeek.en.assignments[k] : v
+        return Object.assign(acc, { [k]: a })
+      }, {})
     const {
       openingPrayer,
       chairman,
@@ -164,7 +172,7 @@ export function generateSchedule (weeks, month) {
       congregationBibleStudy,
       reader,
       closingPrayer
-    } = assignments
+    } = assignmentMap
 
     // Week Title & Information
     if (index > 0 && index % 2 === 0) stack.push(createScheduleSeparator(true))
@@ -205,7 +213,7 @@ export function generateSchedule (weeks, month) {
     stack.push(createScheduleSubheader('APPLY YOURSELF TO THE FIELD MINISTRY', COLORS.MINISTRY))
     const ministryTableRows = []
     for (let i = 1; i <= 4; i++) {
-      const studentTalk = assignments['studentTalk' + i]
+      const studentTalk = assignmentMap['studentTalk' + i]
       if (!studentTalk) {
         ministryTableRows.push(null)
         continue
