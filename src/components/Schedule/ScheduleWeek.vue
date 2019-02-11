@@ -220,6 +220,14 @@
           </VContainer>
         </VCardText>
         <VCardActions>
+          <VBtn
+            flat
+            color="error"
+            :disabled="editLoading"
+            @click="deleteEditor"
+          >
+            DELETE
+          </VBtn>
           <VSpacer />
           <VBtn
             flat
@@ -384,6 +392,7 @@ export default {
       loadWeek: 'schedule/loadWeek',
       scrapeWeek: 'schedule/scrapeWeek',
       updateAssignment: 'schedule/updateAssignment',
+      deleteAssignment: 'schedule/deleteAssignment',
       updateWeekType: 'schedule/updateWeekType',
       updateCOName: 'schedule/updateCOName',
       updateCOTitle: 'schedule/updateCOTitle'
@@ -428,6 +437,21 @@ export default {
       if (!assignment.type) assignment.type = ASSIGNMENT_TYPE_MAP[name]
       this.editAssignment = assignment
       this.editDialog = true
+    },
+    deleteEditor () {
+      this.editLoading = true
+      this.deleteAssignment({
+        weekID: this.localWeek._id,
+        name: this.editName
+      })
+        .then(this.loadLocalWeek)
+        .then(this.closeEditor)
+        .catch(err => {
+          console.error(err)
+        })
+        .finally(() => {
+          this.editLoading = false
+        })
     },
     closeEditor () {
       this.editDialog = false

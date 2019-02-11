@@ -101,6 +101,38 @@ export const updateAssignment = async ({ weekID, language, name, assignment }) =
   return { week: value, members: updatedMembers }
 }
 
+export const deleteAssignment = async ({ weekID, language, name }) => {
+  const coll = await getCollection
+  const query = { _id: ObjectID(weekID) }
+
+  // Remove existing assigned members
+  const updatedMembers = []
+  const baseWeek = await coll.findOne(query)
+  assert.notStrictEqual(null, baseWeek, 404)
+  const week = baseWeek[language] || null
+  assert.notStrictEqual(null, week, 404)
+  const previousAssignment = week.assignments[name]
+  if (previousAssignment) {
+    for (const field of ASSIGNEE_FIELDS) {
+      const memberID = previousAssignment[field]
+      if (memberID) {
+        const member = await removeAssignment({ memberID, assignment: { type: previousAssignment.type, date: baseWeek.date } })
+        updatedMembers.push(member)
+      }
+    }
+  }
+
+  // Update Assignment
+  const update = {}
+  const assignmentPath = language + '.assignments.' + name
+  update.$unset = { [assignmentPath]: '' }
+  const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
+  assert.notStrictEqual(null, value, 404)
+
+  // Return assignment
+  return { week: value, members: updatedMembers }
+}
+
 export const updateWeekType = async ({ weekID, language, type }) => {
   const coll = await getCollection
   const query = { _id: ObjectID(weekID) }

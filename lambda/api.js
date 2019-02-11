@@ -142,6 +142,17 @@ router.put('/schedule/updateAssignment', (req, res) => {
     .catch(handleErrors(res))
 })
 
+router.put('/schedule/deleteAssignment', (req, res) => {
+  const { weekID, language, name } = req.body
+  if (!weekID || !language || !name) {
+    return res.status(400).json({ message: 'Required Fields are: weekID, language, name' })
+  }
+  if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
+  schedule.deleteAssignment({ weekID, language, name })
+    .then(returnResult(res))
+    .catch(handleErrors(res))
+})
+
 router.put('/schedule/updateWeekType', (req, res) => {
   const { weekID, language, type } = req.body
   if (!weekID || !language || type === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, type' })
