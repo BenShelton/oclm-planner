@@ -12,6 +12,7 @@
             :disabled="!downloadSrc"
             :href="downloadSrc"
             :download="downloadTitle"
+            @click="onDownload"
           >
             Download
             <VIcon right dark>
@@ -72,6 +73,7 @@ export default {
   data () {
     return {
       src: null,
+      downloadBlob: null,
       downloadSrc: null,
       numPages: 0
     }
@@ -96,10 +98,12 @@ export default {
     pdf (val) {
       if (!val) {
         this.src = null
+        this.downloadBlob = null
         this.downloadSrc = null
         return
       }
       val.getBlob(blob => {
+        this.downloadBlob = blob
         const dataUrl = URL.createObjectURL(blob)
         this.downloadSrc = dataUrl
         this.src = PDF.createLoadingTask(dataUrl)
@@ -109,6 +113,12 @@ export default {
   },
 
   methods: {
+    onDownload () {
+      // fallback for Edge/IE, which refuse to download a dataURI link
+      if (navigator && navigator.msSaveOrOpenBlob) {
+        navigator.msSaveOrOpenBlob(this.downloadBlob, this.downloadTitle)
+      }
+    },
     onClose () {
       this.$emit('input', false)
     }
