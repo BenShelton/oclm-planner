@@ -85,7 +85,6 @@ export default function scrapeWOL (date, language) {
 
   // We allow for multiple uris because sometimes the url can change slightly for no obvious reason, so we try them all and catch the first that succeeds
   const uris = addressConstructor(date)
-  console.log(uris)
   return Promise.all(uris.map(uri => {
     return rp({ uri, transform })
       .then(
