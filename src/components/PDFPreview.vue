@@ -9,8 +9,8 @@
           <VSpacer />
           <VBtn
             color="primary"
-            :disabled="!dataUrl"
-            :href="dataUrl"
+            :disabled="!downloadSrc"
+            :href="downloadSrc"
             :download="downloadTitle"
           >
             Download
@@ -32,20 +32,36 @@
           This month could not be fully loaded, please check that all weeks have been filled in on the schedule
         </p>
       </VLayout>
-      <VLayout v-else-if="!dataUrl" column align-center>
+      <VLayout v-else-if="!src" column align-center>
         <VProgressCircular indeterminate color="primary" class="py-5" />
         <p>Generating schedule, please wait...</p>
       </VLayout>
-      <VLayout v-else fill-height class="object-wrapper my-3 elevation-1">
-        <object :data="dataUrl" />
+      <VLayout
+        v-else
+        fill-height
+        wrap
+        class="object-wrapper my-3 elevation-1"
+      >
+        <VFlex
+          v-for="i in numPages"
+          :key="i"
+          xs12
+          md6
+        >
+          <PDF :src="src" :page="i" />
+        </VFlex>
       </VLayout>
     </VLayout>
   </VDialog>
 </template>
 
 <script>
+import PDF from 'vue-pdf'
+
 export default {
   name: 'PDFPreview',
+
+  components: { PDF },
 
   props: {
     value: { type: Boolean, required: true },
@@ -55,7 +71,9 @@ export default {
 
   data () {
     return {
-      dataUrl: null
+      src: null,
+      downloadSrc: null,
+      numPages: 0
     }
   },
 
@@ -70,17 +88,23 @@ export default {
     },
     downloadTitle () {
       if (!this.pdf) return ''
-      return this.pdf.docDefinition.info.title
+      return this.pdf.docDefinition.info.title + '.pdf'
     }
   },
 
   watch: {
     pdf (val) {
       if (!val) {
-        this.dataUrl = null
+        this.src = null
+        this.downloadSrc = null
         return
       }
-      val.getDataUrl(dataUrl => { this.dataUrl = dataUrl })
+      val.getBlob(blob => {
+        const dataUrl = URL.createObjectURL(blob)
+        this.downloadSrc = dataUrl
+        this.src = PDF.createLoadingTask(dataUrl)
+        this.src.then(pdf => { this.numPages = pdf.numPages })
+      })
     }
   },
 
@@ -95,7 +119,4 @@ export default {
 <style lang="stylus" scoped>
 .object-wrapper
   overflow scroll
-object
-  width 100%
-  min-height 100%
 </style>
