@@ -4,11 +4,13 @@ const state = {
   weeks: [],
   month: [],
   loadedMonth: '',
-  selectedAssignee: ''
+  selectedAssignee: '',
+  language: 'en'
 }
 
 const getters = {
-  selectedAssignee: state => state.selectedAssignee
+  selectedAssignee: state => state.selectedAssignee,
+  language: state => state.language
 }
 
 const actions = {
@@ -31,16 +33,18 @@ const actions = {
         return weeks
       })
   },
-  scrapeWeek ({ commit }, { weekID }) {
-    return api.schedule.scrape({ weekID })
+  scrapeWeek ({ commit, getters }, { weekID }) {
+    const { language } = getters
+    return api.schedule.scrape({ weekID, language })
       .then(res => {
         const scrapedWeek = res.data.result
         commit('UPDATE_WEEK', scrapedWeek)
         return scrapedWeek
       })
   },
-  updateAssignment ({ commit }, { weekID, name, assignment }) {
-    return api.schedule.updateAssignment({ weekID, name, assignment })
+  updateAssignment ({ commit, getters }, { weekID, name, assignment }) {
+    const { language } = getters
+    return api.schedule.updateAssignment({ weekID, language, name, assignment })
       .then(res => {
         const { week, members } = res.data.result
         commit('UPDATE_WEEK', week)
@@ -50,8 +54,9 @@ const actions = {
         return week
       })
   },
-  updateWeekType ({ commit }, { weekID, type }) {
-    return api.schedule.updateWeekType({ weekID, type })
+  deleteAssignment ({ commit, getters }, { weekID, name }) {
+    const { language } = getters
+    return api.schedule.deleteAssignment({ weekID, language, name })
       .then(res => {
         const { week, members } = res.data.result
         commit('UPDATE_WEEK', week)
@@ -61,16 +66,30 @@ const actions = {
         return week
       })
   },
-  updateCOName ({ commit }, { weekID, name }) {
-    return api.schedule.updateCOName({ weekID, name })
+  updateWeekType ({ commit, getters }, { weekID, type }) {
+    const { language } = getters
+    return api.schedule.updateWeekType({ weekID, language, type })
+      .then(res => {
+        const { week, members } = res.data.result
+        commit('UPDATE_WEEK', week)
+        for (const member of members) {
+          commit('congregation/UPDATE_MEMBER', member, { root: true })
+        }
+        return week
+      })
+  },
+  updateCOName ({ commit, getters }, { weekID, name }) {
+    const { language } = getters
+    return api.schedule.updateCOName({ weekID, language, name })
       .then(res => {
         const week = res.data.result
         commit('UPDATE_WEEK', week)
         return week
       })
   },
-  updateCOTitle ({ commit }, { weekID, title }) {
-    return api.schedule.updateCOTitle({ weekID, title })
+  updateCOTitle ({ commit, getters }, { weekID, title }) {
+    const { language } = getters
+    return api.schedule.updateCOTitle({ weekID, language, title })
       .then(res => {
         const week = res.data.result
         commit('UPDATE_WEEK', week)
@@ -95,6 +114,9 @@ const mutations = {
   },
   UPDATE_SELECTED_ASSIGNEE (state, payload) {
     Object.assign(state, { selectedAssignee: payload })
+  },
+  UPDATE_LANGUAGE (state, payload) {
+    Object.assign(state, { language: payload })
   }
 }
 

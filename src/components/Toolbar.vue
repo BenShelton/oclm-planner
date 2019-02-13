@@ -7,13 +7,41 @@
     <VSpacer />
     <VToolbarItems>
       <VBtn
+        v-if="!loggedIn"
         flat
         :disabled="loading"
         :loading="loading"
-        @click="onButtonClick"
+        @click="onLogin"
       >
-        {{ loggedIn ? 'Logout' : 'Login' }}
+        Login
       </VBtn>
+      <VMenu
+        v-else
+        offset-y
+        :close-on-content-click="false"
+        :min-width="200"
+        :max-width="200"
+      >
+        <VBtn slot="activator" icon>
+          <VIcon>settings</VIcon>
+        </VBtn>
+        <VCard class="pa-3">
+          <VSelect
+            v-model="languageModel"
+            label="Language"
+            :items="items"
+          />
+          <VBtn
+            block
+            color="error"
+            :disabled="loading"
+            :loading="loading"
+            @click="onLogout"
+          >
+            Logout
+          </VBtn>
+        </VCard>
+      </VMenu>
     </VToolbarItems>
   </VToolbar>
 </template>
@@ -21,20 +49,31 @@
 <script>
 import { mapGetters, mapActions, mapMutations } from 'vuex'
 import routes from '@/router/routes'
+import { SUPPORTED_LANGUAGES } from '@/constants'
 
 export default {
   name: 'Toolbar',
 
   data () {
     return {
-      loading: false
+      loading: false,
+      items: SUPPORTED_LANGUAGES
     }
   },
 
   computed: {
     ...mapGetters({
-      loggedIn: 'auth/hasToken'
+      loggedIn: 'auth/hasToken',
+      language: 'schedule/language'
     }),
+    languageModel: {
+      get () {
+        return this.language
+      },
+      set (val) {
+        this.updateLanguage(val)
+      }
+    },
     title () {
       switch (this.$route.name) {
         case routes.HOME:
@@ -61,13 +100,13 @@ export default {
     }),
     ...mapMutations({
       toggleDrawer: 'drawer/TOGGLE_OPEN',
-      alert: 'alert/UPDATE_ALERT'
+      alert: 'alert/UPDATE_ALERT',
+      updateLanguage: 'schedule/UPDATE_LANGUAGE'
     }),
-    onButtonClick () {
-      if (!this.loggedIn) {
-        this.$router.push({ name: routes.LOGIN })
-        return
-      }
+    onLogin () {
+      this.$router.push({ name: routes.LOGIN })
+    },
+    onLogout () {
       this.loading = true
       this.logout()
         .then(() => {

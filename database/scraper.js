@@ -1,22 +1,112 @@
 import rp from 'request-promise'
 import cheerio from 'cheerio'
 
+const LANGUAGE_OPTIONS = {
+  en: {
+    months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'],
+    addressConstructor: date => {
+      return ['https://wol.jw.org/en/wol/dt/r1/lp-e/' + date.replace(/-/g, '/')]
+    },
+    inherit: [],
+    cbsTitle: 'Congregation Bible Study',
+    talkRegexes: {
+      ministryVideo: /(Apply Yourself|Video)/,
+      initialCall: /Initial Call/,
+      returnVisit: /Return Visit/,
+      bibleStudy: /Bible Study/,
+      studentTalk: /Talk/
+    },
+    bookAbbreviations: {
+      jy: 'Jesus - The Way'
+    }
+  },
+  tpo: {
+    months: ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
+    addressConstructor: date => {
+      const { months } = LANGUAGE_OPTIONS.tpo
+      const [sY, sM, sD] = date.split('-').map(Number)
+      const endDate = new Date(date)
+      endDate.setUTCDate(endDate.getUTCDate() + 6)
+      const [, eM, eD] = endDate.toISOString().split('T')[0].split('-').map(Number)
+      const workbookMonth = months[sM - 1]
+      const sMonth = workbookMonth.substr(0, 3)
+      const workbookWeeks = []
+      if (sM === eM) {
+        workbookWeeks.push(sD + 'a' + eD + sMonth)
+        workbookWeeks.push(sD + '-' + eD + sMonth)
+        workbookWeeks.push(sD + 'a' + eD + '-' + sMonth)
+        workbookWeeks.push(sD + '-' + eD + '-' + sMonth)
+        // just in case of an accidental english abbreviation instead (e.g. /programa-reuniao-22a28-apr/)
+        const englishMonth = LANGUAGE_OPTIONS.en.months[sM - 1].substr(0, 3)
+        workbookWeeks.push(sD + 'a' + eD + '-' + englishMonth)
+      } else {
+        const eMonth = months[eM - 1].substr(0, 3)
+        workbookWeeks.push(sD + sMonth + '-' + eD + eMonth)
+      }
+      return workbookWeeks.map(week => `https://www.jw.org/jw-tpo/publicacoes/jw-manual-de-atividades/mwb-${workbookMonth}-${sY}/programa-reuniao-${week}/`)
+    },
+    inherit: [
+      'chairman',
+      'openingPrayer',
+      'highlights',
+      'gems',
+      'bibleReading',
+      'studentTalk',
+      'serviceTalk'
+    ],
+    cbsTitle: 'Estudo Bíblico de Congregação',
+    talkRegexes: {
+      ministryVideo: /(Melhore a Sua Leitura|Vídeo)/,
+      initialCall: /Contacto Inicial/,
+      returnVisit: /Revisita/,
+      bibleStudy: /Estudo Bíblico/,
+      studentTalk: /Discurso/
+    },
+    bookAbbreviations: {}
+  }
+}
+
 const transform = body => cheerio.load(body)
 const titleRegex = /^(.*?): /
 const timeRegex = /: \((.*?)\)/
 const studyPointRegex = /\(.*?(\d+)\)\*?$/
-const paragraphSelector = 'p.su'
-const bookAbbreviations = {
-  jy: 'Jesus - The Way'
+const paragraphSelector = '.pGroup > ul > li > p'
+
+function safeRegex (regex, str) {
+  const result = regex.exec(str)
+  if (!result) {
+    console.warn('Could not run regex on "' + str + '"')
+    return ''
+  }
+  return result[1].trim()
 }
 
-export default function scrapeWOL (date) {
-  const uri = `https://wol.jw.org/en/wol/dt/r1/lp-e/${date.replace(/-/g, '/')}`
-  return rp({ uri, transform })
+export default function scrapeWOL (date, language) {
+  const options = LANGUAGE_OPTIONS[language]
+  if (!options) throw new Error('Unsupported language')
+  const { addressConstructor, inherit, talkRegexes, cbsTitle, bookAbbreviations } = options
+  if (!addressConstructor || !inherit || !talkRegexes || !cbsTitle || !bookAbbreviations) throw new Error('Language not fully supported')
+
+  // We allow for multiple uris because sometimes the url can change slightly for no obvious reason, so we try them all and catch the first that succeeds
+  const uris = addressConstructor(date)
+  return Promise.all(uris.map(uri => {
+    return rp({ uri, transform })
+      .then(
+        val => Promise.reject(val),
+        err => Promise.resolve(err)
+      )
+  }))
+    .then(
+      () => {
+        console.log('No URIs matched: ', uris)
+        throw new Error('404')
+      },
+      val => Promise.resolve(val)
+    )
     .then($ => {
       // Check schedule is online first
       const weeklyBibleReading = $('#p2 strong', 'header').text()
-      if (!weeklyBibleReading) throw new Error('Week not yet available')
+      if (!weeklyBibleReading) throw new Error('404')
 
       // Load as much static information as possible
       const update = {
@@ -29,15 +119,20 @@ export default function scrapeWOL (date) {
         ],
         'assignments.chairman.text': 'N/A',
         'assignments.chairman.type': 'chairman',
+        'assignments.chairman.inherit': inherit.includes('chairman'),
         'assignments.openingPrayer.text': 'N/A',
         'assignments.openingPrayer.type': 'prayer',
+        'assignments.openingPrayer.inherit': inherit.includes('openingPrayer'),
         'assignments.gems.text': 'N/A',
         'assignments.gems.type': 'gems',
         'assignments.gems.time': '8 min.',
+        'assignments.gems.inherit': inherit.includes('gems'),
         'assignments.reader.text': 'N/A',
         'assignments.reader.type': 'reader',
+        'assignments.reader.inherit': inherit.includes('reader'),
         'assignments.closingPrayer.text': 'N/A',
-        'assignments.closingPrayer.type': 'prayer'
+        'assignments.closingPrayer.type': 'prayer',
+        'assignments.closingPrayer.inherit': inherit.includes('closingPrayer')
       }
 
       // Bible Highlights
@@ -46,7 +141,8 @@ export default function scrapeWOL (date) {
       update[highlightsPath + 'text'] = highlightsText
       update[highlightsPath + 'type'] = 'highlights'
       update[highlightsPath + 'title'] = highlightsText.replace(/: \(.*\)$/, '')
-      update[highlightsPath + 'time'] = timeRegex.exec(highlightsText)[1]
+      update[highlightsPath + 'time'] = safeRegex(timeRegex, highlightsText)
+      update[highlightsPath + 'inherit'] = inherit.includes('highlights')
 
       // Bible Reading
       const bibleReadingP = $(paragraphSelector, '#section2').last()
@@ -54,52 +150,59 @@ export default function scrapeWOL (date) {
       const bibleReadingPath = 'assignments.bibleReading.'
       update[bibleReadingPath + 'text'] = bibleReadingText
       update[bibleReadingPath + 'type'] = 'bibleReading'
-      update[bibleReadingPath + 'title'] = bibleReadingP.find('a.b').text().trim()
-      update[bibleReadingPath + 'time'] = timeRegex.exec(bibleReadingText)[1]
-      update[bibleReadingPath + 'studyPoint'] = studyPointRegex.exec(bibleReadingText)[1]
+      update[bibleReadingPath + 'title'] = bibleReadingP.find('a.b, a.jsBibleLink').text().trim()
+      update[bibleReadingPath + 'time'] = safeRegex(timeRegex, bibleReadingText)
+      update[bibleReadingPath + 'studyPoint'] = safeRegex(studyPointRegex, bibleReadingText)
+      update[bibleReadingPath + 'inherit'] = inherit.includes('bibleReading')
 
       // Student Talks
       $(paragraphSelector, '#section3').each((i, elem) => {
         const elemText = $(elem).text().trim()
-        const title = titleRegex.exec(elemText)[1]
+        const title = safeRegex(titleRegex, elemText)
         let type = ''
-        if (title.includes('Apply Yourself') || title.includes('Video')) type = 'ministryVideo'
-        else if (title.includes('Initial Call')) type = 'initialCall'
-        else if (title.includes('Return Visit')) type = 'returnVisit'
-        else if (title.includes('Bible Study')) type = 'bibleStudy'
-        else if (title.includes('Talk')) type = 'studentTalk'
+        if (talkRegexes.ministryVideo.test(title)) type = 'ministryVideo'
+        else if (talkRegexes.initialCall.test(title)) type = 'initialCall'
+        else if (talkRegexes.returnVisit.test(title)) type = 'returnVisit'
+        else if (talkRegexes.bibleStudy.test(title)) type = 'bibleStudy'
+        else if (talkRegexes.studentTalk.test(title)) type = 'studentTalk'
         const studentTalkPath = `assignments.studentTalk${i + 1}.`
         update[studentTalkPath + 'text'] = elemText
         update[studentTalkPath + 'type'] = type
         update[studentTalkPath + 'title'] = title
-        update[studentTalkPath + 'time'] = timeRegex.exec(elemText)[1]
-        if (type && type !== 'ministryVideo') update[studentTalkPath + 'studyPoint'] = studyPointRegex.exec(elemText)[1]
+        update[studentTalkPath + 'time'] = safeRegex(timeRegex, elemText)
+        update[studentTalkPath + 'inherit'] = inherit.includes('studentTalk')
+        if (type && type !== 'ministryVideo') update[studentTalkPath + 'studyPoint'] = safeRegex(studyPointRegex, elemText)
       })
 
       // Service Talks & CBS
       $(paragraphSelector, '#section4').each((i, elem) => {
         if (i === 0) return // ignore opening song
         const elemText = $(elem).text().trim()
-        const title = titleRegex.exec(elemText)[1]
-        if (title === 'Congregation Bible Study') {
+        const title = safeRegex(titleRegex, elemText)
+        if (title === cbsTitle) {
           const congregationBibleStudyPath = 'assignments.congregationBibleStudy.'
-          const bookInfo = /\) (.*)$/.exec(elemText)[1].trim()
-          const bookAbbreviation = /^(\w+)/.exec(bookInfo)[1]
+          const bookInfo = safeRegex(/\) (.*)$/, elemText)
+          const bookAbbreviation = safeRegex(/^(\w+)/, bookInfo)
           const bookTitle = bookAbbreviations[bookAbbreviation] || bookAbbreviation
           update[congregationBibleStudyPath + 'text'] = elemText
           update[congregationBibleStudyPath + 'type'] = 'congregationBibleStudy'
           update[congregationBibleStudyPath + 'title'] = bookInfo.replace(bookAbbreviation, bookTitle)
-          update[congregationBibleStudyPath + 'time'] = timeRegex.exec(elemText)[1]
+          update[congregationBibleStudyPath + 'time'] = safeRegex(timeRegex, elemText)
+          update[congregationBibleStudyPath + 'inherit'] = inherit.includes('congregationBibleStudy')
           return false // stop loop
         } else {
           const serviceTalkPath = `assignments.serviceTalk${i}.`
           update[serviceTalkPath + 'text'] = elemText
           update[serviceTalkPath + 'type'] = 'serviceTalk'
           update[serviceTalkPath + 'title'] = title
-          update[serviceTalkPath + 'time'] = timeRegex.exec(elemText)[1]
+          update[serviceTalkPath + 'time'] = safeRegex(timeRegex, elemText)
+          update[serviceTalkPath + 'inherit'] = inherit.includes('serviceTalk')
         }
       })
 
-      return update
+      // Prepend the language to each key
+      const languagePrefix = language + '.'
+      return Object.entries(update)
+        .reduce((acc, [k, v]) => Object.assign(acc, { [languagePrefix + k]: v }), {})
     })
 }
