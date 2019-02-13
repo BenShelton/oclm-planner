@@ -140,8 +140,7 @@ export const updateWeekType = async ({ weekID, language, type }) => {
   // Check the previous week didn't already have the same type
   const baseWeek = await coll.findOne(query)
   assert.notStrictEqual(null, baseWeek, 404)
-  const week = baseWeek[language] || null
-  assert.notStrictEqual(null, week, 404)
+  const week = baseWeek[language] || {}
   assert.notStrictEqual(type, week.type, 400)
 
   // Remove existing assigned members if necessary
