@@ -3,6 +3,7 @@ import cheerio from 'cheerio'
 
 const LANGUAGE_OPTIONS = {
   en: {
+    months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'],
     addressConstructor: date => {
       return ['https://wol.jw.org/en/wol/dt/r1/lp-e/' + date.replace(/-/g, '/')]
     },
@@ -35,6 +36,9 @@ const LANGUAGE_OPTIONS = {
         workbookWeeks.push(sD + '-' + eD + sMonth)
         workbookWeeks.push(sD + 'a' + eD + '-' + sMonth)
         workbookWeeks.push(sD + '-' + eD + '-' + sMonth)
+        // just in case of an accidental english abbreviation instead (e.g. /programa-reuniao-22a28-apr/)
+        const englishMonth = LANGUAGE_OPTIONS.en.months[sM - 1].substr(0, 3)
+        workbookWeeks.push(sD + 'a' + eD + '-' + englishMonth)
       } else {
         const eMonth = months[eM - 1].substr(0, 3)
         workbookWeeks.push(sD + sMonth + '-' + eD + eMonth)
@@ -93,7 +97,10 @@ export default function scrapeWOL (date, language) {
       )
   }))
     .then(
-      () => { throw new Error('404') },
+      () => {
+        console.log('No URIs matched: ', uris)
+        throw new Error('404')
+      },
       val => Promise.resolve(val)
     )
     .then($ => {
