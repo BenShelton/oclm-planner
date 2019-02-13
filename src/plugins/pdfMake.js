@@ -7,6 +7,74 @@ import { COLORS, WEEK_TYPES } from '@/constants'
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const ASSIGNMENT_SLIP_TRANSLATIONS = {
+  en: {
+    verticalPadding: 32,
+    defaultRoom: 'mainHall',
+    title: 'OUR CHRISTIAN LIFE AND MINISTRY MEETING ASSIGNMENT',
+    name: 'Name',
+    assistant: 'Assistant',
+    date: 'Date',
+    studyPoint: 'Study Point',
+    assignment: 'Assignment',
+    bibleReading: 'Bible reading',
+    initialCall: 'Initial call',
+    firstReturnVisit: 'First return visit',
+    secondReturnVisit: 'Second return visit',
+    first: 'First',
+    second: 'Second',
+    givenIn: 'To be given in',
+    mainHall: 'Main hall',
+    class1: 'Auxiliary classroom 1',
+    class2: 'Auxiliary classroom 2',
+    bibleStudy: 'Bible study',
+    studentTalk: 'Talk',
+    other: 'Other: ..................',
+    note: [
+      { text: 'Note to student: ', bold: true },
+      { text: 'The source material and study point for your assignment can be found in the ' },
+      { text: 'Life and Ministry Meeting Workbook. ', italics: true },
+      { text: 'Please work on the listed study point, which is discussed in the ' },
+      { text: 'Teaching ', italics: true },
+      { text: 'brochure. You should ' },
+      { text: 'bring your brochure, either printed or electronic, to the Life and Ministry Meeting.', bold: true }
+    ],
+    footer: 'S-89-E      10/18'
+  },
+  tpo: {
+    verticalPadding: 28,
+    defaultRoom: 'class1',
+    title: 'DESIGNAÇÃO PARA A REUNIÃO VIDA E MINISTÉRIO CRISTÃOS',
+    name: 'Nome',
+    assistant: 'Ajudante',
+    date: 'Data',
+    studyPoint: 'Ponto de Conselho',
+    assignment: 'Designação',
+    bibleReading: 'Leitura da Bíblia',
+    initialCall: 'Contacto Inicial',
+    firstReturnVisit: 'Primeira Revisita',
+    secondReturnVisit: 'Segunda Revisita',
+    first: 'Primeira',
+    second: 'Segunda',
+    givenIn: 'A ser apresentada no(a)',
+    mainHall: 'Salão principal',
+    class1: '1a Sala auxiliar',
+    class2: '2a Sala auxiliar',
+    bibleStudy: 'Estudo Bíblico',
+    studentTalk: 'Discurso',
+    other: 'Outra: ..................',
+    note: [
+      { text: 'Nota ao estudante: ', bold: true },
+      { text: 'A fonte de matéria para a sua designação encontra-se no ' },
+      { text: 'Manual de Atividades da Reunião Vida e Ministério. ', italics: true },
+      { text: 'Por favor, trabalhe o ponto de conselho que é designado, e que é abordado na brochura ' },
+      { text: 'Melhore a Sua Leitura e o Seu Ensino. ', italics: true },
+      { text: 'Deverá ' },
+      { text: 'trazer a sua brochura, quer impressa ou em formato electrónico para a Reunião Vida e Ministério.', bold: true }
+    ],
+    footer: 'S-89-TPO     10/18'
+  }
+}
 let timer
 
 function setTime (time) {
@@ -256,25 +324,25 @@ export function generateSchedule (weeks, month) {
   return pdfMake.createPdf(docDefinition)
 }
 
-function createSlip (assignment, date = '') {
+function createSlip (translation, assignment, date = '') {
   const { title, type, assignee, assistant, studyPoint } = assignment || {}
   const [y, m, d] = date.split('-')
   const prettyDate = [d, MONTHS[+m - 1], y].join(' ')
   return {
     width: '50%',
-    margin: [32, 32, 32, 32],
+    margin: [32, translation.verticalPadding, 32, translation.verticalPadding],
     stack: [
       {
-        text: 'OUR CHRISTIAN LIFE AND MINISTRY MEETING ASSIGNMENT',
+        text: translation.title,
         fontSize: 14,
         alignment: 'center',
         bold: true,
         margin: [0, 0, 0, 12]
       },
-      createAssignmentInput('Name:', getAssigneeName(assignee)),
-      createAssignmentInput('Assistant:', getAssigneeName(assistant)),
-      createAssignmentInput('Date:', prettyDate),
-      createAssignmentInput('Study Point:', studyPoint),
+      createAssignmentInput(translation.name + ':', getAssigneeName(assignee)),
+      createAssignmentInput(translation.assistant + ':', getAssigneeName(assistant)),
+      createAssignmentInput(translation.date + ':', prettyDate),
+      createAssignmentInput(translation.studyPoint + ':', studyPoint),
       {
         fontSize: 10,
         margin: [0, 8, 0, 16],
@@ -282,24 +350,24 @@ function createSlip (assignment, date = '') {
           {
             width: '55%',
             stack: [
-              { text: 'Assignment:', bold: true, margin: [0, 0, 0, 1] },
-              createAssignmentCheckbox('Bible reading', type === 'bibleReading'),
-              createAssignmentCheckbox('Initial call', type === 'initialCall'),
-              createAssignmentCheckbox('First return visit', title === 'First Return Visit'),
-              createAssignmentCheckbox('Second return visit', title === 'Second Return Visit'),
-              { text: 'To be given in:', bold: true, margin: [0, 4, 0, 1] },
-              createAssignmentCheckbox('Main hall', !!assignment),
-              createAssignmentCheckbox('Auxiliary classroom 1'),
-              createAssignmentCheckbox('Auxiliary classroom 2')
+              { text: translation.assignment + ':', bold: true, margin: [0, 0, 0, 1] },
+              createAssignmentCheckbox(translation.bibleReading, type === 'bibleReading'),
+              createAssignmentCheckbox(translation.initialCall, type === 'initialCall'),
+              createAssignmentCheckbox(translation.firstReturnVisit, type === 'returnVisit' && title.includes(translation.first)),
+              createAssignmentCheckbox(translation.secondReturnVisit, type === 'returnVisit' && title.includes(translation.second)),
+              { text: translation.givenIn + ':', bold: true, margin: [0, 4, 0, 1] },
+              createAssignmentCheckbox(translation.mainHall, assignment && translation.defaultRoom === 'mainHall'),
+              createAssignmentCheckbox(translation.class1, assignment && translation.defaultRoom === 'class1'),
+              createAssignmentCheckbox(translation.class2, assignment && translation.defaultRoom === 'class2')
             ]
           },
           {
             width: '45%',
             margin: [0, 12, 0, 0],
             stack: [
-              createAssignmentCheckbox('Bible study', type === 'bibleStudy'),
-              createAssignmentCheckbox('Talk', type === 'studentTalk'),
-              createAssignmentCheckbox('Other: ..................')
+              createAssignmentCheckbox(translation.bibleStudy, type === 'bibleStudy'),
+              createAssignmentCheckbox(translation.studentTalk, type === 'studentTalk'),
+              createAssignmentCheckbox(translation.other)
             ]
           }
         ]
@@ -307,18 +375,10 @@ function createSlip (assignment, date = '') {
       {
         fontSize: 9,
         alignment: 'justify',
-        text: [
-          { text: 'Note to student: ', bold: true },
-          { text: 'The source material and study point for your assignment can be found in the ' },
-          { text: 'Life and Ministry Meeting Workbook. ', italics: true },
-          { text: 'Please work on the listed study point, which is discussed in the ' },
-          { text: 'Teaching ', italics: true },
-          { text: 'brochure. You should ' },
-          { text: 'bring your brochure, either printed or electronic, to the Life and Ministry Meeting.', bold: true }
-        ]
+        text: translation.note
       },
       {
-        text: 'S-89-E      10/18',
+        text: translation.footer,
         fontSize: 10,
         margin: [0, 8, 0, 0]
       }
@@ -410,6 +470,8 @@ export function generateAssignmentSlips (weeks, month) {
   const slips = []
   const VALID_TYPES = ['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
   const language = store.getters['schedule/language']
+  const translation = ASSIGNMENT_SLIP_TRANSLATIONS[language]
+  if (!translation) throw new Error('Translations not created for the selected language')
   for (const baseWeek of weeks) {
     const { date } = baseWeek
     const week = baseWeek[language]
@@ -419,14 +481,14 @@ export function generateAssignmentSlips (weeks, month) {
     for (let i = 0; i <= 4; i++) {
       // treat index 0 as the bibleReading, else extract a student talk
       const talk = i === 0 ? assignments.bibleReading : assignments['studentTalk' + i]
-      if (!talk || !(VALID_TYPES.includes(talk.type))) continue
-      slips.push(createSlip(talk, date))
+      if (!talk || talk.inherit || !(VALID_TYPES.includes(talk.type))) continue
+      slips.push(createSlip(translation, talk, date))
     }
   }
 
   // complete the last page so there aren't blank slips
   while (slips.length % 4 !== 0) {
-    slips.push(createSlip())
+    slips.push(createSlip(translation))
   }
 
   // arrange the slips
