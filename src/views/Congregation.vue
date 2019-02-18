@@ -184,7 +184,7 @@ export default {
         abbreviation: '',
         gender: GENDERS[0],
         appointment: APPOINTMENTS[0],
-        languageGroup: SUPPORTED_LANGUAGES[0],
+        languageGroup: SUPPORTED_LANGUAGES[0].value,
         show: true,
         privileges: {}
       }
@@ -224,7 +224,7 @@ export default {
         abbreviation: '',
         gender: GENDERS[0],
         appointment: APPOINTMENTS[0],
-        languageGroup: SUPPORTED_LANGUAGES[0],
+        languageGroup: SUPPORTED_LANGUAGES[0].value,
         show: true,
         privileges: {}
       })
