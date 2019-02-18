@@ -37,7 +37,7 @@ export const COLORS = {
   LIVING: '#961526'
 }
 
-export const APPOINTMENTS = ['None', 'Brother', 'Sister', 'Ministerial Servant', 'Elder']
+export const APPOINTMENTS = ['None', 'Brother', 'Sister', 'Ministerial Servant', 'Elder', 'Circuit Overseer']
 
 export const GENDERS = ['Male', 'Female']
 
