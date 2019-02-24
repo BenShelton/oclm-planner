@@ -1,9 +1,7 @@
 <template>
   <VToolbar app>
     <VToolbarSideIcon v-if="loggedIn" @click.stop="toggleDrawer" />
-    <VToolbarTitle>
-      OCLM Planner | {{ title }}
-    </VToolbarTitle>
+    <VToolbarTitle v-text="title" />
     <VSpacer />
     <VToolbarItems>
       <VBtn
@@ -75,22 +73,17 @@ export default {
       }
     },
     title () {
+      const prefix = this.$vuetify.breakpoint.smAndDown ? '' : 'OCLM Planner | '
+      let title = 'Untitled'
       switch (this.$route.name) {
-        case routes.HOME:
-          return 'Home'
-        case routes.LOGIN:
-          return 'Login'
-        case routes.SCHEDULE:
-          return 'Schedule'
-        case routes.EXPORT:
-          return 'Export'
-        case routes.CONGREGATION:
-          return 'Congregation'
-        case routes.HELP:
-          return 'Help'
-        default:
-          return 'Untitled'
+        case routes.HOME: title = 'Home'; break
+        case routes.LOGIN: title = 'Login'; break
+        case routes.SCHEDULE: title = 'Schedule'; break
+        case routes.EXPORT: title = 'Export'; break
+        case routes.CONGREGATION: title = 'Congregation'; break
+        case routes.HELP: title = 'Help'; break
       }
+      return prefix + title
     }
   },
 
