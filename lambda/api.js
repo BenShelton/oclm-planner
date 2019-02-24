@@ -65,8 +65,8 @@ router.get('/congregation/members', (req, res) => {
 
 const languageCodes = SUPPORTED_LANGUAGES.map(({ value }) => value)
 const validateMember = member => {
-  const { name, abbreviation, appointment, gender, languageGroup, privileges, show } = member
-  if (!name || !abbreviation) return 'Name & Abbreviation are required'
+  const { name, appointment, gender, languageGroup, privileges, show } = member
+  if (!name) return 'Name is required'
   if (!APPOINTMENTS.includes(appointment)) return 'Appointment must be one of the following: ' + APPOINTMENTS.join(', ')
   if (!GENDERS.includes(gender)) return 'Gender must be one of the following: ' + GENDERS.join(', ')
   if (!languageCodes.includes(languageGroup)) return 'Language Group must be one of the following: ' + languageCodes.join(', ')
@@ -76,8 +76,8 @@ const validateMember = member => {
 }
 
 router.post('/congregation/addMember', (req, res) => {
-  const { name, abbreviation, appointment, gender, languageGroup, privileges, show } = req.body
-  const member = { name, abbreviation, appointment, gender, languageGroup, privileges, show }
+  const { name, appointment, gender, languageGroup, privileges, show } = req.body
+  const member = { name, appointment, gender, languageGroup, privileges, show }
   const validationError = validateMember(member)
   if (validationError) return res.status(400).json({ message: validationError })
   congregation.addMember(member)

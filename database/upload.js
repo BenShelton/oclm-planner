@@ -19,7 +19,6 @@ console.log('File Loaded, Validating...')
 /* Data Sanity Checks */
 const columns = [
   { name: 'name', noDuplicates: true },
-  { name: 'abbreviation', noDuplicates: true },
   { name: 'appointment', allowedValues: APPOINTMENTS },
   { name: 'gender', allowedValues: GENDERS },
   { name: 'languageGroup', allowedValues: SUPPORTED_LANGUAGES.map(({ value }) => value) },

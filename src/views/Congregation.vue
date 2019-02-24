@@ -28,9 +28,6 @@
                   <VTextField v-model="editMember.name" required label="Name" />
                 </VFlex>
                 <VFlex xs12 sm6 md4>
-                  <VTextField v-model="editMember.abbreviation" required label="Abbreviation" />
-                </VFlex>
-                <VFlex xs12 sm6 md4>
                   <VSelect v-model="editMember.gender" label="Gender" :items="GENDERS" />
                 </VFlex>
                 <VFlex xs12 sm6 md4>
@@ -92,7 +89,6 @@
       <template slot="items" slot-scope="props">
         <tr class="pointer" @click="expandRow(props)">
           <td v-text="props.item.name" />
-          <td v-text="props.item.abbreviation" />
           <td v-text="props.item.gender" />
           <td v-text="props.item.appointment" />
           <td v-text="languageGroups[props.item.languageGroup]" />
@@ -166,7 +162,6 @@ export default {
       languageGroups: SUPPORTED_LANGUAGES.reduce((acc, { text, value }) => Object.assign(acc, { [value]: text }), {}),
       headers: [
         { text: 'Name', value: 'name' },
-        { text: 'Abbreviation', value: 'abbreviation' },
         { text: 'Gender', value: 'gender' },
         { text: 'Appointment', value: 'appointment' },
         { text: 'Language Group', value: 'languageGroup' },
@@ -181,7 +176,6 @@ export default {
       editTitle: '',
       editMember: {
         name: '',
-        abbreviation: '',
         gender: GENDERS[0],
         appointment: APPOINTMENTS[0],
         languageGroup: SUPPORTED_LANGUAGES[0].value,
@@ -221,7 +215,6 @@ export default {
       this.editID = null
       Object.assign(this.editMember, {
         name: '',
-        abbreviation: '',
         gender: GENDERS[0],
         appointment: APPOINTMENTS[0],
         languageGroup: SUPPORTED_LANGUAGES[0].value,
@@ -233,10 +226,9 @@ export default {
     },
     onEdit (member) {
       this.editID = member._id
-      const { name, abbreviation, gender, appointment, languageGroup, show, privileges } = member
+      const { name, gender, appointment, languageGroup, show, privileges } = member
       Object.assign(this.editMember, {
         name,
-        abbreviation,
         gender,
         appointment,
         languageGroup,
@@ -259,8 +251,8 @@ export default {
         })
     },
     onSave () {
-      if (!this.editMember.name || !this.editMember.abbreviation) {
-        this.alert({ text: 'Name and Abbreviation are required', color: 'error' })
+      if (!this.editMember.name) {
+        this.alert({ text: 'Name is required', color: 'error' })
         return
       }
       if (this.editID) {
