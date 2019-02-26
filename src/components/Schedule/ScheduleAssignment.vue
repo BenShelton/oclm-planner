@@ -1,40 +1,56 @@
 <template>
-  <VHover>
-    <div slot-scope="{ hover }">
-      <VListTile class="py-2" :class="{ grey: !assignment.details, 'blue lighten-5': assignment.inherit || assignment.stream }">
-        <VListTileContent>
-          <VListTileTitle>
-            <span v-text="assignment.displayName" />
-            <span v-if="assignment.inherit" class="primary--text font-weight-bold">
-              (English)
-            </span>
-          </VListTileTitle>
-          <VListTileSubTitle v-if="!assignment.details">
-            No Assignment Found
-          </VListTileSubTitle>
-          <template v-else>
-            <VListTileSubTitle v-if="assignment.details.stream">
-              <VChip small color="primary" class="white--text">
-                Streaming
-              </VChip>
-            </VListTileSubTitle>
-            <VListTileSubTitle v-else>
-              <ScheduleAssignee :assignee="assignment.details.assignee" />
-              <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant" />
-            </VListTileSubTitle>
-            <VListTileSubTitle v-text="assignment.details.title" />
-          </template>
-        </VListTileContent>
-        <VListTileAction>
-          <VListTileActionText v-if="assignment.details" v-text="assignment.details.time" />
-          <VBtn v-show="hover" icon @click="onEdit">
-            <VIcon>edit</VIcon>
-          </VBtn>
-        </VListTileAction>
-      </VListTile>
-      <VDivider />
-    </div>
-  </VHover>
+  <VLayout
+    column
+    class="schedule-assignment"
+    :class="{ grey: !assignment.details, 'blue lighten-5': assignment.inherit || assignment.stream }"
+  >
+    <VBtn
+      icon
+      outline
+      absolute
+      right
+      class="mt-2"
+      @click="onEdit"
+    >
+      <VIcon>edit</VIcon>
+    </VBtn>
+    <VLayout align-center class="my-2 mx-3 subheading">
+      <span class="mr-2" v-text="assignment.displayName" />
+      <span v-if="assignment.inherit" class="primary--text font-weight-bold">
+        (English)
+      </span>
+    </VLayout>
+    <VLayout v-if="!assignment.details" class="mx-3">
+      <span>No Assignment Found</span>
+    </VLayout>
+    <template v-else>
+      <VLayout class="mx-3">
+        <VChip
+          v-if="assignment.details.stream"
+          small
+          color="primary"
+          class="white--text"
+        >
+          Streaming
+        </VChip>
+        <VLayout v-else>
+          <ScheduleAssignee class="mr-1" :assignee="assignment.details.assignee" />
+          <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant" />
+          <VSpacer />
+        </VLayout>
+      </VLayout>
+      <VLayout justify-center class="mx-3">
+        <VFlex xs10 class="text-truncate" v-text="assignment.details.title" />
+        <VFlex
+          v-if="assignment.details"
+          xs2
+          class="caption grey--text text--darken-2 text-xs-right text-truncate"
+          v-text="assignment.details.time"
+        />
+      </VLayout>
+    </template>
+    <VDivider class="mt-2" />
+  </VLayout>
 </template>
 
 <script>
@@ -64,3 +80,9 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+.schedule-assignment
+  height 100px
+  position relative
+</style>

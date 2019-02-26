@@ -1,6 +1,6 @@
 <template>
   <VCard>
-    <VToolbar :color="toolbarColor">
+    <VToolbar :color="toolbarColor" class="elevation-0">
       <VToolbarTitle v-text="prettyDate" />
       <VSpacer />
       <VMenu
@@ -59,8 +59,9 @@
             />
           </template>
         </VCard>
-      </Vmenu>
+      </VMenu>
     </VToolbar>
+    <VDivider />
 
     <!-- Loading Week Display -->
     <VLayout v-if="!localWeek.loaded" justify-center class="pa-3">
@@ -134,31 +135,29 @@
         <VDivider />
       </div>
 
-      <VList two-line subheader class="pa-0">
-        <ScheduleAssignment :assignment="assignments.chairman" @edit="onEdit" />
-        <ScheduleAssignment :assignment="assignments.openingPrayer" @edit="onEdit" />
+      <ScheduleAssignment :assignment="assignments.chairman" @edit="onEdit" />
+      <ScheduleAssignment :assignment="assignments.openingPrayer" @edit="onEdit" />
 
-        <ScheduleSection title="TREASURES FROM GOD'S WORD" color="TREASURES">
-          <ScheduleAssignment :assignment="assignments.highlights" @edit="onEdit" />
-          <ScheduleAssignment :assignment="assignments.gems" @edit="onEdit" />
-          <ScheduleAssignment :assignment="assignments.bibleReading" @edit="onEdit" />
-        </ScheduleSection>
+      <ScheduleSection title="TREASURES FROM GOD'S WORD" color="TREASURES">
+        <ScheduleAssignment :assignment="assignments.highlights" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.gems" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.bibleReading" @edit="onEdit" />
+      </ScheduleSection>
 
-        <ScheduleSection title="APPLY YOURSELF TO THE FIELD MINISTRY" color="MINISTRY">
-          <ScheduleAssignment :assignment="assignments.studentTalk1" @edit="onEdit" />
-          <ScheduleAssignment :assignment="assignments.studentTalk2" @edit="onEdit" />
-          <ScheduleAssignment :assignment="assignments.studentTalk3" @edit="onEdit" />
-          <ScheduleAssignment :assignment="assignments.studentTalk4" @edit="onEdit" />
-        </ScheduleSection>
+      <ScheduleSection title="APPLY YOURSELF TO THE FIELD MINISTRY" color="MINISTRY">
+        <ScheduleAssignment :assignment="assignments.studentTalk1" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.studentTalk2" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.studentTalk3" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.studentTalk4" @edit="onEdit" />
+      </ScheduleSection>
 
-        <ScheduleSection title="LIVING AS CHRISTIANS" color="LIVING">
-          <ScheduleAssignment :assignment="assignments.serviceTalk1" @edit="onEdit" />
-          <ScheduleAssignment :assignment="assignments.serviceTalk2" @edit="onEdit" />
-          <ScheduleAssignment v-if="!coVisit" :assignment="assignments.congregationBibleStudy" @edit="onEdit" />
-          <ScheduleAssignment v-if="!coVisit" :assignment="assignments.reader" @edit="onEdit" />
-          <ScheduleAssignment :assignment="assignments.closingPrayer" @edit="onEdit" />
-        </ScheduleSection>
-      </VList>
+      <ScheduleSection title="LIVING AS CHRISTIANS" color="LIVING">
+        <ScheduleAssignment :assignment="assignments.serviceTalk1" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.serviceTalk2" @edit="onEdit" />
+        <ScheduleAssignment v-if="!coVisit" :assignment="assignments.congregationBibleStudy" @edit="onEdit" />
+        <ScheduleAssignment v-if="!coVisit" :assignment="assignments.reader" @edit="onEdit" />
+        <ScheduleAssignment :assignment="assignments.closingPrayer" @edit="onEdit" />
+      </ScheduleSection>
     </template>
 
     <!-- Edit Assignment Dialog -->
@@ -235,6 +234,20 @@
               </VFlex>
             </VLayout>
             <VAlert
+              :value="!!multipleAssignments.length"
+              color="error"
+              icon="warning"
+              outline
+            >
+              <span class="font-weight-bold">
+                Warning:
+              </span>
+              <span>
+                Assignee is already on the following assignments this week:
+              </span>
+              <span class="font-italic" v-text="multipleAssignments.join(', ')" />
+            </VAlert>
+            <VAlert
               :value="editAssignment.text !== 'N/A'"
               color="info"
               icon="info"
@@ -250,7 +263,7 @@
             </VAlert>
           </VContainer>
         </VCardText>
-        <VCardActions>
+        <VCardActions class="pb-3">
           <VBtn
             flat
             color="error"
@@ -419,6 +432,16 @@ export default {
     },
     coVisit () {
       return this.weekType === WEEK_TYPES.coVisit.value
+    },
+    multipleAssignments () {
+      const { type, assignee } = this.editAssignment || {}
+      if (!assignee) return []
+      const multipleAssignments = []
+      for (const assignment of Object.values(this.assignments)) {
+        if (!assignment.details) continue
+        if (assignment.details.type !== type && assignment.details.assignee === assignee) multipleAssignments.push(assignment.displayName)
+      }
+      return multipleAssignments
     }
   },
 
