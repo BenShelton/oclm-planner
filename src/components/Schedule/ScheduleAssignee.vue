@@ -1,6 +1,6 @@
 <template>
   <VChip
-    class="ml-0 mr-2 no-select"
+    class="mx-0 no-select"
     small
     :color="color"
     @click="onClick"
