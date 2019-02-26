@@ -234,6 +234,20 @@
               </VFlex>
             </VLayout>
             <VAlert
+              :value="!!multipleAssignments.length"
+              color="error"
+              icon="warning"
+              outline
+            >
+              <span class="font-weight-bold">
+                Warning:
+              </span>
+              <span>
+                Assignee is already on the following assignments this week:
+              </span>
+              <span class="font-italic" v-text="multipleAssignments.join(', ')" />
+            </VAlert>
+            <VAlert
               :value="editAssignment.text !== 'N/A'"
               color="info"
               icon="info"
@@ -418,6 +432,16 @@ export default {
     },
     coVisit () {
       return this.weekType === WEEK_TYPES.coVisit.value
+    },
+    multipleAssignments () {
+      const { type, assignee } = this.editAssignment || {}
+      if (!assignee) return []
+      const multipleAssignments = []
+      for (const assignment of Object.values(this.assignments)) {
+        if (!assignment.details) continue
+        if (assignment.details.type !== type && assignment.details.assignee === assignee) multipleAssignments.push(assignment.displayName)
+      }
+      return multipleAssignments
     }
   },
 
