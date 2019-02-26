@@ -1,6 +1,6 @@
 <template>
   <VCard>
-    <VToolbar :color="toolbarColor">
+    <VToolbar :color="toolbarColor" class="elevation-0">
       <VToolbarTitle v-text="prettyDate" />
       <VSpacer />
       <VMenu
@@ -59,8 +59,9 @@
             />
           </template>
         </VCard>
-      </Vmenu>
+      </VMenu>
     </VToolbar>
+    <VDivider />
 
     <!-- Loading Week Display -->
     <VLayout v-if="!localWeek.loaded" justify-center class="pa-3">

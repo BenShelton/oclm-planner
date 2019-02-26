@@ -9,7 +9,7 @@
       outline
       absolute
       right
-      class="mt-1"
+      class="mt-2"
       @click="onEdit"
     >
       <VIcon>edit</VIcon>
