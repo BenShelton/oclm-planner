@@ -15,7 +15,10 @@ let win
 protocol.registerStandardSchemes(['app'], { secure: true })
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 600 })
+  win = new BrowserWindow({
+    width: 1200,
+    height: 800
+  })
 
   if (isDevelopment) {
     // Load the url of the dev server if in development mode

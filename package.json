@@ -11,8 +11,10 @@
     "build:lambda": "netlify-lambda -c lambda.config.js build lambda",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit",
-    "electron:build": "vue-cli-service electron:build",
-    "electron:serve": "vue-cli-service electron:serve",
+    "electron:build": "npm-run-all --parallel electron:build:app build:lambda",
+    "electron:build:app": "vue-cli-service electron:build",
+    "electron:serve": "npm-run-all --parallel electron:serve:app serve:lambda",
+    "electron:serve:app": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "upload": "babel-node --config-file=./upload.config.js database/upload"
   },
