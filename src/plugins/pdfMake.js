@@ -292,25 +292,6 @@ export function generateSchedule (weeks, month) {
     const week = baseWeek[language]
     if (!week) throw new Error('Week not created for the selected language')
     const { type, weeklyBibleReading, songs, assignments, coTitle, coName } = week
-    const assignmentMap = Object.entries(assignments)
-      .reduce((acc, [k, v]) => {
-        if (!v) return acc
-        const { assignee, assistant } = baseWeek.en.assignments[k]
-        const a = v.inherit ? { ...v, assignee, assistant } : v
-        return Object.assign(acc, { [k]: a })
-      }, {})
-    const {
-      openingPrayer,
-      chairman,
-      highlights,
-      gems,
-      bibleReading,
-      serviceTalk1,
-      serviceTalk2,
-      congregationBibleStudy,
-      reader,
-      closingPrayer
-    } = assignmentMap
 
     // Week Title & Information
     if (index > 0 && index % 2 === 0) stack.push(createScheduleSeparator(true))
@@ -329,6 +310,28 @@ export function generateSchedule (weeks, month) {
       stack.push(createScheduleSeparator())
       return
     }
+
+    // Extract assignments from the correct language
+    const baseAssignments = baseWeek.en.assignments || {}
+    const assignmentMap = Object.entries(assignments || {})
+      .reduce((acc, [k, v]) => {
+        if (!v) return acc
+        const { assignee, assistant } = baseAssignments[k]
+        const a = v.inherit ? { ...v, assignee, assistant } : v
+        return Object.assign(acc, { [k]: a })
+      }, {})
+    const {
+      openingPrayer,
+      chairman,
+      highlights,
+      gems,
+      bibleReading,
+      serviceTalk1,
+      serviceTalk2,
+      congregationBibleStudy,
+      reader,
+      closingPrayer
+    } = assignmentMap
 
     stack.push({
       columns: [
