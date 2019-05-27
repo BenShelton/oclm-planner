@@ -36,6 +36,7 @@ const LANGUAGE_OPTIONS = {
         workbookWeeks.push(sD + '-' + eD + sMonth)
         workbookWeeks.push(sD + 'a' + eD + '-' + sMonth)
         workbookWeeks.push(sD + '-' + eD + '-' + sMonth)
+        workbookWeeks.push(sD + 'a' + eD + '-' + workbookMonth)
         // just in case of an accidental english abbreviation instead (e.g. /programa-reuniao-22a28-apr/)
         const englishMonth = LANGUAGE_OPTIONS.en.months[sM - 1].substr(0, 3)
         workbookWeeks.push(sD + 'a' + eD + '-' + englishMonth)
