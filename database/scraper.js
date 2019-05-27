@@ -47,12 +47,6 @@ const LANGUAGE_OPTIONS = {
       return workbookWeeks.map(week => `https://www.jw.org/jw-tpo/publicacoes/jw-manual-de-atividades/mwb-${workbookMonth}-${sY}/programa-reuniao-${week}/`)
     },
     inherit: [
-      'chairman',
-      'openingPrayer',
-      'highlights',
-      'gems',
-      'bibleReading',
-      'studentTalk',
       'serviceTalk'
     ],
     cbsTitle: 'Estudo Bíblico de Congregação',
