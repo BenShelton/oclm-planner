@@ -3,11 +3,11 @@ import { MongoClient } from 'mongodb'
 
 dotenv.config()
 
-const { MONGDB_CONNECTION } = process.env
+const { MONGODB_URI, MONGODB_NAME } = process.env
 const connectionOptions = {
   useNewUrlParser: true,
   validateOptions: true
 }
 
-export default MongoClient.connect(MONGDB_CONNECTION, connectionOptions)
-  .then(client => client.db('oclm'))
+export default MongoClient.connect(MONGODB_URI, connectionOptions)
+  .then(client => client.db(MONGODB_NAME))
