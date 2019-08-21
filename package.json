@@ -2,6 +2,7 @@
   "name": "oclm-planner",
   "version": "0.1.0",
   "private": true,
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "serve": "npm-run-all --parallel serve:**",
     "serve:app": "vue-cli-service serve",
