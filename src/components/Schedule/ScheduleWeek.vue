@@ -1,9 +1,9 @@
 <template>
-  <VCard>
-    <VToolbar :color="toolbarColor" class="elevation-0">
-      <VToolbarTitle v-text="prettyDate" />
-      <VSpacer />
-      <VMenu
+  <v-card>
+    <v-toolbar :color="toolbarColor" class="elevation-0">
+      <v-toolbar-title v-text="prettyDate" />
+      <v-spacer />
+      <v-menu
         v-if="localWeek.loaded && !localWeek.unavailable"
         v-model="settingsMenu"
         lazy
@@ -11,31 +11,31 @@
         offset-y
         :close-on-content-click="false"
       >
-        <VBtn slot="activator" flat icon>
-          <VIcon>settings</VIcon>
-        </VBtn>
-        <VCard class="pa-3">
-          <VLayout justify-center>
-            <VBtn
+        <v-btn slot="activator" flat icon>
+          <v-icon>settings</v-icon>
+        </v-btn>
+        <v-card class="pa-3">
+          <v-layout justify-center>
+            <v-btn
               color="primary"
               :loading="scrapeLoading"
               :disabled="scrapeLoading"
               @click="onScrape"
             >
               Redownload
-              <VIcon right>
+              <v-icon right>
                 cloud_download
-              </VIcon>
-            </VBtn>
-          </VLayout>
-          <VDivider class="mt-3" />
-          <VRadioGroup
+              </v-icon>
+            </v-btn>
+          </v-layout>
+          <v-divider class="mt-3" />
+          <v-radio-group
             v-model="weekType"
             hide-details
             label="Week Type"
             :disabled="weekTypeLoading"
           >
-            <VRadio
+            <v-radio
               v-for="type in WEEK_TYPES"
               :key="type.value"
               class="ml-3"
@@ -43,14 +43,14 @@
               :label="type.label"
               :value="type.value"
             />
-          </VRadioGroup>
+          </v-radio-group>
           <template v-if="week.type === WEEK_TYPES.coVisit.value">
-            <VDivider class="my-3" />
+            <v-divider class="my-3" />
             <label class="v-label theme--light py-2">
               Circuit Overseer Details
             </label>
-            <VTextField :value="week.coName" label="Name" @change="onUpdateCOName" />
-            <VTextarea
+            <v-text-field :value="week.coName" label="Name" @change="onUpdateCOName" />
+            <v-textarea
               label="Talk Title"
               :value="week.coTitle"
               :rows="1"
@@ -58,73 +58,73 @@
               @change="onUpdateCOTitle"
             />
           </template>
-        </VCard>
-      </VMenu>
-    </VToolbar>
-    <VDivider />
+        </v-card>
+      </v-menu>
+    </v-toolbar>
+    <v-divider />
 
     <!-- Loading Week Display -->
-    <VLayout v-if="!localWeek.loaded" justify-center class="pa-3">
-      <VLayout v-if="loadError" column align-center>
-        <VIcon color="red">
+    <v-layout v-if="!localWeek.loaded" justify-center class="pa-3">
+      <v-layout v-if="loadError" column align-center>
+        <v-icon color="red">
           warning
-        </VIcon>
+        </v-icon>
         <p class="text-xs-center red--text">
           An error occured when loading this week
         </p>
-      </VLayout>
-      <VProgressCircular v-else indeterminate color="primary" />
-    </VLayout>
+      </v-layout>
+      <v-progress-circular v-else indeterminate color="primary" />
+    </v-layout>
 
     <!-- Unavailable Week Display -->
-    <VLayout v-else-if="localWeek.unavailable" justify-center class="pa-3">
-      <VLayout column align-center>
-        <VIcon color="primary">
+    <v-layout v-else-if="localWeek.unavailable" justify-center class="pa-3">
+      <v-layout column align-center>
+        <v-icon color="primary">
           info
-        </VIcon>
+        </v-icon>
         <p class="pt-3 text-xs-center primary--text">
           This week date cannot be organised, only weeks from Jan 2019 are available
         </p>
-      </VLayout>
-    </VLayout>
+      </v-layout>
+    </v-layout>
 
     <!-- Assembly/Memorial Week Display -->
-    <VLayout v-else-if="week.type === WEEK_TYPES.assembly.value || week.type === WEEK_TYPES.memorial.value" justify-center class="pa-3">
-      <VLayout class="pt-3" column align-center>
-        <VIcon large color="primary" v-text="week.type === WEEK_TYPES.assembly.value ? 'group' : 'public'" />
+    <v-layout v-else-if="week.type === WEEK_TYPES.assembly.value || week.type === WEEK_TYPES.memorial.value" justify-center class="pa-3">
+      <v-layout class="pt-3" column align-center>
+        <v-icon large color="primary" v-text="week.type === WEEK_TYPES.assembly.value ? 'group' : 'public'" />
         <p class="headline text-xs-center primary--text mt-3" v-text="week.type === WEEK_TYPES.assembly.value ? 'Assembly Week' : 'Memorial Week'" />
-      </VLayout>
-    </VLayout>
+      </v-layout>
+    </v-layout>
 
     <!-- Unscraped Week Display -->
-    <VLayout v-else-if="!week.scraped" justify-center class="pa-3">
-      <VLayout v-if="!scrapeError" column align-center>
-        <VIcon color="primary">
+    <v-layout v-else-if="!week.scraped" justify-center class="pa-3">
+      <v-layout v-if="!scrapeError" column align-center>
+        <v-icon color="primary">
           info
-        </VIcon>
+        </v-icon>
         <p class="pt-3 text-xs-center primary--text">
           Assignment information for this week hasn't been downloaded yet, click the button below if you would like to try and download this week's information
         </p>
-        <VBtn
+        <v-btn
           color="primary"
           :loading="scrapeLoading"
           :disabled="scrapeLoading"
           @click="onScrape"
         >
           Download
-        </VBtn>
-      </VLayout>
-      <VLayout v-else column align-center>
-        <VIcon color="error">
+        </v-btn>
+      </v-layout>
+      <v-layout v-else column align-center>
+        <v-icon color="error">
           warning
-        </VIcon>
+        </v-icon>
         <div class="pt-3 text-xs-center error--text">
           <p>There was an error scraping this week's data</p>
           <p>This is most likely because the information isn't available yet on WOL, but may also be because of a special week such as the Memorial</p>
           <p>If you believe this is a mistake please contact support</p>
         </div>
-      </VLayout>
-    </VLayout>
+      </v-layout>
+    </v-layout>
 
     <!-- Assignment Display -->
     <template v-else>
@@ -132,7 +132,7 @@
         <p class="headline text-xs-center primary--text py-2 ma-0">
           Circuit Overseer Visit
         </p>
-        <VDivider />
+        <v-divider />
       </div>
 
       <ScheduleAssignment :assignment="assignments.chairman" @edit="onEdit" />
@@ -161,57 +161,57 @@
     </template>
 
     <!-- Edit Assignment Dialog -->
-    <VDialog
+    <v-dialog
       v-model="editDialog"
       lazy
       max-width="900px"
     >
-      <VCard>
-        <VCardTitle>
+      <v-card>
+        <v-card-title>
           <span class="headline" v-text="editTitle" />
-        </VCardTitle>
-        <VCardText>
-          <VContainer grid-list-md>
-            <VLayout wrap>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout wrap>
               <template v-if="language !== 'en'">
-                <VFlex :class="fieldClass">
-                  <VCheckbox
+                <v-flex :class="fieldClass">
+                  <v-checkbox
                     v-model="editAssignment.stream"
                     label="Listen to Video from JW Streaming"
                     :disabled="!!editAssignment.inherit"
                     @change="onSettingChange"
                   />
-                </VFlex>
-                <VFlex :class="fieldClass">
-                  <VCheckbox
+                </v-flex>
+                <v-flex :class="fieldClass">
+                  <v-checkbox
                     v-model="editAssignment.inherit"
                     label="Inherit Assignment from English"
                     :disabled="!!editAssignment.stream"
                     @change="onSettingChange"
                   />
-                </VFlex>
-                <VFlex xs12>
-                  <VDivider class="mb-3" />
-                </VFlex>
+                </v-flex>
+                <v-flex xs12>
+                  <v-divider class="mb-3" />
+                </v-flex>
               </template>
-              <VFlex :class="fieldClass">
+              <v-flex :class="fieldClass">
                 <AssigneeSelect
                   v-model="editAssignment.assignee"
                   label="Assignee"
                   :type="editAssignment.type"
                   :disabled="!!(editAssignment.stream || editAssignment.inherit)"
                 />
-              </VFlex>
-              <VFlex v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)" :class="fieldClass">
+              </v-flex>
+              <v-flex v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)" :class="fieldClass">
                 <AssigneeSelect
                   v-model="editAssignment.assistant"
                   label="Assistant"
                   :type="editAssignment.type + 'Assist'"
                   :disabled="!!(editAssignment.stream || editAssignment.inherit)"
                 />
-              </VFlex>
-              <VFlex v-if="editName.includes('studentTalk')" :class="fieldClass">
-                <VSelect
+              </v-flex>
+              <v-flex v-if="editName.includes('studentTalk')" :class="fieldClass">
+                <v-select
                   v-model="editAssignment.type"
                   label="Type"
                   :items="[
@@ -222,18 +222,18 @@
                     { text: 'Talk', value: 'studentTalk' }
                   ]"
                 />
-              </VFlex>
-              <VFlex v-if="!(['chairman', 'prayer', 'gems', 'reader'].includes(editAssignment.type))" :class="fieldClass">
-                <VTextField v-model="editAssignment.title" label="Title" />
-              </VFlex>
-              <VFlex v-if="['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(editAssignment.type)" :class="fieldClass">
-                <VTextField v-model="editAssignment.studyPoint" label="Study Point" />
-              </VFlex>
-              <VFlex v-if="!(['chairman', 'prayer', 'reader'].includes(editAssignment.type))" :class="fieldClass">
-                <VTextField v-model="editAssignment.time" label="Time" />
-              </VFlex>
-            </VLayout>
-            <VAlert
+              </v-flex>
+              <v-flex v-if="!(['chairman', 'prayer', 'gems', 'reader'].includes(editAssignment.type))" :class="fieldClass">
+                <v-text-field v-model="editAssignment.title" label="Title" />
+              </v-flex>
+              <v-flex v-if="['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(editAssignment.type)" :class="fieldClass">
+                <v-text-field v-model="editAssignment.studyPoint" label="Study Point" />
+              </v-flex>
+              <v-flex v-if="!(['chairman', 'prayer', 'reader'].includes(editAssignment.type))" :class="fieldClass">
+                <v-text-field v-model="editAssignment.time" label="Time" />
+              </v-flex>
+            </v-layout>
+            <v-alert
               :value="!!multipleAssignments.length"
               color="error"
               icon="warning"
@@ -246,8 +246,8 @@
                 Assignee is already on the following assignments this week:
               </span>
               <span class="font-italic" v-text="multipleAssignments.join(', ')" />
-            </VAlert>
-            <VAlert
+            </v-alert>
+            <v-alert
               :value="editAssignment.text !== 'N/A'"
               color="info"
               icon="info"
@@ -260,28 +260,28 @@
                 Text was not downloaded for this assignment, it may have been manually added
               </span>
               <span v-else v-text="editAssignment.text" />
-            </VAlert>
-          </VContainer>
-        </VCardText>
-        <VCardActions class="pb-3">
-          <VBtn
+            </v-alert>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="pb-3">
+          <v-btn
             flat
             color="error"
             :disabled="editLoading"
             @click="deleteEditor"
           >
             DELETE
-          </VBtn>
-          <VSpacer />
-          <VBtn
+          </v-btn>
+          <v-spacer />
+          <v-btn
             flat
             color="grey"
             :disabled="editLoading"
             @click="closeEditor"
           >
             CANCEL
-          </VBtn>
-          <VBtn
+          </v-btn>
+          <v-btn
             flat
             color="primary"
             :disabled="editLoading"
@@ -289,11 +289,11 @@
             @click="saveEditor"
           >
             SAVE
-          </VBtn>
-        </VCardActions>
-      </VCard>
-    </VDialog>
-  </VCard>
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-card>
 </template>
 
 <script>

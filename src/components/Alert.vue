@@ -1,18 +1,18 @@
 <template>
-  <VSnackbar
+  <v-snackbar
     v-model="showAlert"
     :color="color"
     :timeout="6000"
   >
     {{ text }}
-    <VBtn
+    <v-btn
       dark
       flat
       @click="setVisibility(false)"
     >
       Close
-    </VBtn>
-  </VSnackbar>
+    </v-btn>
+  </v-snackbar>
 </template>
 
 <script>

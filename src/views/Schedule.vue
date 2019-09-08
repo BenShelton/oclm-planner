@@ -1,29 +1,29 @@
 <template>
-  <VLayout fill-height column>
-    <VLayout class="elevation-1 mx-2">
-      <VBtn icon @click="shiftCurrentWeek(-4)">
-        <VIcon>skip_previous</VIcon>
-      </VBtn>
-      <VBtn class="flip" icon @click="shiftCurrentWeek(-1)">
-        <VIcon>play_arrow</VIcon>
-      </VBtn>
-      <VSpacer />
-      <VDialog v-model="dateDialog" lazy width="290px">
-        <VBtn slot="activator" color="primary" @click="dateDialog = true">
+  <v-layout fill-height column>
+    <v-layout class="elevation-1 mx-2">
+      <v-btn icon @click="shiftCurrentWeek(-4)">
+        <v-icon>skip_previous</v-icon>
+      </v-btn>
+      <v-btn class="flip" icon @click="shiftCurrentWeek(-1)">
+        <v-icon>play_arrow</v-icon>
+      </v-btn>
+      <v-spacer />
+      <v-dialog v-model="dateDialog" lazy width="290px">
+        <v-btn slot="activator" color="primary" @click="dateDialog = true">
           Select Week
-        </VBtn>
-        <VDatePicker v-model="currentWeek" :allowed-dates="allowedDates" @input="dateDialog = false" />
-      </VDialog>
-      <VSpacer />
-      <VBtn icon @click="shiftCurrentWeek(1)">
-        <VIcon>play_arrow</VIcon>
-      </VBtn>
-      <VBtn icon @click="shiftCurrentWeek(4)">
-        <VIcon>skip_next</VIcon>
-      </VBtn>
-    </VLayout>
-    <VLayout justify-center fill-height>
-      <VFlex
+        </v-btn>
+        <v-date-picker v-model="currentWeek" :allowed-dates="allowedDates" @input="dateDialog = false" />
+      </v-dialog>
+      <v-spacer />
+      <v-btn icon @click="shiftCurrentWeek(1)">
+        <v-icon>play_arrow</v-icon>
+      </v-btn>
+      <v-btn icon @click="shiftCurrentWeek(4)">
+        <v-icon>skip_next</v-icon>
+      </v-btn>
+    </v-layout>
+    <v-layout justify-center fill-height>
+      <v-flex
         v-for="week in visibleWeeks"
         :key="week.weekDate"
         class="ma-2 xs12 sm6 md4 lg3 xl2"
@@ -32,9 +32,9 @@
           :week-date="week.weekDate"
           :current="week.current"
         />
-      </VFlex>
-    </VLayout>
-  </VLayout>
+      </v-flex>
+    </v-layout>
+  </v-layout>
 </template>
 
 <script>

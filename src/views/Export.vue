@@ -1,48 +1,48 @@
 <template>
-  <VLayout column>
+  <v-layout column>
     <p class="subheading text-xs-center mt-4 mb-5">
       Select a month/year below and click the buttons to generate a PDF
     </p>
-    <VLayout wrap shrink justify-center>
-      <VFlex xs12 sm6 md4>
-        <VSelect
+    <v-layout wrap shrink justify-center>
+      <v-flex xs12 sm6 md4>
+        <v-select
           v-model="month"
           outline
           class="mx-4"
           label="Month"
           :items="months"
         />
-      </VFlex>
-      <VFlex xs12 sm6 md4>
-        <VSelect
+      </v-flex>
+      <v-flex xs12 sm6 md4>
+        <v-select
           v-model="year"
           outline
           class="mx-4"
           label="Year"
           :items="years"
         />
-      </VFlex>
-    </VLayout>
-    <VLayout column align-center class="mt-3 px-3">
-      <VBtn large color="primary" @click="previewSchedule">
+      </v-flex>
+    </v-layout>
+    <v-layout column align-center class="mt-3 px-3">
+      <v-btn large color="primary" @click="previewSchedule">
         Preview Schedule
-        <VIcon right dark>
+        <v-icon right dark>
           find_in_page
-        </VIcon>
-      </VBtn>
-      <VBtn large color="primary" @click="previewAssignmentSlips">
+        </v-icon>
+      </v-btn>
+      <v-btn large color="primary" @click="previewAssignmentSlips">
         Preview Assignment Slips
-        <VIcon right dark>
+        <v-icon right dark>
           find_in_page
-        </VIcon>
-      </VBtn>
-    </VLayout>
+        </v-icon>
+      </v-btn>
+    </v-layout>
     <PDFPreview
       v-model="showPreview"
       :pdf="pdf"
       :error="generationError"
     />
-  </VLayout>
+  </v-layout>
 </template>
 
 <script>

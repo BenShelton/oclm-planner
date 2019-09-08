@@ -1,10 +1,10 @@
 <template>
-  <VToolbar app>
-    <VToolbarSideIcon v-if="loggedIn" @click.stop="toggleDrawer" />
-    <VToolbarTitle v-text="title" />
-    <VSpacer />
-    <VToolbarItems>
-      <VBtn
+  <v-toolbar app>
+    <v-toolbar-side-icon v-if="loggedIn" @click.stop="toggleDrawer" />
+    <v-toolbar-title v-text="title" />
+    <v-spacer />
+    <v-toolbar-items>
+      <v-btn
         v-if="!loggedIn"
         flat
         :disabled="loading"
@@ -12,24 +12,24 @@
         @click="onLogin"
       >
         Login
-      </VBtn>
-      <VMenu
+      </v-btn>
+      <v-menu
         v-else
         offset-y
         :close-on-content-click="false"
         :min-width="200"
         :max-width="200"
       >
-        <VBtn slot="activator" icon>
-          <VIcon>settings</VIcon>
-        </VBtn>
-        <VCard class="pa-3">
-          <VSelect
+        <v-btn slot="activator" icon>
+          <v-icon>settings</v-icon>
+        </v-btn>
+        <v-card class="pa-3">
+          <v-select
             v-model="languageModel"
             label="Language"
             :items="items"
           />
-          <VBtn
+          <v-btn
             block
             color="error"
             :disabled="loading"
@@ -37,11 +37,11 @@
             @click="onLogout"
           >
             Logout
-          </VBtn>
-        </VCard>
-      </VMenu>
-    </VToolbarItems>
-  </VToolbar>
+          </v-btn>
+        </v-card>
+      </v-menu>
+    </v-toolbar-items>
+  </v-toolbar>
 </template>
 
 <script>

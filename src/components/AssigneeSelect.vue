@@ -1,6 +1,6 @@
 <template>
-  <VLayout align-center>
-    <VSelect
+  <v-layout align-center>
+    <v-select
       clearable
       item-text="name"
       item-value="_id"
@@ -12,8 +12,8 @@
       :value="value"
       @input="onInput"
     />
-    <VTooltip top>
-      <VBtn
+    <v-tooltip top>
+      <v-btn
         slot="activator"
         icon
         small
@@ -22,11 +22,11 @@
         :disabled="inputDisabled"
         @click="onToggleLanguage"
       >
-        <VIcon small v-text="restrictLanguage ? 'person' : 'group'" />
-      </VBtn>
+        <v-icon small v-text="restrictLanguage ? 'person' : 'group'" />
+      </v-btn>
       <span v-text="restrictLanguage ? 'Only include this language group' : 'Include all language groups'" />
-    </VTooltip>
-  </VLayout>
+    </v-tooltip>
+  </v-layout>
 </template>
 
 <script>

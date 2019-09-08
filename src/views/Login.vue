@@ -1,13 +1,13 @@
 <template>
-  <VLayout fill-height align-center justify-center>
-    <VCard width="400" class="pa-4">
-      <VCardTitle class="justify-center">
+  <v-layout fill-height align-center justify-center>
+    <v-card width="400" class="pa-4">
+      <v-card-title class="justify-center">
         <p class="headline text-xs-center">
           Please enter a password to continue
         </p>
-      </VCardTitle>
-      <VCardText>
-        <VTextField
+      </v-card-title>
+      <v-card-text>
+        <v-text-field
           v-model="password"
           solo
           label="Password"
@@ -16,19 +16,19 @@
           @click:append="toggleVisible"
           @keydown.enter="onLogin"
         />
-      </VCardText>
-      <VCardActions class="justify-center">
-        <VBtn
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-btn
           color="primary"
           :disabled="disabled"
           :loading="loading"
           @click="onLogin"
         >
           Login
-        </VBtn>
-      </VCardActions>
-    </VCard>
-  </VLayout>
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-layout>
 </template>
 
 <script>

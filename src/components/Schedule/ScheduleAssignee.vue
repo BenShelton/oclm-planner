@@ -1,12 +1,12 @@
 <template>
-  <VChip
+  <v-chip
     class="mx-0 no-select"
     small
     :color="color"
     @click="onClick"
   >
     {{ assigneeName }}
-  </VChip>
+  </v-chip>
 </template>
 
 <script>

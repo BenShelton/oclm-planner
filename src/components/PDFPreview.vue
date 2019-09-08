@@ -1,13 +1,13 @@
 <template>
-  <VDialog v-model="dialog" content-class="fill-height">
-    <VLayout column fill-height class="pa-4 white">
-      <VFlex shrink>
-        <VLayout align-center wrap>
+  <v-dialog v-model="dialog" content-class="fill-height">
+    <v-layout column fill-height class="pa-4 white">
+      <v-flex shrink>
+        <v-layout align-center wrap>
           <p class="headline ma-0">
             Preview
           </p>
-          <VSpacer />
-          <VBtn
+          <v-spacer />
+          <v-btn
             color="primary"
             :disabled="!downloadSrc"
             :href="downloadSrc"
@@ -15,45 +15,45 @@
             @click="onDownload"
           >
             Download
-            <VIcon right dark>
+            <v-icon right dark>
               cloud_download
-            </VIcon>
-          </VBtn>
-          <VBtn icon @click="onClose">
-            <VIcon>close</VIcon>
-          </VBtn>
-        </VLayout>
-      </VFlex>
+            </v-icon>
+          </v-btn>
+          <v-btn icon @click="onClose">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-layout>
+      </v-flex>
 
-      <VLayout v-if="error" column align-center>
-        <VIcon large color="error" class="py-5">
+      <v-layout v-if="error" column align-center>
+        <v-icon large color="error" class="py-5">
           warning
-        </VIcon>
+        </v-icon>
         <p class="error--text">
           This month could not be fully loaded, please check that all weeks have been filled in on the schedule
         </p>
-      </VLayout>
-      <VLayout v-else-if="!src" column align-center>
-        <VProgressCircular indeterminate color="primary" class="py-5" />
+      </v-layout>
+      <v-layout v-else-if="!src" column align-center>
+        <v-progress-circular indeterminate color="primary" class="py-5" />
         <p>Generating schedule, please wait...</p>
-      </VLayout>
-      <VLayout
+      </v-layout>
+      <v-layout
         v-else
         fill-height
         wrap
         class="object-wrapper my-3 elevation-1"
       >
-        <VFlex
+        <v-flex
           v-for="i in numPages"
           :key="i"
           xs12
           md6
         >
           <PDF :src="src" :page="i" />
-        </VFlex>
-      </VLayout>
-    </VLayout>
-  </VDialog>
+        </v-flex>
+      </v-layout>
+    </v-layout>
+  </v-dialog>
 </template>
 
 <script>

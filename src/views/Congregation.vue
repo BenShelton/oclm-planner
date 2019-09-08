@@ -1,8 +1,8 @@
 <template>
-  <VLayout column fill-height>
-    <VLayout shrink class="mb-4">
-      <VFlex xs6 md4>
-        <VTextField
+  <v-layout column fill-height>
+    <v-layout shrink class="mb-4">
+      <v-flex xs6 md4>
+        <v-text-field
           v-model="search"
           single-line
           hide-details
@@ -10,72 +10,72 @@
           prepend-icon="search"
           label="Search"
         />
-      </VFlex>
-      <VSpacer />
-      <VBtn color="primary" @click="onAdd">
+      </v-flex>
+      <v-spacer />
+      <v-btn color="primary" @click="onAdd">
         Add New Member
-      </VBtn>
-      <VDialog v-model="editDialog" max-width="900px">
-        <VCard>
-          <VCardTitle>
+      </v-btn>
+      <v-dialog v-model="editDialog" max-width="900px">
+        <v-card>
+          <v-card-title>
             <span class="headline" v-text="editTitle" />
-          </VCardTitle>
+          </v-card-title>
 
-          <VCardText>
-            <VContainer grid-list-lg>
-              <VLayout wrap>
-                <VFlex xs12 sm6 md4>
-                  <VTextField v-model="editMember.name" required label="Name" />
-                </VFlex>
-                <VFlex xs12 sm6 md4>
-                  <VSelect v-model="editMember.gender" label="Gender" :items="GENDERS" />
-                </VFlex>
-                <VFlex xs12 sm6 md4>
-                  <VSelect v-model="editMember.appointment" label="Appointment" :items="APPOINTMENTS" />
-                </VFlex>
-                <VFlex xs12 sm6 md4>
-                  <VSelect v-model="editMember.languageGroup" label="Language Group" :items="SUPPORTED_LANGUAGES" />
-                </VFlex>
-                <VFlex xs12 sm6 md4>
-                  <VCheckbox v-model="editMember.show" label="Show On Schedule" />
-                </VFlex>
-              </VLayout>
-              <VDivider />
+          <v-card-text>
+            <v-container grid-list-lg>
+              <v-layout wrap>
+                <v-flex xs12 sm6 md4>
+                  <v-text-field v-model="editMember.name" required label="Name" />
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                  <v-select v-model="editMember.gender" label="Gender" :items="GENDERS" />
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                  <v-select v-model="editMember.appointment" label="Appointment" :items="APPOINTMENTS" />
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                  <v-select v-model="editMember.languageGroup" label="Language Group" :items="SUPPORTED_LANGUAGES" />
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                  <v-checkbox v-model="editMember.show" label="Show On Schedule" />
+                </v-flex>
+              </v-layout>
+              <v-divider />
               <p class="mt-3 mb-0 subheading">
                 Privileges
               </p>
-              <VLayout wrap>
-                <VFlex
+              <v-layout wrap>
+                <v-flex
                   v-for="privilege in PRIVILEGES"
                   :key="privilege.key"
                   xs12
                   sm6
                   md4
                 >
-                  <VCheckbox
+                  <v-checkbox
                     v-model="editMember.privileges[privilege.key]"
                     hide-details
                     :label="privilege.name"
                   />
-                </VFlex>
-              </VLayout>
-            </VContainer>
-          </VCardText>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
 
-          <VCardActions>
-            <VSpacer />
-            <VBtn color="blue darken-1" flat @click="closeEditor">
+          <v-card-actions>
+            <v-spacer />
+            <v-btn color="blue darken-1" flat @click="closeEditor">
               Cancel
-            </VBtn>
-            <VBtn color="blue darken-1" flat @click="onSave">
+            </v-btn>
+            <v-btn color="blue darken-1" flat @click="onSave">
               Save
-            </VBtn>
-          </VCardActions>
-        </VCard>
-      </VDialog>
-    </VLayout>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-layout>
 
-    <VDataTable
+    <v-data-table
       class="elevation-1"
       expand
       item-key="_id"
@@ -96,31 +96,31 @@
             <BooleanIcon :value="props.item.show" />
           </td>
           <td class="text-xs-center">
-            <VIcon v-text="props.expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
+            <v-icon v-text="props.expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
           </td>
           <td class="text-xs-center">
-            <VBtn
+            <v-btn
               flat
               round
               icon
               @click.stop="onEdit(props.item)"
             >
-              <VIcon>edit</VIcon>
-            </VBtn>
-            <VBtn
+              <v-icon>edit</v-icon>
+            </v-btn>
+            <v-btn
               flat
               round
               icon
               @click.stop="onDelete(props.item)"
             >
-              <VIcon>delete</VIcon>
-            </VBtn>
+              <v-icon>delete</v-icon>
+            </v-btn>
           </td>
         </tr>
       </template>
       <template slot="expand" slot-scope="props">
-        <VLayout row wrap class="grey lighten-5">
-          <VLayout
+        <v-layout row wrap class="grey lighten-5">
+          <v-layout
             v-for="privilege in prettyPrivileges(props.item.privileges)"
             :key="privilege.name"
             align-center
@@ -128,12 +128,12 @@
           >
             <span v-text="privilege.name" />
             <BooleanIcon class="px-1" :value="privilege.selected" />
-          </VLayout>
-        </VLayout>
-        <VDivider />
+          </v-layout>
+        </v-layout>
+        <v-divider />
       </template>
-    </VDataTable>
-  </VLayout>
+    </v-data-table>
+  </v-layout>
 </template>
 
 <script>

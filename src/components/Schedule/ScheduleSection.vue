@@ -1,15 +1,15 @@
 <template>
   <div>
-    <VSubheader
+    <v-subheader
       class="schedule-section white--text"
       :style="{ backgroundColor }"
       @click="toggleShow"
     >
       <span v-text="title" />
-      <VSpacer />
-      <VIcon color="white" v-text="show ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
-    </VSubheader>
-    <VDivider />
+      <v-spacer />
+      <v-icon color="white" v-text="show ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
+    </v-subheader>
+    <v-divider />
     <slot v-if="show" />
   </div>
 </template>

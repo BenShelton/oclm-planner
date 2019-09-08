@@ -1,10 +1,10 @@
 <template>
-  <VLayout
+  <v-layout
     column
     class="schedule-assignment"
     :class="{ grey: !assignment.details, 'blue lighten-5': assignment.inherit || assignment.stream }"
   >
-    <VBtn
+    <v-btn
       icon
       outline
       absolute
@@ -12,45 +12,45 @@
       class="mt-2"
       @click="onEdit"
     >
-      <VIcon>edit</VIcon>
-    </VBtn>
-    <VLayout align-center class="my-2 mx-3 subheading">
+      <v-icon>edit</v-icon>
+    </v-btn>
+    <v-layout align-center class="my-2 mx-3 subheading">
       <span class="mr-2" v-text="assignment.displayName" />
       <span v-if="assignment.inherit" class="primary--text font-weight-bold">
         (English)
       </span>
-    </VLayout>
-    <VLayout v-if="!assignment.details" class="mx-3">
+    </v-layout>
+    <v-layout v-if="!assignment.details" class="mx-3">
       <span>No Assignment Found</span>
-    </VLayout>
+    </v-layout>
     <template v-else>
-      <VLayout class="mx-3">
-        <VChip
+      <v-layout class="mx-3">
+        <v-chip
           v-if="assignment.details.stream"
           small
           color="primary"
           class="white--text"
         >
           Streaming
-        </VChip>
-        <VLayout v-else>
+        </v-chip>
+        <v-layout v-else>
           <ScheduleAssignee class="mr-1" :assignee="assignment.details.assignee" />
           <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant" />
-          <VSpacer />
-        </VLayout>
-      </VLayout>
-      <VLayout justify-center class="mx-3">
-        <VFlex xs10 class="text-truncate" v-text="assignment.details.title" />
-        <VFlex
+          <v-spacer />
+        </v-layout>
+      </v-layout>
+      <v-layout justify-center class="mx-3">
+        <v-flex xs10 class="text-truncate" v-text="assignment.details.title" />
+        <v-flex
           v-if="assignment.details"
           xs2
           class="caption grey--text text--darken-2 text-xs-right text-truncate"
           v-text="assignment.details.time"
         />
-      </VLayout>
+      </v-layout>
     </template>
-    <VDivider class="mt-2" />
-  </VLayout>
+    <v-divider class="mt-2" />
+  </v-layout>
 </template>
 
 <script>

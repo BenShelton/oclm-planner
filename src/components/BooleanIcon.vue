@@ -1,5 +1,5 @@
 <template>
-  <VIcon
+  <v-icon
     :color="color"
     v-text="icon"
   />
