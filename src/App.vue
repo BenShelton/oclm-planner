@@ -1,14 +1,14 @@
 <template>
-  <VApp>
+  <v-app>
     <NavigationDrawer />
     <Toolbar />
-    <VContent>
-      <VContainer fluid fill-height>
-        <RouterView />
-      </VContainer>
+    <v-content>
+      <v-container fluid fill-height>
+        <router-view />
+      </v-container>
       <Alert />
-    </VContent>
-  </VApp>
+    </v-content>
+  </v-app>
 </template>
 
 <script>

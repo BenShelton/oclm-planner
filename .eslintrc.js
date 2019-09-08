@@ -43,5 +43,15 @@ module.exports = {
   },
   parserOptions: {
     parser: 'babel-eslint'
-  }
+  },
+  overrides: [
+    {
+      files: [
+        '**/__tests__/*.{j,t}s'
+      ],
+      env: {
+        jest: true
+      }
+    }
+  ]
 }

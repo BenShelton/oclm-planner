@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import { shallowMount } from '@vue/test-utils'
 
 import App from '@/App.vue'
@@ -17,7 +16,7 @@ describe('App', () => {
     })
   })
 
-  it('has the name "App"', () => {
-    expect(wrapper.name()).to.equal('App')
+  it('should have the name "App"', () => {
+    expect(wrapper.name()).toBe('App')
   })
 })
