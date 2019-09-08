@@ -1,8 +1,14 @@
 <template>
   <VNavigationDrawer v-model="drawer" app temporary>
+    <VToolbar class="pl-0">
+      <VToolbarSideIcon @click="setOpen(false)">
+        <VIcon>close</VIcon>
+      </VToolbarSideIcon>
+      <VToolbarTitle>OCLM Planner</VToolbarTitle>
+    </VToolbar>
     <VList>
       <VListTile
-        v-for="item in items"
+        v-for="item of items"
         :key="item.title"
         exact
         :to="item.link"
@@ -63,3 +69,8 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+.icon
+  height 100%
+</style>
