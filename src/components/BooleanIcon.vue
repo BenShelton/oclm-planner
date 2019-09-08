@@ -10,7 +10,7 @@ export default {
   name: 'BooleanIcon',
 
   props: {
-    value: { type: Boolean, default: false }
+    value: { type: Boolean }
   },
 
   computed: {

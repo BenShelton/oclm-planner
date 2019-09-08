@@ -19,7 +19,7 @@ export default {
 
   props: {
     assignee: { type: String, default: '' },
-    assistant: { type: Boolean, default: false }
+    assistant: { type: Boolean }
   },
 
   computed: {
