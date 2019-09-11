@@ -53,30 +53,28 @@
   </v-layout>
 </template>
 
-<script>
-import ScheduleAssignee from '@/components/Schedule/ScheduleAssignee'
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
 
-export default {
-  name: 'ScheduleAssignment',
+import ScheduleAssignee from '@/components/Schedule/ScheduleAssignee.vue'
 
-  components: { ScheduleAssignee },
+@Component({
+  components: { ScheduleAssignee }
+})
+export default class ScheduleAssignment extends Vue {
+  // Props
+  @Prop({ type: Object, required: true }) assignment: any
 
-  props: {
-    assignment: { type: Object, required: true }
-  },
+  // Computed
+  get hasAssistant (): boolean {
+    const { details } = this.assignment
+    if (!details) return false
+    return ['initialCall', 'returnVisit', 'bibleStudy'].includes(details.type)
+  }
 
-  computed: {
-    hasAssistant () {
-      const { details } = this.assignment
-      if (!details) return false
-      return ['initialCall', 'returnVisit', 'bibleStudy'].includes(details.type)
-    }
-  },
-
-  methods: {
-    onEdit () {
-      this.$emit('edit', this.assignment.name)
-    }
+  // Methods
+  onEdit (): void {
+    this.$emit('edit', this.assignment.name)
   }
 }
 </script>

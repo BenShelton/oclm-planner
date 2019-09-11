@@ -29,43 +29,43 @@
   </v-navigation-drawer>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { getModule } from 'vuex-module-decorators'
 import { mapState, mapMutations } from 'vuex'
+
+import Drawer from '@/store/drawer'
 import routes from '@/router/routes'
 
-export default {
-  name: 'NavigationDrawer',
-
-  data () {
-    return {
-      items: [
-        { title: 'Home', icon: 'home', link: { name: routes.HOME }, label: { text: 'Stable', color: 'green' } },
-        { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE }, label: { text: 'Stable', color: 'green' } },
-        { title: 'Export', icon: 'picture_as_pdf', link: { name: routes.EXPORT }, label: { text: 'Stable', color: 'green' } },
-        { title: 'Congregation', icon: 'people', link: { name: routes.CONGREGATION }, label: { text: 'Stable', color: 'green' } },
-        { title: 'Help', icon: 'help', link: { name: routes.HELP }, label: { text: 'Incomplete', color: 'yellow' } }
-      ]
-    }
+interface DrawerItem {
+  title: string,
+  icon: string,
+  link: {
+    name: string
   },
+  label: {
+    text: string,
+    color: string
+  }
+}
 
-  computed: {
-    ...mapState({
-      open: state => state.drawer.open
-    }),
-    drawer: {
-      get () {
-        return this.open
-      },
-      set (val) {
-        this.setOpen(val)
-      }
-    }
-  },
+const drawerModule = getModule(Drawer)
 
-  methods: {
-    ...mapMutations({
-      setOpen: 'drawer/SET_OPEN'
-    })
+@Component
+export default class NavigationDrawer extends Vue {
+  items: DrawerItem[] = [
+    { title: 'Home', icon: 'home', link: { name: routes.HOME }, label: { text: 'Stable', color: 'green' } },
+    { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE }, label: { text: 'Stable', color: 'green' } },
+    { title: 'Export', icon: 'picture_as_pdf', link: { name: routes.EXPORT }, label: { text: 'Stable', color: 'green' } },
+    { title: 'Congregation', icon: 'people', link: { name: routes.CONGREGATION }, label: { text: 'Stable', color: 'green' } },
+    { title: 'Help', icon: 'help', link: { name: routes.HELP }, label: { text: 'Incomplete', color: 'yellow' } }
+  ]
+
+  get drawer () {
+    return drawerModule.open
+  }
+  set drawer (val) {
+    drawerModule.SET_OPEN(val)
   }
 }
 </script>

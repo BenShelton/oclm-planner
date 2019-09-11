@@ -136,10 +136,13 @@
   </v-layout>
 </template>
 
-<script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { getModule } from 'vuex-module-decorators'
 
-import BooleanIcon from '@/components/BooleanIcon'
+import Alert from '@/store/alert'
+import Congregation from '@/store/congregation'
+import BooleanIcon from '@/components/BooleanIcon.vue'
 
 import {
   GENDERS,
@@ -148,134 +151,134 @@ import {
   PRIVILEGES
 } from '@/constants'
 
-export default {
-  name: 'Congregation',
+const alertModule = getModule(Alert)
+const congregationModule = getModule(Congregation)
 
-  components: { BooleanIcon },
+@Component({
+  components: {
+    BooleanIcon
+  }
+})
+export default class Schedule extends Vue {
+  // Data
+  GENDERS = GENDERS
+  APPOINTMENTS = APPOINTMENTS
+  SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES
+  PRIVILEGES = PRIVILEGES
+  languageGroups = SUPPORTED_LANGUAGES.reduce((acc, { text, value }) => Object.assign(acc, { [value]: text }), {})
+  headers = [
+    { text: 'Name', value: 'name' },
+    { text: 'Gender', value: 'gender' },
+    { text: 'Appointment', value: 'appointment' },
+    { text: 'Language Group', value: 'languageGroup' },
+    { text: 'Show On Schedule', value: 'show', align: 'center' },
+    { text: 'Privileges', value: '', align: 'center', sortable: false },
+    { text: 'Actions', value: '', align: 'center', sortable: false }
+  ]
+  rowsPerPageItems = [20, 50, 100, { text: 'All', value: -1 }]
+  search = ''
+  editDialog = false
+  editID = null
+  editTitle = ''
+  editMember = {
+    name: '',
+    gender: GENDERS[0],
+    appointment: APPOINTMENTS[0],
+    languageGroup: SUPPORTED_LANGUAGES[0].value,
+    show: true,
+    privileges: {}
+  }
 
-  data () {
-    return {
-      GENDERS,
-      APPOINTMENTS,
-      SUPPORTED_LANGUAGES,
-      PRIVILEGES,
-      languageGroups: SUPPORTED_LANGUAGES.reduce((acc, { text, value }) => Object.assign(acc, { [value]: text }), {}),
-      headers: [
-        { text: 'Name', value: 'name' },
-        { text: 'Gender', value: 'gender' },
-        { text: 'Appointment', value: 'appointment' },
-        { text: 'Language Group', value: 'languageGroup' },
-        { text: 'Show On Schedule', value: 'show', align: 'center' },
-        { text: 'Privileges', value: '', align: 'center', sortable: false },
-        { text: 'Actions', value: '', align: 'center', sortable: false }
-      ],
-      rowsPerPageItems: [20, 50, 100, { text: 'All', value: -1 }],
-      search: '',
-      editDialog: false,
-      editID: null,
-      editTitle: '',
-      editMember: {
-        name: '',
-        gender: GENDERS[0],
-        appointment: APPOINTMENTS[0],
-        languageGroup: SUPPORTED_LANGUAGES[0].value,
-        show: true,
-        privileges: {}
-      }
-    }
-  },
+  // Computed
+  get members () {
+    return congregationModule.members
+  }
 
-  computed: {
-    ...mapGetters({
-      members: 'congregation/members',
-      loading: 'congregation/loading'
+  get loading () {
+    return congregationModule.loading
+  }
+
+  // Methods
+  expandRow (props) {
+    props.expanded = !props.expanded
+  }
+
+  closeEditor () {
+    this.editDialog = false
+  }
+
+  prettyPrivileges (privileges) {
+    if (!privileges) return []
+    return PRIVILEGES.map(({ name, key }) => ({ name, selected: !!privileges[key] }))
+  }
+
+  onAdd () {
+    this.editID = null
+    Object.assign(this.editMember, {
+      name: '',
+      gender: GENDERS[0],
+      appointment: APPOINTMENTS[0],
+      languageGroup: SUPPORTED_LANGUAGES[0].value,
+      show: true,
+      privileges: {}
     })
-  },
+    this.editTitle = 'Add New Congregation Member'
+    this.editDialog = true
+  }
 
-  methods: {
-    ...mapActions({
-      addMember: 'congregation/add',
-      updateMember: 'congregation/update',
-      deleteMember: 'congregation/delete'
-    }),
-    ...mapMutations({
-      alert: 'alert/UPDATE_ALERT'
-    }),
-    expandRow (props) {
-      props.expanded = !props.expanded
-    },
-    closeEditor () {
-      this.editDialog = false
-    },
-    prettyPrivileges (privileges) {
-      if (!privileges) return []
-      return PRIVILEGES.map(({ name, key }) => ({ name, selected: !!privileges[key] }))
-    },
-    onAdd () {
-      this.editID = null
-      Object.assign(this.editMember, {
-        name: '',
-        gender: GENDERS[0],
-        appointment: APPOINTMENTS[0],
-        languageGroup: SUPPORTED_LANGUAGES[0].value,
-        show: true,
-        privileges: {}
+  onEdit (member) {
+    this.editID = member._id
+    const { name, gender, appointment, languageGroup, show, privileges } = member
+    Object.assign(this.editMember, {
+      name,
+      gender,
+      appointment,
+      languageGroup,
+      show,
+      privileges: { ...privileges }
+    })
+    this.editTitle = 'Edit Existing Congregation Member'
+    this.editDialog = true
+  }
+
+  onDelete ({ _id: memberID, name }) {
+    if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
+    congregationModule.delete({ memberID })
+      .then(() => {
+        alertModule.UPDATE_ALERT({ text: `${name} was successfully deleted`, color: 'success' })
+        this.closeEditor()
       })
-      this.editTitle = 'Add New Congregation Member'
-      this.editDialog = true
-    },
-    onEdit (member) {
-      this.editID = member._id
-      const { name, gender, appointment, languageGroup, show, privileges } = member
-      Object.assign(this.editMember, {
-        name,
-        gender,
-        appointment,
-        languageGroup,
-        show,
-        privileges: { ...privileges }
+      .catch(err => {
+        alertModule.UPDATE_ALERT({ text: 'An error occured whilst deleting this member', color: 'error' })
+        console.error(err)
       })
-      this.editTitle = 'Edit Existing Congregation Member'
-      this.editDialog = true
-    },
-    onDelete ({ _id: memberID, name }) {
-      if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
-      this.deleteMember({ memberID })
+  }
+
+  onSave () {
+    if (!this.editMember.name) {
+      alertModule.UPDATE_ALERT({ text: 'Name is required', color: 'error' })
+      return
+    }
+    if (this.editID) {
+      congregationModule.update({ memberID: this.editID, member: this.editMember })
         .then(() => {
-          this.alert({ text: `${name} was successfully deleted`, color: 'success' })
+          alertModule.UPDATE_ALERT({ text: `${this.editMember.name} was successfully updated`, color: 'success' })
           this.closeEditor()
         })
         .catch(err => {
-          this.alert({ text: 'An error occured whilst deleting this member', color: 'error' })
+          alertModule.UPDATE_ALERT({ text: 'An error occured whilst updating this member', color: 'error' })
           console.error(err)
         })
-    },
-    onSave () {
-      if (!this.editMember.name) {
-        this.alert({ text: 'Name is required', color: 'error' })
-        return
-      }
-      if (this.editID) {
-        this.updateMember({ memberID: this.editID, member: this.editMember })
-          .then(() => {
-            this.alert({ text: `${this.editMember.name} was successfully updated`, color: 'success' })
-            this.closeEditor()
-          })
-          .catch(err => {
-            this.alert({ text: 'An error occured whilst updating this member', color: 'error' })
-            console.error(err)
-          })
-      } else {
-        this.addMember(this.editMember)
-          .then(() => {
-            this.alert({ text: `${this.editMember.name} was successfully added`, color: 'success' })
-            this.closeEditor()
-          })
-          .catch(err => {
-            this.alert({ text: 'An error occured whilst adding this member', color: 'error' })
-            console.error(err)
-          })
-      }
+    } else {
+      congregationModule.add(this.editMember)
+        .then(() => {
+          alertModule.UPDATE_ALERT({ text: `${this.editMember.name} was successfully added`, color: 'success' })
+          this.closeEditor()
+        })
+        .catch(err => {
+          alertModule.UPDATE_ALERT({ text: 'An error occured whilst adding this member', color: 'error' })
+          console.error(err)
+        })
     }
   }
 }

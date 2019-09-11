@@ -1,4 +1,4 @@
-export default {
+export default <const>{
   HOME: 'HOME',
   LOGIN: 'LOGIN',
   SCHEDULE: 'SCHEDULE',

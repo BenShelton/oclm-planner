@@ -1,5 +1,5 @@
 // TODO: Probably just worth having one map of talks with all their information
-export const ASSIGNMENT_TYPE_MAP = {
+export const ASSIGNMENT_TYPE_MAP = <const>{
   chairman: 'chairman',
   openingPrayer: 'prayer',
   highlights: 'highlights',
@@ -12,7 +12,7 @@ export const ASSIGNMENT_TYPE_MAP = {
   closingPrayer: 'prayer'
 }
 
-export const PRIVILEGES = [
+export const PRIVILEGES: readonly { name: string, key: string }[] = <const>[
   { name: 'Chairman', key: 'chairman' },
   { name: 'Highlights', key: 'highlights' },
   { name: 'Gems', key: 'gems' },
@@ -31,22 +31,22 @@ export const PRIVILEGES = [
   { name: 'Student Talk', key: 'studentTalk' }
 ]
 
-export const COLORS = {
+export const COLORS = <const>{
   TREASURES: '#5A6A70',
   MINISTRY: '#C18626',
   LIVING: '#961526'
 }
 
-export const APPOINTMENTS = ['None', 'Brother', 'Sister', 'Ministerial Servant', 'Elder', 'Circuit Overseer']
+export const APPOINTMENTS: readonly string[] = <const>['None', 'Brother', 'Sister', 'Ministerial Servant', 'Elder', 'Circuit Overseer']
 
-export const GENDERS = ['Male', 'Female']
+export const GENDERS: readonly string[] = <const>['Male', 'Female']
 
-export const SUPPORTED_LANGUAGES = [
+export const SUPPORTED_LANGUAGES: readonly { text: string, value: string }[] = <const>[
   { text: 'English', value: 'en' },
   { text: 'Portuguese', value: 'tpo' }
 ]
 
-export const WEEK_TYPES = {
+export const WEEK_TYPES = <const>{
   normal: { label: 'Normal', value: 0 },
   assembly: { label: 'Assembly', value: 1 },
   coVisit: { label: 'Circuit Overseer Visit', value: 2 },

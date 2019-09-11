@@ -10,7 +10,7 @@ describe('Store: Drawer', () => {
   describe('Mutations', () => {
     describe('SET_OPEN', () => {
       it('should set the open state to the payload', () => {
-        const mutation = drawer.mutations.SET_OPEN
+        const mutation = drawer.mutations!.SET_OPEN
         const state = { open: false }
         mutation(state, true)
         expect(state.open).toBe(true)
@@ -23,7 +23,7 @@ describe('Store: Drawer', () => {
 
     describe('SET_OPEN', () => {
       it('should toggle the open state', () => {
-        const mutation = drawer.mutations.TOGGLE_OPEN
+        const mutation = drawer.mutations!.TOGGLE_OPEN
         const state = { open: false }
         mutation(state)
         expect(state.open).toBe(true)

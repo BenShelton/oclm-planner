@@ -5,22 +5,19 @@
   />
 </template>
 
-<script>
-export default {
-  name: 'BooleanIcon',
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
 
-  props: {
-    value: { type: Boolean }
-  },
+@Component
+export default class BooleanIcon extends Vue {
+  @Prop(Boolean) readonly value!: boolean
 
-  computed: {
-    color () {
-      return this.value ? 'green' : 'red'
-    },
+  get color () {
+    return this.value ? 'green' : 'red'
+  }
 
-    icon () {
-      return this.value ? 'check' : 'clear'
-    }
+  get icon () {
+    return this.value ? 'check' : 'clear'
   }
 }
 </script>

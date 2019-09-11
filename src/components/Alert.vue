@@ -15,32 +15,33 @@
   </v-snackbar>
 </template>
 
-<script>
-import { mapState, mapMutations } from 'vuex'
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
+import { getModule } from 'vuex-module-decorators'
 
-export default {
-  name: 'Alert',
+import AlertMod from '@/store/alert'
 
-  computed: {
-    ...mapState('alert', [
-      'text',
-      'color',
-      'visible'
-    ]),
-    showAlert: {
-      get () {
-        return this.visible
-      },
-      set (v) {
-        this.setVisibility(v)
-      }
-    }
-  },
+const alertModule = getModule(AlertMod)
 
-  methods: {
-    ...mapMutations({
-      setVisibility: 'alert/UPDATE_VISIBILITY'
-    })
+@Component
+export default class Alert extends Vue {
+  // Computed
+  get text (): string {
+    return alertModule.text
   }
+
+  get color (): string {
+    return alertModule.color
+  }
+
+  get showAlert (): boolean {
+    return alertModule.visible
+  }
+  set showAlert (v) {
+    this.setVisibility(v)
+  }
+
+  // Methods
+  setVisibility = alertModule.UPDATE_VISIBILITY
 }
 </script>

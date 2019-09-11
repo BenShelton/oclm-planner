@@ -14,33 +14,28 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
+
 import { COLORS } from '@/constants'
 
-export default {
-  name: 'ScheduleSection',
+@Component
+export default class ScheduleSection extends Vue {
+  // Props
+  @Prop({ type: String, required: true }) title!: string
+  @Prop({ type: String, required: true }) color!: string
 
-  props: {
-    title: { type: String, required: true },
-    color: { type: String, required: true }
-  },
+  // Data
+  show: boolean = true
 
-  data () {
-    return {
-      show: true
-    }
-  },
+  // Computed
+  get backgroundColor (): string {
+    return COLORS[this.color] || this.color
+  }
 
-  computed: {
-    backgroundColor () {
-      return COLORS[this.color] || this.color
-    }
-  },
-
-  methods: {
-    toggleShow () {
-      this.show = !this.show
-    }
+  // Methods
+  toggleShow (): void {
+    this.show = !this.show
   }
 }
 </script>

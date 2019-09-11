@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <NavigationDrawer />
+    <NavigationDrawer :test="test" />
     <Toolbar />
     <v-content>
       <v-container fluid fill-height>
@@ -11,20 +11,21 @@
   </v-app>
 </template>
 
-<script>
-import NavigationDrawer from '@/components/NavigationDrawer'
-import Toolbar from '@/components/Toolbar'
-import Alert from '@/components/Alert'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 
-export default {
-  name: 'App',
+import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import Toolbar from '@/components/Toolbar.vue'
+import Alert from '@/components/Alert.vue'
 
+@Component({
   components: {
     NavigationDrawer,
     Toolbar,
     Alert
   }
-}
+})
+export default class extends Vue {}
 </script>
 
 <style lang="stylus">

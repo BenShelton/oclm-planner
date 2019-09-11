@@ -37,91 +37,95 @@
   </v-layout>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 import { mapMutations } from 'vuex'
 
-import ScheduleWeek from '@/components/Schedule/ScheduleWeek'
+import ScheduleWeek from '@/components/Schedule/ScheduleWeek.vue'
 
-export default {
-  name: 'Schedule',
-
-  components: { ScheduleWeek },
+@Component({
+  components: {
+    ScheduleWeek
+  },
+  methods: {
+    ...mapMutations({
+      clearWeeks: 'schedule/CLEAR_WEEKS'
+    })
+  }
+})
+export default class Schedule extends Vue {
+  currentWeek: string = this.weekStart(new Date())
+  dateDialog: boolean = false
 
   beforeRouteLeave (to, from, next) {
     this.clearWeeks()
     next()
-  },
+  }
 
-  data () {
-    return {
-      currentWeek: this.weekStart(new Date()),
-      dateDialog: false
+  // Computed
+  get bufferBefore (): number {
+    switch (this.$vuetify.breakpoint.name) {
+      case 'sm':
+        return 1
+      case 'md':
+      case 'lg':
+        return 2
+      case 'xl':
+        return 3
+      default:
+        return 0
     }
-  },
+  }
 
-  computed: {
-    bufferBefore () {
-      switch (this.$vuetify.breakpoint.name) {
-        case 'sm':
-          return 1
-        case 'md':
-        case 'lg':
-          return 2
-        case 'xl':
-          return 3
-        default:
-          return 0
-      }
-    },
-    bufferAfter () {
-      switch (this.$vuetify.breakpoint.name) {
-        case 'lg':
-          return 1
-        case 'xl':
-          return 2
-        default:
-          return 0
-      }
-    },
-    visibleWeeks () {
-      const { bufferBefore, bufferAfter } = this
-      const weeks = []
-      for (let i = -bufferBefore; i <= bufferAfter; i++) {
-        const current = i === 0
-        weeks.push({
-          weekDate: current ? this.currentWeek : this.addWeek(this.currentWeek, i),
-          current
-        })
-      }
-      return weeks
+  get bufferAfter (): number {
+    switch (this.$vuetify.breakpoint.name) {
+      case 'lg':
+        return 1
+      case 'xl':
+        return 2
+      default:
+        return 0
     }
-  },
+  }
 
-  methods: {
-    ...mapMutations({
-      clearWeeks: 'schedule/CLEAR_WEEKS'
-    }),
-    allowedDates (date) {
-      return new Date(date).getDay() === 1
-    },
-    weekStart (date) {
-      const outputDate = new Date(date)
-      const daysSinceMonday = outputDate.getDay() - 1
-      outputDate.setDate(outputDate.getDate() - daysSinceMonday)
-      return this.getDateString(outputDate)
-    },
-    addWeek (date, weeks) {
-      const outputDate = new Date(date)
-      const days = weeks * 7
-      outputDate.setUTCDate(outputDate.getUTCDate() + days)
-      return this.getDateString(outputDate)
-    },
-    shiftCurrentWeek (weeks) {
-      this.currentWeek = this.addWeek(this.currentWeek, weeks)
-    },
-    getDateString (date) {
-      return date.toISOString().split('T')[0]
+  get visibleWeeks () {
+    const { bufferBefore, bufferAfter } = this
+    const weeks = []
+    for (let i = -bufferBefore; i <= bufferAfter; i++) {
+      const current = i === 0
+      weeks.push({
+        weekDate: current ? this.currentWeek : this.addWeek(this.currentWeek, i),
+        current
+      })
     }
+    return weeks
+  }
+
+  // Methods
+  allowedDates (date) {
+    return new Date(date).getDay() === 1
+  }
+
+  weekStart (date) {
+    const outputDate = new Date(date)
+    const daysSinceMonday = outputDate.getDay() - 1
+    outputDate.setDate(outputDate.getDate() - daysSinceMonday)
+    return this.getDateString(outputDate)
+  }
+
+  addWeek (date, weeks) {
+    const outputDate = new Date(date)
+    const days = weeks * 7
+    outputDate.setUTCDate(outputDate.getUTCDate() + days)
+    return this.getDateString(outputDate)
+  }
+
+  shiftCurrentWeek (weeks) {
+    this.currentWeek = this.addWeek(this.currentWeek, weeks)
+  }
+
+  getDateString (date) {
+    return date.toISOString().split('T')[0]
   }
 }
 </script>

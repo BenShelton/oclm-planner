@@ -296,247 +296,253 @@
   </v-card>
 </template>
 
-<script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
+import { getModule } from 'vuex-module-decorators'
 
-import ScheduleSection from '@/components/Schedule/ScheduleSection'
-import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment'
-import AssigneeSelect from '@/components/AssigneeSelect'
+import ScheduleSection from '@/components/Schedule/ScheduleSection.vue'
+import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment.vue'
+import AssigneeSelect from '@/components/AssigneeSelect.vue'
+
+import Alert from '@/store/alert'
+import Schedule from '@/store/schedule'
 
 import { ASSIGNMENT_TYPE_MAP, WEEK_TYPES } from '@/constants'
 
-export default {
-  name: 'ScheduleWeek',
+import { Languages } from '@/ts/types'
 
+const alertModule = getModule(Alert)
+const scheduleModule = getModule(Schedule)
+
+@Component({
   components: {
     ScheduleSection,
     ScheduleAssignment,
     AssigneeSelect
-  },
+  }
+})
+export default class ScheduleWeek extends Vue {
+  // Props
+  @Prop({ type: String, required: true }) weekDate: string
+  @Prop({ type: Boolean, required: true }) current: boolean
 
-  props: {
-    weekDate: { type: String, required: true },
-    current: { type: Boolean, required: true }
-  },
-
+  // Hooks
   mounted () {
     if (this.weekDate < '2019-01-07') {
       Object.assign(this.localWeek, { date: this.weekDate, loaded: true, unavailable: true })
       return
     }
-    this.loadWeek({ date: this.weekDate })
+    scheduleModule.loadWeek({ date: this.weekDate })
       .then(this.loadLocalWeek)
       .catch(err => {
         this.loadError = true
         console.error(err)
       })
-  },
+  }
 
-  data () {
-    return {
-      WEEK_TYPES,
-      fieldClass: 'xs12 md6 xl4',
-      localWeek: { _id: null, loaded: false },
-      loadError: false,
-      scrapeLoading: false,
-      scrapeError: false,
-      settingsMenu: false,
-      weekTypeLoading: false,
-      editDialog: false,
-      editName: '',
-      editTitle: '',
-      editAssignment: {},
-      editLoading: false
-    }
-  },
+  // Data
+  WEEK_TYPES = WEEK_TYPES
+  fieldClass: string = 'xs12 md6 xl4'
+  localWeek = { _id: null, loaded: false }
+  loadError: boolean = false
+  scrapeLoading: boolean = false
+  scrapeError: boolean = false
+  settingsMenu: boolean = false
+  weekTypeLoading: boolean = false
+  editDialog: boolean = false
+  editName: string = ''
+  editTitle: string = ''
+  editAssignment: any = {}
+  editLoading: boolean = false
 
-  computed: {
-    ...mapGetters({
-      language: 'schedule/language'
-    }),
-    week () {
-      return this.localWeek[this.language] || {}
-    },
-    weekID () {
-      return this.localWeek._id
-    },
-    weekType: {
-      get () {
-        return this.week.type || 0
-      },
-      set (val) {
-        const prev = this.weekType
-        this.$set(this.week, 'type', val)
-        // wait for the animation to finish
-        setTimeout(() => {
-          if (!window.confirm('Are you sure you want to change the week type? All items may be unassigned.')) {
-            this.week.type = prev
-            return
-          }
-          this.weekTypeLoading = true
-          this.updateWeekType({ weekID: this.weekID, type: val })
-            .then(this.loadLocalWeek)
-            .then(() => {
-              this.alert({ text: 'Week Type successfully updated', color: 'success' })
-              this.settingsMenu = false
-            })
-            .catch(err => {
-              this.week.type = prev
-              this.alert({ text: 'Week Type could not be toggled', color: 'error' })
-              console.error(err)
-            })
-            .finally(() => { this.weekTypeLoading = false })
-        }, 100)
+  // Computed
+  get language (): Languages {
+    return scheduleModule.language
+  }
+
+  get week (): any {
+    return this.localWeek[this.language] || {}
+  }
+
+  get weekID (): string {
+    return this.localWeek._id
+  }
+
+  get weekType () {
+    return this.week.type || 0
+  }
+  set weekType(val) {
+    const prev = this.weekType
+    this.$set(this.week, 'type', val)
+    // wait for the animation to finish
+    setTimeout(() => {
+      if (!window.confirm('Are you sure you want to change the week type? All items may be unassigned.')) {
+        this.week.type = prev
+        return
       }
-    },
-    toolbarColor () {
-      return this.current ? 'primary' : 'grey'
-    },
-    prettyDate () {
-      const { weekDate } = this
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-      const [year, month, day] = weekDate.split('-')
-      return `${day} ${months[month - 1]} ${year}`
-    },
-    assignments () {
-      const { assignments } = this.week
-      const assignmentRefs = [
-        { name: 'chairman', displayName: 'Chairman' },
-        { name: 'openingPrayer', displayName: 'Opening Prayer' },
-        { name: 'highlights', displayName: 'Highlights' },
-        { name: 'gems', displayName: 'Gems' },
-        { name: 'bibleReading', displayName: 'Bible Reading' },
-        { name: 'studentTalk1', displayName: 'Student Talk 1' },
-        { name: 'studentTalk2', displayName: 'Student Talk 2' },
-        { name: 'studentTalk3', displayName: 'Student Talk 3' },
-        { name: 'studentTalk4', displayName: 'Student Talk 4' },
-        { name: 'serviceTalk1', displayName: 'Service Talk 1' },
-        { name: 'serviceTalk2', displayName: 'Service Talk 2' },
-        { name: 'congregationBibleStudy', displayName: 'Congregation Bible Study' },
-        { name: 'reader', displayName: 'Reader' },
-        { name: 'closingPrayer', displayName: 'Closing Prayer' }
-      ]
-      return assignmentRefs.reduce((acc, { name, displayName }) => {
-        const assignment = assignments[name]
-        const inherit = !!(assignment && assignment.inherit)
-        const details = inherit ? this.localWeek.en.assignments[name] : assignment
-        return Object.assign(acc, {
-          [name]: {
-            name,
-            displayName,
-            inherit,
-            details
-          }
-        })
-      }, {})
-    },
-    coVisit () {
-      return this.weekType === WEEK_TYPES.coVisit.value
-    },
-    multipleAssignments () {
-      const { type, assignee } = this.editAssignment || {}
-      if (!assignee) return []
-      const multipleAssignments = []
-      for (const assignment of Object.values(this.assignments)) {
-        if (!assignment.details) continue
-        if (assignment.details.type !== type && assignment.details.assignee === assignee) multipleAssignments.push(assignment.displayName)
-      }
-      return multipleAssignments
-    }
-  },
-
-  methods: {
-    ...mapActions({
-      loadWeek: 'schedule/loadWeek',
-      scrapeWeek: 'schedule/scrapeWeek',
-      updateAssignment: 'schedule/updateAssignment',
-      deleteAssignment: 'schedule/deleteAssignment',
-      updateWeekType: 'schedule/updateWeekType',
-      updateCOName: 'schedule/updateCOName',
-      updateCOTitle: 'schedule/updateCOTitle'
-    }),
-    ...mapMutations({
-      alert: 'alert/UPDATE_ALERT'
-    }),
-    loadLocalWeek (week) {
-      this.localWeek = Object.assign({}, { loaded: true }, week)
-    },
-    onUpdateCOName (name) {
-      this.updateCOName({ weekID: this.weekID, name })
+      this.weekTypeLoading = true
+      scheduleModule.updateWeekType({ weekID: this.weekID, type: val })
         .then(this.loadLocalWeek)
-        .catch(() => {
-          this.alert({ text: 'Circuit Overseer Name could not be updated.', color: 'error' })
+        .then(() => {
+          alertModule.UPDATE_ALERT({ text: 'Week Type successfully updated', color: 'success' })
+          this.settingsMenu = false
         })
-    },
-    onUpdateCOTitle (title) {
-      this.updateCOTitle({ weekID: this.weekID, title })
-        .then(this.loadLocalWeek)
-        .catch(() => {
-          this.alert({ text: 'Circuit Overseer Talk Title could not be updated.', color: 'error' })
-        })
-    },
-    onScrape () {
-      this.scrapeLoading = true
-      this.scrapeWeek({ weekID: this.weekID })
-        .then(this.loadLocalWeek)
-        .then(() => this.alert({ text: 'Week successfully downloaded', color: 'success' }))
         .catch(err => {
-          this.scrapeError = true
-          this.alert({ text: 'Week could not be downloaded', color: 'error' })
+          this.week.type = prev
+          alertModule.UPDATE_ALERT({ text: 'Week Type could not be toggled', color: 'error' })
           console.error(err)
         })
-        .finally(() => { this.scrapeLoading = false })
-    },
-    onEdit (name) {
-      this.editName = name
-      const { displayName, inherit, details } = this.assignments[name]
-      const editDetails = inherit ? this.week.assignments[name] : details
-      this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
-      const assignment = { ...editDetails }
-      if (!assignment.type) assignment.type = ASSIGNMENT_TYPE_MAP[name]
-      this.editAssignment = assignment
-      this.editDialog = true
-    },
-    onSettingChange (val) {
-      if (val) {
-        if (this.editAssignment.assignee) this.editAssignment.assignee = null
-        if (this.editAssignment.assistant) this.editAssignment.assistant = null
-      }
-    },
-    deleteEditor () {
-      this.editLoading = true
-      this.deleteAssignment({
-        weekID: this.localWeek._id,
-        name: this.editName
+        .finally(() => { this.weekTypeLoading = false })
+    }, 100)
+  }
+
+  get toolbarColor () {
+    return this.current ? 'primary' : 'grey'
+  }
+
+
+  get prettyDate () {
+    const { weekDate } = this
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const [year, month, day] = weekDate.split('-')
+    return `${day} ${months[month - 1]} ${year}`
+  }
+
+  get assignments () {
+    const { assignments } = this.week
+    const assignmentRefs = [
+      { name: 'chairman', displayName: 'Chairman' },
+      { name: 'openingPrayer', displayName: 'Opening Prayer' },
+      { name: 'highlights', displayName: 'Highlights' },
+      { name: 'gems', displayName: 'Gems' },
+      { name: 'bibleReading', displayName: 'Bible Reading' },
+      { name: 'studentTalk1', displayName: 'Student Talk 1' },
+      { name: 'studentTalk2', displayName: 'Student Talk 2' },
+      { name: 'studentTalk3', displayName: 'Student Talk 3' },
+      { name: 'studentTalk4', displayName: 'Student Talk 4' },
+      { name: 'serviceTalk1', displayName: 'Service Talk 1' },
+      { name: 'serviceTalk2', displayName: 'Service Talk 2' },
+      { name: 'congregationBibleStudy', displayName: 'Congregation Bible Study' },
+      { name: 'reader', displayName: 'Reader' },
+      { name: 'closingPrayer', displayName: 'Closing Prayer' }
+    ]
+    return assignmentRefs.reduce((acc, { name, displayName }) => {
+      const assignment = assignments[name]
+      const inherit = !!(assignment && assignment.inherit)
+      const details = inherit ? this.localWeek.en.assignments[name] : assignment
+      return Object.assign(acc, {
+        [name]: {
+          name,
+          displayName,
+          inherit,
+          details
+        }
       })
-        .then(this.loadLocalWeek)
-        .then(this.closeEditor)
-        .catch(err => {
-          console.error(err)
-        })
-        .finally(() => {
-          this.editLoading = false
-        })
-    },
-    closeEditor () {
-      this.editDialog = false
-    },
-    saveEditor () {
-      this.editLoading = true
-      this.updateAssignment({
-        weekID: this.localWeek._id,
-        name: this.editName,
-        assignment: this.editAssignment
-      })
-        .then(this.loadLocalWeek)
-        .then(this.closeEditor)
-        .catch(err => {
-          console.error(err)
-        })
-        .finally(() => {
-          this.editLoading = false
-        })
+    }, {})
+  }
+
+  get coVisit () {
+    return this.weekType === WEEK_TYPES.coVisit.value
+  }
+
+  get multipleAssignments () {
+    const { type, assignee } = this.editAssignment || {}
+    if (!assignee) return []
+    const multipleAssignments = []
+    for (const assignment of Object.values(this.assignments)) {
+      if (!assignment.details) continue
+      if (assignment.details.type !== type && assignment.details.assignee === assignee) multipleAssignments.push(assignment.displayName)
     }
+    return multipleAssignments
+  }
+
+  // Methods
+  loadLocalWeek (week) {
+    this.localWeek = Object.assign({}, { loaded: true }, week)
+  }
+
+  onUpdateCOName (name) {
+    scheduleModule.updateCOName({ weekID: this.weekID, name })
+      .then(this.loadLocalWeek)
+      .catch(() => {
+        alertModule.UPDATE_ALERT({ text: 'Circuit Overseer Name could not be updated.', color: 'error' })
+      })
+  }
+
+  onUpdateCOTitle (title) {
+    scheduleModule.updateCOTitle({ weekID: this.weekID, title })
+      .then(this.loadLocalWeek)
+      .catch(() => {
+        alertModule.UPDATE_ALERT({ text: 'Circuit Overseer Talk Title could not be updated.', color: 'error' })
+      })
+  }
+
+  onScrape () {
+    this.scrapeLoading = true
+    scheduleModule.scrapeWeek({ weekID: this.weekID })
+      .then(this.loadLocalWeek)
+      .then(() => alertModule.UPDATE_ALERT({ text: 'Week successfully downloaded', color: 'success' }))
+      .catch(err => {
+        this.scrapeError = true
+        alertModule.UPDATE_ALERT({ text: 'Week could not be downloaded', color: 'error' })
+        console.error(err)
+      })
+      .finally(() => { this.scrapeLoading = false })
+  }
+
+  onEdit (name) {
+    this.editName = name
+    const { displayName, inherit, details } = this.assignments[name]
+    const editDetails = inherit ? this.week.assignments[name] : details
+    this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
+    const assignment = { ...editDetails }
+    if (!assignment.type) assignment.type = ASSIGNMENT_TYPE_MAP[name]
+    this.editAssignment = assignment
+    this.editDialog = true
+  }
+
+  onSettingChange (val) {
+    if (val) {
+      if (this.editAssignment.assignee) this.editAssignment.assignee = null
+      if (this.editAssignment.assistant) this.editAssignment.assistant = null
+    }
+  }
+
+  deleteEditor () {
+    this.editLoading = true
+    scheduleModule.deleteAssignment({
+      weekID: this.localWeek._id,
+      name: this.editName
+    })
+      .then(this.loadLocalWeek)
+      .then(this.closeEditor)
+      .catch(err => {
+        console.error(err)
+      })
+      .finally(() => {
+        this.editLoading = false
+      })
+  }
+
+  closeEditor () {
+    this.editDialog = false
+  }
+
+  saveEditor () {
+    this.editLoading = true
+    scheduleModule.updateAssignment({
+      weekID: this.localWeek._id,
+      name: this.editName,
+      assignment: this.editAssignment
+    })
+      .then(this.loadLocalWeek)
+      .then(this.closeEditor)
+      .catch(err => {
+        console.error(err)
+      })
+      .finally(() => {
+        this.editLoading = false
+      })
   }
 }
 </script>
