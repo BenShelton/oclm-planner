@@ -1,12 +1,16 @@
 module.exports = {
   root: true,
+
   env: {
     node: true
   },
+
   extends: [
     'plugin:vue/recommended',
-    '@vue/standard'
+    '@vue/standard',
+    '@vue/typescript'
   ],
+
   rules: {
     'vue/max-attributes-per-line': ['error', {
       singleline: 3,
@@ -54,16 +58,17 @@ module.exports = {
     'vue/no-boolean-default': 'error',
     'vue/no-restricted-syntax': 'error',
     'vue/object-curly-spacing': ['error', 'always'],
-    'vue/require-direct-export': 'error',
     'vue/space-infix-ops': 'error',
     'vue/space-unary-ops': 'error',
     'vue/v-on-function-call': 'error',
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
+
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: '@typescript-eslint/parser'
   },
+
   overrides: [
     {
       files: [
