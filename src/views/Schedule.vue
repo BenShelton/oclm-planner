@@ -39,26 +39,23 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { mapMutations } from 'vuex'
 
 import ScheduleWeek from '@/components/Schedule/ScheduleWeek.vue'
+import { scheduleModule } from '@/store'
 
 @Component({
   components: {
     ScheduleWeek
-  },
-  methods: {
-    ...mapMutations({
-      clearWeeks: 'schedule/CLEAR_WEEKS'
-    })
   }
 })
 export default class Schedule extends Vue {
+  // Data
   currentWeek: string = this.weekStart(new Date())
   dateDialog: boolean = false
 
+  // Hooks
   beforeRouteLeave (to, from, next) {
-    this.clearWeeks()
+    scheduleModule.CLEAR_WEEKS()
     next()
   }
 
@@ -88,7 +85,7 @@ export default class Schedule extends Vue {
     }
   }
 
-  get visibleWeeks () {
+  get visibleWeeks (): { weekDate: string, current: boolean}[] {
     const { bufferBefore, bufferAfter } = this
     const weeks = []
     for (let i = -bufferBefore; i <= bufferAfter; i++) {
@@ -102,29 +99,29 @@ export default class Schedule extends Vue {
   }
 
   // Methods
-  allowedDates (date) {
+  allowedDates (date): boolean {
     return new Date(date).getDay() === 1
   }
 
-  weekStart (date) {
+  weekStart (date): string {
     const outputDate = new Date(date)
     const daysSinceMonday = outputDate.getDay() - 1
     outputDate.setDate(outputDate.getDate() - daysSinceMonday)
     return this.getDateString(outputDate)
   }
 
-  addWeek (date, weeks) {
+  addWeek (date, weeks): string {
     const outputDate = new Date(date)
     const days = weeks * 7
     outputDate.setUTCDate(outputDate.getUTCDate() + days)
     return this.getDateString(outputDate)
   }
 
-  shiftCurrentWeek (weeks) {
+  shiftCurrentWeek (weeks): void {
     this.currentWeek = this.addWeek(this.currentWeek, weeks)
   }
 
-  getDateString (date) {
+  getDateString (date): string {
     return date.toISOString().split('T')[0]
   }
 }

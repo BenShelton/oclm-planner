@@ -11,15 +11,9 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import { getModule } from 'vuex-module-decorators'
 
-import Schedule from '@/store/schedule'
-import Congregation from '@/store/congregation'
+import { congregationModule, scheduleModule } from '@/store'
 
-import { CongregationMember } from '@/ts/interfaces'
-
-const scheduleModule = getModule(Schedule)
-const congregationModule = getModule(Congregation)
 const DELETED = 'DELETED'
 
 @Component
@@ -33,7 +27,7 @@ export default class ScheduleAssignee extends Vue {
     return congregationModule.loading
   }
 
-  get idMap () {
+  get idMap (): typeof congregationModule.idMap {
     return congregationModule.idMap
   }
 

@@ -1,0 +1,12 @@
+{
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "html",
+    "vue"
+  ],
+  "eslint.autoFixOnSave": true,
+  "jest.pathToJest": "npm run test:unit --",
+  "jest.pathToConfig": "jest.config.js",
+  "vetur.experimental.templateInterpolationService": true
+}

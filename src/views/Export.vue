@@ -45,68 +45,67 @@
   </v-layout>
 </template>
 
-<script>
-import { mapActions } from 'vuex'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 import { generateSchedule, generateAssignmentSlips } from '@/plugins/pdfMake'
 
-import PDFPreview from '@/components/PDFPreview'
+import PDFPreview from '@/components/PDFPreview.vue'
+import { scheduleModule } from '../store'
 
-export default {
-  name: 'Export',
+interface Month {
+  text: string
+  value: string
+}
 
+@Component({
   components: {
     PDFPreview
-  },
+  }
+})
+export default class Export extends Vue {
+  // Data
+  month: string = (new Date().getMonth() + 1).toString().padStart(2, '0')
+  months: Month[] = [
+    { text: 'January', value: '01' },
+    { text: 'February', value: '02' },
+    { text: 'March', value: '03' },
+    { text: 'April', value: '04' },
+    { text: 'May', value: '05' },
+    { text: 'June', value: '06' },
+    { text: 'July', value: '07' },
+    { text: 'August', value: '08' },
+    { text: 'September', value: '09' },
+    { text: 'October', value: '10' },
+    { text: 'November', value: '11' },
+    { text: 'December', value: '12' }
+  ]
+  year: string = new Date().getFullYear().toString()
+  years: string[] = ['2019']
+  pdf: any = null
+  showPreview: boolean = false
+  generationError: boolean = false
 
-  data () {
-    const today = new Date()
-    return {
-      month: (today.getMonth() + 1).toString().padStart(2, '0'),
-      months: [
-        { text: 'January', value: '01' },
-        { text: 'February', value: '02' },
-        { text: 'March', value: '03' },
-        { text: 'April', value: '04' },
-        { text: 'May', value: '05' },
-        { text: 'June', value: '06' },
-        { text: 'July', value: '07' },
-        { text: 'August', value: '08' },
-        { text: 'September', value: '09' },
-        { text: 'October', value: '10' },
-        { text: 'November', value: '11' },
-        { text: 'December', value: '12' }
-      ],
-      year: today.getFullYear().toString(),
-      years: ['2019'],
-      pdf: null,
-      showPreview: false,
-      generationError: false
-    }
-  },
+  // Methods
+  previewPDF (generator): Promise<void> {
+    this.generationError = false
+    this.pdf = null
+    this.showPreview = true
+    const month = this.year + '-' + this.month
+    return scheduleModule.loadMonth({ month })
+      .then(weeks => generator(weeks, month))
+      .then(pdf => { this.pdf = pdf })
+      .catch(err => {
+        this.generationError = true
+        console.error(err)
+      })
+  }
 
-  methods: {
-    ...mapActions({
-      loadMonth: 'schedule/loadMonth'
-    }),
-    previewPDF (generator) {
-      this.generationError = false
-      this.pdf = null
-      this.showPreview = true
-      const month = this.year + '-' + this.month
-      return this.loadMonth({ month })
-        .then(weeks => generator(weeks, month))
-        .then(pdf => { this.pdf = pdf })
-        .catch(err => {
-          this.generationError = true
-          console.error(err)
-        })
-    },
-    previewSchedule () {
-      this.previewPDF(generateSchedule)
-    },
-    previewAssignmentSlips () {
-      this.previewPDF(generateAssignmentSlips)
-    }
+  previewSchedule (): void {
+    this.previewPDF(generateSchedule)
+  }
+
+  previewAssignmentSlips (): void {
+    this.previewPDF(generateAssignmentSlips)
   }
 }
 </script>

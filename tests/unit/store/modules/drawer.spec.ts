@@ -1,4 +1,4 @@
-import drawer from '@/store/drawer'
+import drawer from '@/store/modules/drawer'
 
 describe('Store: Drawer', () => {
   it('should have the correct starting state', () => {

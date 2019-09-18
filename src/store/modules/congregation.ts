@@ -1,22 +1,16 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 
-import { CongregationMember } from '@/ts/interfaces'
-import store from './index'
+import { ICongregationMember } from '@/ts/interfaces'
 import api from '@/api'
 
 interface IdMap {
-  [key: string]: CongregationMember
+  [key: string]: ICongregationMember
 }
 
-@Module({
-  store,
-  dynamic: true,
-  namespaced: true,
-  name: 'auth'
-})
+@Module({ namespaced: true, name: 'congregation' })
 export default class Alert extends VuexModule {
   // State
-  members: CongregationMember[] = []
+  members: ICongregationMember[] = []
   loading: boolean = true
 
   // Getters
@@ -38,7 +32,7 @@ export default class Alert extends VuexModule {
   }
 
   @Action
-  async add (payload: CongregationMember) {
+  async add (payload: ICongregationMember) {
     const { commit } = this.context
     commit('START_LOADING')
     const res = await api.congregation.addMember(payload)
@@ -46,7 +40,7 @@ export default class Alert extends VuexModule {
   }
 
   @Action
-  async update ({ memberID, member }: { memberID: string, member: CongregationMember }) {
+  async update ({ memberID, member }: { memberID: string, member: ICongregationMember }) {
     const { commit } = this.context
     commit('START_LOADING')
     const res = await api.congregation.updateMember({ memberID, member })
@@ -63,19 +57,19 @@ export default class Alert extends VuexModule {
 
   // Mutations
   @Mutation
-  LOAD_MEMBERS (payload: CongregationMember[]) {
+  LOAD_MEMBERS (payload: ICongregationMember[]) {
     this.members = payload
     this.loading = false
   }
 
   @Mutation
-  ADD_MEMBER (payload: CongregationMember) {
+  ADD_MEMBER (payload: ICongregationMember) {
     this.members.push(payload)
     this.loading = false
   }
 
   @Mutation
-  UPDATE_MEMBER (payload: CongregationMember) {
+  UPDATE_MEMBER (payload: ICongregationMember) {
     const existingMember = this.members.find(m => m._id === payload._id)
     Object.assign(existingMember, payload)
     this.loading = false

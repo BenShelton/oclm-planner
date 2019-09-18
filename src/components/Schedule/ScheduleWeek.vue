@@ -298,21 +298,14 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import { getModule } from 'vuex-module-decorators'
 
 import ScheduleSection from '@/components/Schedule/ScheduleSection.vue'
 import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment.vue'
 import AssigneeSelect from '@/components/AssigneeSelect.vue'
 
-import Alert from '@/store/alert'
-import Schedule from '@/store/schedule'
-
+import { alertModule, scheduleModule } from '@/store'
 import { ASSIGNMENT_TYPE_MAP, WEEK_TYPES } from '@/constants'
-
 import { Languages } from '@/ts/types'
-
-const alertModule = getModule(Alert)
-const scheduleModule = getModule(Schedule)
 
 @Component({
   components: {
@@ -323,8 +316,8 @@ const scheduleModule = getModule(Schedule)
 })
 export default class ScheduleWeek extends Vue {
   // Props
-  @Prop({ type: String, required: true }) weekDate: string
-  @Prop({ type: Boolean, required: true }) current: boolean
+  @Prop({ type: String, required: true }) weekDate!: string
+  @Prop({ type: Boolean, required: true }) current!: boolean
 
   // Hooks
   mounted () {
@@ -368,10 +361,10 @@ export default class ScheduleWeek extends Vue {
     return this.localWeek._id
   }
 
-  get weekType () {
+  get weekType (): number {
     return this.week.type || 0
   }
-  set weekType(val) {
+  set weekType (val) {
     const prev = this.weekType
     this.$set(this.week, 'type', val)
     // wait for the animation to finish
@@ -396,19 +389,17 @@ export default class ScheduleWeek extends Vue {
     }, 100)
   }
 
-  get toolbarColor () {
+  get toolbarColor (): string {
     return this.current ? 'primary' : 'grey'
   }
 
-
-  get prettyDate () {
-    const { weekDate } = this
+  get prettyDate (): string {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    const [year, month, day] = weekDate.split('-')
+    const [year, month, day] = this.weekDate.split('-')
     return `${day} ${months[month - 1]} ${year}`
   }
 
-  get assignments () {
+  get assignments (): any {
     const { assignments } = this.week
     const assignmentRefs = [
       { name: 'chairman', displayName: 'Chairman' },
@@ -441,14 +432,14 @@ export default class ScheduleWeek extends Vue {
     }, {})
   }
 
-  get coVisit () {
+  get coVisit (): boolean {
     return this.weekType === WEEK_TYPES.coVisit.value
   }
 
-  get multipleAssignments () {
+  get multipleAssignments (): string[] {
     const { type, assignee } = this.editAssignment || {}
     if (!assignee) return []
-    const multipleAssignments = []
+    const multipleAssignments: string[] = []
     for (const assignment of Object.values(this.assignments)) {
       if (!assignment.details) continue
       if (assignment.details.type !== type && assignment.details.assignee === assignee) multipleAssignments.push(assignment.displayName)
@@ -457,11 +448,11 @@ export default class ScheduleWeek extends Vue {
   }
 
   // Methods
-  loadLocalWeek (week) {
+  loadLocalWeek (week): void {
     this.localWeek = Object.assign({}, { loaded: true }, week)
   }
 
-  onUpdateCOName (name) {
+  onUpdateCOName (name): void {
     scheduleModule.updateCOName({ weekID: this.weekID, name })
       .then(this.loadLocalWeek)
       .catch(() => {
@@ -469,7 +460,7 @@ export default class ScheduleWeek extends Vue {
       })
   }
 
-  onUpdateCOTitle (title) {
+  onUpdateCOTitle (title): void {
     scheduleModule.updateCOTitle({ weekID: this.weekID, title })
       .then(this.loadLocalWeek)
       .catch(() => {
@@ -477,7 +468,7 @@ export default class ScheduleWeek extends Vue {
       })
   }
 
-  onScrape () {
+  onScrape (): void {
     this.scrapeLoading = true
     scheduleModule.scrapeWeek({ weekID: this.weekID })
       .then(this.loadLocalWeek)
@@ -490,7 +481,7 @@ export default class ScheduleWeek extends Vue {
       .finally(() => { this.scrapeLoading = false })
   }
 
-  onEdit (name) {
+  onEdit (name): void {
     this.editName = name
     const { displayName, inherit, details } = this.assignments[name]
     const editDetails = inherit ? this.week.assignments[name] : details
@@ -501,14 +492,14 @@ export default class ScheduleWeek extends Vue {
     this.editDialog = true
   }
 
-  onSettingChange (val) {
+  onSettingChange (val): void {
     if (val) {
       if (this.editAssignment.assignee) this.editAssignment.assignee = null
       if (this.editAssignment.assistant) this.editAssignment.assistant = null
     }
   }
 
-  deleteEditor () {
+  deleteEditor (): void {
     this.editLoading = true
     scheduleModule.deleteAssignment({
       weekID: this.localWeek._id,
@@ -524,11 +515,11 @@ export default class ScheduleWeek extends Vue {
       })
   }
 
-  closeEditor () {
+  closeEditor (): void {
     this.editDialog = false
   }
 
-  saveEditor () {
+  saveEditor (): void {
     this.editLoading = true
     scheduleModule.updateAssignment({
       weekID: this.localWeek._id,

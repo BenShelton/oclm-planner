@@ -44,76 +44,66 @@
   </v-toolbar>
 </template>
 
-<script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+<script lang="ts">
+import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
+
 import routes from '@/router/routes'
+import { authModule, scheduleModule, alertModule, drawerModule } from '@/store'
 import { SUPPORTED_LANGUAGES } from '@/constants'
 
-export default {
-  name: 'Toolbar',
+@Component
+export default class Toolbar extends Vue {
+  // Data
+  loading: boolean = false
+  items = SUPPORTED_LANGUAGES
 
-  data () {
-    return {
-      loading: false,
-      items: SUPPORTED_LANGUAGES
-    }
-  },
+  // Computed
+  get loggedIn (): boolean {
+    return authModule.hasToken
+  }
 
-  computed: {
-    ...mapGetters({
-      loggedIn: 'auth/hasToken',
-      language: 'schedule/language'
-    }),
-    languageModel: {
-      get () {
-        return this.language
-      },
-      set (val) {
-        this.updateLanguage(val)
-      }
-    },
-    title () {
-      const prefix = this.$vuetify.breakpoint.smAndDown ? '' : 'OCLM Planner | '
-      let title = 'Untitled'
-      switch (this.$route.name) {
-        case routes.HOME: title = 'Home'; break
-        case routes.LOGIN: title = 'Login'; break
-        case routes.SCHEDULE: title = 'Schedule'; break
-        case routes.EXPORT: title = 'Export'; break
-        case routes.CONGREGATION: title = 'Congregation'; break
-        case routes.HELP: title = 'Help'; break
-      }
-      return prefix + title
-    }
-  },
+  get languageModel (): string {
+    return scheduleModule.language
+  }
+  set languageModel (val) {
+    scheduleModule.UPDATE_LANGUAGE(val)
+  }
 
-  methods: {
-    ...mapActions({
-      logout: 'auth/logout'
-    }),
-    ...mapMutations({
-      toggleDrawer: 'drawer/TOGGLE_OPEN',
-      alert: 'alert/UPDATE_ALERT',
-      updateLanguage: 'schedule/UPDATE_LANGUAGE'
-    }),
-    onLogin () {
-      this.$router.push({ name: routes.LOGIN })
-    },
-    onLogout () {
-      this.loading = true
-      this.logout()
-        .then(() => {
-          this.alert({ text: 'Successfully logged out', color: 'success' })
-          this.$router.push({ name: routes.HOME })
-        })
-        .catch(err => {
-          this.alert({ text: 'Logout failed', color: 'error' })
-          console.error(err)
-        })
-        .finally(() => {
-          this.loading = false
-        })
+  get title (): string {
+    const prefix = this.$vuetify.breakpoint.smAndDown ? '' : 'OCLM Planner | '
+    let title = 'Untitled'
+    switch (this.$route.name) {
+      case routes.HOME: title = 'Home'; break
+      case routes.LOGIN: title = 'Login'; break
+      case routes.SCHEDULE: title = 'Schedule'; break
+      case routes.EXPORT: title = 'Export'; break
+      case routes.CONGREGATION: title = 'Congregation'; break
+      case routes.HELP: title = 'Help'; break
     }
+    return prefix + title
+  }
+
+  // Methods
+  toggleDrawer = drawerModule.TOGGLE_OPEN
+
+  onLogin (): void {
+    this.$router.push({ name: routes.LOGIN })
+  }
+
+  onLogout (): void {
+    this.loading = true
+    authModule.logout()
+      .then(() => {
+        alertModule.UPDATE_ALERT({ text: 'Successfully logged out', color: 'success' })
+        this.$router.push({ name: routes.HOME })
+      })
+      .catch(err => {
+        alertModule.UPDATE_ALERT({ text: 'Logout failed', color: 'error' })
+        console.error(err)
+      })
+      .finally(() => {
+        this.loading = false
+      })
   }
 }
 </script>

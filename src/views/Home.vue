@@ -10,9 +10,9 @@
   </v-layout>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 
-export default {
-  name: 'Home'
-}
+@Component
+export default class Home extends Vue {}
 </script>

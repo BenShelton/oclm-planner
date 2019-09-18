@@ -56,72 +56,67 @@
   </v-dialog>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
 import PDF from 'vue-pdf'
 
-export default {
-  name: 'PDFPreview',
+@Component({
+  components: { PDF }
+})
+export default class PDFPreview extends Vue {
+  // Props
+  @Prop({ type: Boolean, required: true }) value!: boolean
+  @Prop({ type: Object, default: null }) pdf: any = null
+  @Prop({ type: Boolean, required: true }) error!: boolean
 
-  components: { PDF },
+  // Data
+  src: Promise<any> | null = null
+  downloadBlob: string | null = null
+  downloadSrc: string | null = null
+  numPages: number = 0
 
-  props: {
-    value: { type: Boolean, required: true },
-    pdf: { type: Object, default: null },
-    error: { type: Boolean, required: true }
-  },
+  // Computed
+  get dialog (): boolean {
+    return this.value
+  }
+  set dialog (val) {
+    if (!val) this.onClose()
+  }
 
-  data () {
-    return {
-      src: null,
-      downloadBlob: null,
-      downloadSrc: null,
-      numPages: 0
+  get downloadTitle (): string {
+    if (!this.pdf) return ''
+    return this.pdf.docDefinition.info.title + '.pdf'
+  }
+
+  // Watchers
+  @Watch('pdf')
+  onPdfChanged (val: any) {
+    if (!val) {
+      this.src = null
+      this.downloadBlob = null
+      this.downloadSrc = null
+      return
     }
-  },
+    val.getBlob(blob => {
+      this.downloadBlob = blob
+      const dataUrl = URL.createObjectURL(blob)
+      this.downloadSrc = dataUrl
+      this.src = PDF.createLoadingTask(dataUrl)
+      this.src.then(pdf => { this.numPages = pdf.numPages })
+    })
+  }
 
-  computed: {
-    dialog: {
-      get () {
-        return this.value
-      },
-      set (val) {
-        if (!val) this.onClose()
-      }
-    },
-    downloadTitle () {
-      if (!this.pdf) return ''
-      return this.pdf.docDefinition.info.title + '.pdf'
+  // Methods
+  onDownload (): void {
+    // fallback for Edge/IE, which refuse to download a dataURI link
+    if (navigator && navigator.msSaveOrOpenBlob) {
+      navigator.msSaveOrOpenBlob(this.downloadBlob, this.downloadTitle)
     }
-  },
+  }
 
-  watch: {
-    pdf (val) {
-      if (!val) {
-        this.src = null
-        this.downloadBlob = null
-        this.downloadSrc = null
-        return
-      }
-      val.getBlob(blob => {
-        this.downloadBlob = blob
-        const dataUrl = URL.createObjectURL(blob)
-        this.downloadSrc = dataUrl
-        this.src = PDF.createLoadingTask(dataUrl)
-        this.src.then(pdf => { this.numPages = pdf.numPages })
-      })
-    }
-  },
-
-  methods: {
-    onDownload () {
-      // fallback for Edge/IE, which refuse to download a dataURI link
-      if (navigator && navigator.msSaveOrOpenBlob) {
-        navigator.msSaveOrOpenBlob(this.downloadBlob, this.downloadTitle)
-      }
-    },
-    onClose () {
-      this.$emit('input', false)
-    }
+  @Emit('input')
+  onClose (): boolean {
+    return false
   }
 }
 </script>

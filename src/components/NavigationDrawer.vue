@@ -34,7 +34,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import { getModule } from 'vuex-module-decorators'
 import { mapState, mapMutations } from 'vuex'
 
-import Drawer from '@/store/drawer'
+import { drawerModule } from '@/store'
 import routes from '@/router/routes'
 
 interface DrawerItem {
@@ -49,10 +49,9 @@ interface DrawerItem {
   }
 }
 
-const drawerModule = getModule(Drawer)
-
 @Component
 export default class NavigationDrawer extends Vue {
+  // Data
   items: DrawerItem[] = [
     { title: 'Home', icon: 'home', link: { name: routes.HOME }, label: { text: 'Stable', color: 'green' } },
     { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE }, label: { text: 'Stable', color: 'green' } },
@@ -61,10 +60,16 @@ export default class NavigationDrawer extends Vue {
     { title: 'Help', icon: 'help', link: { name: routes.HELP }, label: { text: 'Incomplete', color: 'yellow' } }
   ]
 
-  get drawer () {
+  // Computed
+  get drawer (): boolean {
     return drawerModule.open
   }
   set drawer (val) {
+    this.setOpen(val)
+  }
+
+  // Methods
+  setOpen (val: boolean): void {
     drawerModule.SET_OPEN(val)
   }
 }

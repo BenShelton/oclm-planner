@@ -54,16 +54,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
 
 import ScheduleAssignee from '@/components/Schedule/ScheduleAssignee.vue'
+import { IScheduleAssignment } from '@/ts/interfaces'
 
 @Component({
   components: { ScheduleAssignee }
 })
 export default class ScheduleAssignment extends Vue {
   // Props
-  @Prop({ type: Object, required: true }) assignment: any
+  @Prop({ type: Object, required: true }) assignment!: IScheduleAssignment
 
   // Computed
   get hasAssistant (): boolean {
@@ -73,8 +74,9 @@ export default class ScheduleAssignment extends Vue {
   }
 
   // Methods
-  onEdit (): void {
-    this.$emit('edit', this.assignment.name)
+  @Emit('edit')
+  onEdit (): string {
+    return this.assignment.name
   }
 }
 </script>

@@ -140,8 +140,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { getModule } from 'vuex-module-decorators'
 
-import Alert from '@/store/alert'
-import Congregation from '@/store/congregation'
+import { alertModule, congregationModule } from '@/store'
 import BooleanIcon from '@/components/BooleanIcon.vue'
 
 import {
@@ -150,9 +149,7 @@ import {
   SUPPORTED_LANGUAGES,
   PRIVILEGES
 } from '@/constants'
-
-const alertModule = getModule(Alert)
-const congregationModule = getModule(Congregation)
+import { ICongregationMember } from '../ts/interfaces'
 
 @Component({
   components: {
@@ -190,29 +187,29 @@ export default class Schedule extends Vue {
   }
 
   // Computed
-  get members () {
+  get members (): ICongregationMember[] {
     return congregationModule.members
   }
 
-  get loading () {
+  get loading (): boolean {
     return congregationModule.loading
   }
 
   // Methods
-  expandRow (props) {
+  expandRow (props): void {
     props.expanded = !props.expanded
   }
 
-  closeEditor () {
+  closeEditor (): void {
     this.editDialog = false
   }
 
-  prettyPrivileges (privileges) {
+  prettyPrivileges (privileges): { name: string, selected: boolean}[] {
     if (!privileges) return []
     return PRIVILEGES.map(({ name, key }) => ({ name, selected: !!privileges[key] }))
   }
 
-  onAdd () {
+  onAdd (): void {
     this.editID = null
     Object.assign(this.editMember, {
       name: '',
@@ -226,7 +223,7 @@ export default class Schedule extends Vue {
     this.editDialog = true
   }
 
-  onEdit (member) {
+  onEdit (member): void {
     this.editID = member._id
     const { name, gender, appointment, languageGroup, show, privileges } = member
     Object.assign(this.editMember, {
@@ -241,7 +238,7 @@ export default class Schedule extends Vue {
     this.editDialog = true
   }
 
-  onDelete ({ _id: memberID, name }) {
+  onDelete ({ _id: memberID, name }): void {
     if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
     congregationModule.delete({ memberID })
       .then(() => {
@@ -254,7 +251,7 @@ export default class Schedule extends Vue {
       })
   }
 
-  onSave () {
+  onSave (): void {
     if (!this.editMember.name) {
       alertModule.UPDATE_ALERT({ text: 'Name is required', color: 'error' })
       return

@@ -17,11 +17,8 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import { getModule } from 'vuex-module-decorators'
 
-import AlertMod from '@/store/alert'
-
-const alertModule = getModule(AlertMod)
+import { alertModule } from '@/store'
 
 @Component
 export default class Alert extends Vue {

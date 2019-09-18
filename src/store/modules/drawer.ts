@@ -1,12 +1,6 @@
 import { Module, VuexModule, Mutation } from 'vuex-module-decorators'
-import store from './index'
 
-@Module({
-  store,
-  dynamic: true,
-  namespaced: true,
-  name: 'drawer'
-})
+@Module({ namespaced: true, name: 'drawer' })
 export default class Drawer extends VuexModule {
   // State
   open: boolean = false

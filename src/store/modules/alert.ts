@@ -1,13 +1,6 @@
 import { Module, VuexModule, Mutation } from 'vuex-module-decorators'
 
-import store from './index'
-
-@Module({
-  store,
-  dynamic: true,
-  namespaced: true,
-  name: 'alert'
-})
+@Module({ namespaced: true, name: 'alert' })
 export default class Alert extends VuexModule {
   // State
   text: string = ''

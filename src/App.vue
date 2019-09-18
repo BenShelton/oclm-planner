@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <NavigationDrawer :test="test" />
+    <NavigationDrawer />
     <Toolbar />
     <v-content>
       <v-container fluid fill-height>
@@ -25,7 +25,7 @@ import Alert from '@/components/Alert.vue'
     Alert
   }
 })
-export default class extends Vue {}
+export default class App extends Vue {}
 </script>
 
 <style lang="stylus">

@@ -1,36 +1,29 @@
 import { Genders, Appointments, Languages, Privileges } from './types'
 
-export type ScheduleWeek = {
-  [key in Languages]: ScheduleWeekLanguage
-} & {
-  _id: string
-  date: string
-}
-
-export interface ScheduleWeekLanguage {
+export interface IScheduleWeekLanguage {
   scraped: boolean
   weeklyBibleReading: string
   type: number
   songs: string[]
   assignments: {
-    bibleReading: ScheduleAssignment
-    chairman: ScheduleAssignment
-    closingPrayer: ScheduleAssignment
-    congregationBibleStudy: ScheduleAssignment
-    gems: ScheduleAssignment
-    highlights: ScheduleAssignment
-    openingPrayer: ScheduleAssignment
-    reader: ScheduleAssignment
-    serviceTalk1: ScheduleAssignment
-    serviceTalk2?: ScheduleAssignment
-    studentTalk1: ScheduleAssignment
-    studentTalk2: ScheduleAssignment
-    studentTalk3?: ScheduleAssignment
-    studentTalk4?: ScheduleAssignment
+    bibleReading: IScheduleAssignment
+    chairman: IScheduleAssignment
+    closingPrayer: IScheduleAssignment
+    congregationBibleStudy: IScheduleAssignment
+    gems: IScheduleAssignment
+    highlights: IScheduleAssignment
+    openingPrayer: IScheduleAssignment
+    reader: IScheduleAssignment
+    serviceTalk1: IScheduleAssignment
+    serviceTalk2?: IScheduleAssignment
+    studentTalk1: IScheduleAssignment
+    studentTalk2: IScheduleAssignment
+    studentTalk3?: IScheduleAssignment
+    studentTalk4?: IScheduleAssignment
   }
 }
 
-export interface ScheduleAssignment {
+export interface IScheduleAssignment {
   inherit: boolean
   studyPoint: string
   text: string
@@ -40,12 +33,12 @@ export interface ScheduleAssignment {
   assignee: string
 }
 
-export interface MemberAssignment {
+export interface IMemberAssignment {
   type: String
   date: String
 }
 
-export interface CongregationMember {
+export interface ICongregationMember {
   _id: string
   name: string
   gender: Genders
@@ -55,5 +48,5 @@ export interface CongregationMember {
   privileges: {
     [key in Privileges]: boolean
   }
-  assignments: MemberAssignment[]
+  assignments: IMemberAssignment[]
 }

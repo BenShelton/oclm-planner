@@ -31,50 +31,40 @@
   </v-layout>
 </template>
 
-<script>
-import { mapActions, mapMutations } from 'vuex'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 
+import { authModule, alertModule } from '@/store'
 import routes from '@/router/routes'
 
-export default {
-  name: 'Login',
+@Component
+export default class Login extends Vue {
+  // Data
+  password: string = ''
+  visible: boolean = false
+  loading: boolean = false
 
-  data () {
-    return {
-      password: '',
-      visible: false,
-      loading: false
-    }
-  },
+  // Computed
+  get disabled (): boolean {
+    return this.loading || !this.password
+  }
 
-  computed: {
-    disabled () {
-      return this.loading || !this.password
-    }
-  },
+  // Methods
+  toggleVisible (): void {
+    this.visible = !this.visible
+  }
 
-  methods: {
-    ...mapActions({
-      login: 'auth/login'
-    }),
-    ...mapMutations({
-      alert: 'alert/UPDATE_ALERT'
-    }),
-    toggleVisible () {
-      this.visible = !this.visible
-    },
-    onLogin () {
-      const { password } = this
-      if (!password) return
-      this.loading = true
-      this.login({ password })
-        .then(() => this.$router.push({ name: routes.HOME }))
-        .catch(err => {
-          this.alert({ text: 'Login was unsuccessful', color: 'error' })
-          console.error(err)
-        })
-        .finally(() => { this.loading = false })
-    }
+  onLogin (): void {
+    const { password } = this
+    if (!password) return
+    this.loading = true
+    authModule.login({ password })
+      .then(() => this.$router.push({ name: routes.HOME }))
+      .catch(err => {
+        alertModule.UPDATE_ALERT({ text: 'Login was unsuccessful', color: 'error' })
+        console.error(err)
+      })
+      .finally(() => { this.loading = false })
   }
 }
 </script>

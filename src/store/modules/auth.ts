@@ -1,14 +1,8 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 
-import store from './index'
 import api from '@/api'
 
-@Module({
-  store,
-  dynamic: true,
-  namespaced: true,
-  name: 'auth'
-})
+@Module({ namespaced: true, name: 'auth' })
 export default class Auth extends VuexModule {
   // State
   token: string = ''

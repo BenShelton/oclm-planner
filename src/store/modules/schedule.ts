@@ -1,15 +1,9 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 
-import { ScheduleWeek } from '@/ts/interfaces'
-import store from './index'
+import { ScheduleWeek } from '@/ts/types'
 import api from '@/api'
 
-@Module({
-  store,
-  dynamic: true,
-  namespaced: true,
-  name: 'schedule'
-})
+@Module({ namespaced: true, name: 'schedule' })
 export default class Schedule extends VuexModule {
   // State
   weeks: ScheduleWeek[] = []
