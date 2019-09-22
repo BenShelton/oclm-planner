@@ -9,17 +9,17 @@ export default class Alert extends VuexModule {
 
   // Mutations
   @Mutation
-  UPDATE_ALERT ({ text, color = 'primary', visible = true }: { text: string, color?: string, visible?: boolean }) {
+  UPDATE_ALERT ({ text, color = 'primary', visible = true }: { text: string, color?: string, visible?: boolean }): void {
     Object.assign(this, { text, color, visible })
   }
 
   @Mutation
-  UPDATE_VISIBILITY (payload: boolean) {
+  UPDATE_VISIBILITY (payload: boolean): void {
     this.visible = payload
   }
 
   @Mutation
-  CLEAR_ALERT () {
+  CLEAR_ALERT (): void {
     this.text = ''
     this.color = ''
     this.visible = false

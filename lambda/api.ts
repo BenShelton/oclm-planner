@@ -1,11 +1,11 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const serverless = require('serverless-http')
+import express, { Response } from 'express'
+import bodyParser from 'body-parser'
+import serverless from 'serverless-http'
 
-const auth = require('../database/auth')
-const congregation = require('../database/congregation')
-const schedule = require('../database/schedule')
-const { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES, WEEK_TYPES } = require('../src/constants')
+import * as auth from '../database/auth'
+import * as congregation from '../database/congregation'
+import * as schedule from '../database/schedule'
+import { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES, WEEK_TYPES } from '../src/constants'
 
 // Initialize express app
 const app = express()
@@ -13,28 +13,32 @@ app.use(bodyParser.json())
 
 const router = express.Router()
 
-const returnResult = res => result => res.status(200).json({ result })
+function returnResult (res: Response) {
+  return (result: object) => res.status(200).json({ result })
+}
 
-const handleErrors = res => error => {
-  console.error('Error Message: ' + error.message)
-  switch (error.message.toString()) {
-    case '401':
-      return res.status(401).json({ message: '401 - Unauthorized', error: { message: 'Invalid Password' } })
-    case '404':
-      return res.status(404).json({ message: '404 - Not Found', error })
-    default:
-      return res.status(500).json({ message: '500 - Server Error', error })
+function handleErrors (res: Response) {
+  return (error: Error) => {
+    console.error('Error Message: ' + error.message)
+    switch (error.message) {
+      case '401':
+        return res.status(401).json({ message: '401 - Unauthorized', error: { message: 'Invalid Password' } })
+      case '404':
+        return res.status(404).json({ message: '404 - Not Found', error })
+      default:
+        return res.status(500).json({ message: '500 - Server Error', error })
+    }
   }
 }
 
-const validLanguage = language => {
-  return SUPPORTED_LANGUAGES.some(({ value }) => value === language)
+function validLanguage (language: string): boolean {
+  return SUPPORTED_LANGUAGES.some(({ value }): boolean => value === language)
 }
 
 router.post('/auth/login', (req, res) => {
   const { password } = req.body
   if (!password) return res.status(400).json({ message: 'No password provided' })
-  auth.createToken({ password })
+  auth.createToken(password)
     .then(returnResult(res))
     .catch(handleErrors(res))
 })
@@ -43,7 +47,7 @@ router.use(async (req, res, next) => {
   try {
     const token = req.headers.authorization
     if (!token) throw new Error('No token sent')
-    const decoded = await auth.validateToken({ token })
+    const decoded = await auth.validateToken(token)
     req.tokenID = decoded._id
     next()
   } catch (err) {
@@ -64,7 +68,7 @@ router.get('/congregation/members', (req, res) => {
 })
 
 const languageCodes = SUPPORTED_LANGUAGES.map(({ value }) => value)
-const validateMember = member => {
+function validateMember (member: any): string | null {
   const { name, appointment, gender, languageGroup, privileges, show } = member
   if (!name) return 'Name is required'
   if (!APPOINTMENTS.includes(appointment)) return 'Appointment must be one of the following: ' + APPOINTMENTS.join(', ')
@@ -130,8 +134,8 @@ router.put('/schedule/scrape', (req, res) => {
     .then(returnResult(res))
     .catch(err => {
       const errorHandler = handleErrors(res)
-      if (err.status === 404) errorHandler(new Error('404'))
-      else errorHandler(err)
+      if (err.status === 404) return errorHandler(new Error('404'))
+      return errorHandler(err)
     })
 })
 

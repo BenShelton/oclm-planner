@@ -1,7 +1,28 @@
 import rp from 'request-promise'
 import cheerio from 'cheerio'
 
-const LANGUAGE_OPTIONS = {
+import { Languages } from '@/ts/types'
+
+type Assignments = 'chairman' | 'openingPrayer' | 'closingPrayer' | 'gems' | 'reader' | 'highlights' | 'bibleReading' | 'studentTalk' | 'serviceTalk' | 'congregationBibleStudy'
+
+interface ILanguageOptions {
+  months: string[]
+  addressConstructor: (date: string) => string[]
+  inherit: Assignments[]
+  cbsTitle: string
+  talkRegexes: {
+    ministryVideo: RegExp
+    initialCall: RegExp
+    returnVisit: RegExp
+    bibleStudy: RegExp
+    studentTalk: RegExp
+  }
+  bookAbbreviations: {
+    jy?: string
+  }
+}
+
+const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
   en: {
     months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'],
     addressConstructor: date => {
@@ -61,13 +82,13 @@ const LANGUAGE_OPTIONS = {
   }
 }
 
-const transform = body => cheerio.load(body)
+const transform = (body: Buffer): CheerioStatic => cheerio.load(body)
 const titleRegex = /^(.*?): /
 const timeRegex = /: \((.*?)\)/
 const studyPointRegex = /\(.*?(\d+)\)\*?$/
 const paragraphSelector = '.pGroup > ul > li > p'
 
-function safeRegex (regex, str) {
+function safeRegex (regex: RegExp, str: string): string {
   const result = regex.exec(str)
   if (!result) {
     console.warn('Could not run regex on "' + str + '"')
@@ -76,7 +97,7 @@ function safeRegex (regex, str) {
   return result[1].trim()
 }
 
-export default function scrapeWOL (date, language) {
+export default function scrapeWOL (date: string, language: Languages): any {
   const options = LANGUAGE_OPTIONS[language]
   if (!options) throw new Error('Unsupported language')
   const { addressConstructor, inherit, talkRegexes, cbsTitle, bookAbbreviations } = options
@@ -84,12 +105,13 @@ export default function scrapeWOL (date, language) {
 
   // We allow for multiple uris because sometimes the url can change slightly for no obvious reason, so we try them all and catch the first that succeeds
   const uris = addressConstructor(date)
-  return Promise.all(uris.map(uri => {
-    return rp({ uri, transform })
-      .then(
-        val => Promise.reject(val),
-        err => Promise.resolve(err)
-      )
+  return Promise.all(uris.map(async uri => {
+    try {
+      const val = await rp({ uri, transform })
+      return Promise.reject(val)
+    } catch (err) {
+      return Promise.resolve(err)
+    }
   }))
     .then(
       () => {

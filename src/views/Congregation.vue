@@ -121,7 +121,7 @@
       <template slot="expand" slot-scope="props">
         <v-layout row wrap class="grey lighten-5">
           <v-layout
-            v-for="privilege in prettyPrivileges(props.item.privileges)"
+            v-for="privilege of prettyPrivileges(props.item.privileges)"
             :key="privilege.name"
             align-center
             class="pa-3 shrink"
@@ -138,7 +138,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { getModule } from 'vuex-module-decorators'
 
 import { alertModule, congregationModule } from '@/store'
 import BooleanIcon from '@/components/BooleanIcon.vue'
@@ -149,7 +148,7 @@ import {
   SUPPORTED_LANGUAGES,
   PRIVILEGES
 } from '@/constants'
-import { ICongregationMember } from '../ts/interfaces'
+import { ICongregationMember } from '@/ts/interfaces'
 
 @Component({
   components: {
@@ -173,11 +172,12 @@ export default class Schedule extends Vue {
     { text: 'Actions', value: '', align: 'center', sortable: false }
   ]
   rowsPerPageItems = [20, 50, 100, { text: 'All', value: -1 }]
-  search = ''
-  editDialog = false
-  editID = null
-  editTitle = ''
-  editMember = {
+  search: string = ''
+  editDialog: boolean = false
+  editID: string | null = null
+  editTitle: string = ''
+  editMember: ICongregationMember = {
+    _id: '',
     name: '',
     gender: GENDERS[0],
     appointment: APPOINTMENTS[0],
@@ -196,7 +196,7 @@ export default class Schedule extends Vue {
   }
 
   // Methods
-  expandRow (props): void {
+  expandRow (props: { expanded: boolean }): void {
     props.expanded = !props.expanded
   }
 
@@ -204,7 +204,7 @@ export default class Schedule extends Vue {
     this.editDialog = false
   }
 
-  prettyPrivileges (privileges): { name: string, selected: boolean}[] {
+  prettyPrivileges (privileges: ICongregationMember['privileges']): { name: string, selected: boolean}[] {
     if (!privileges) return []
     return PRIVILEGES.map(({ name, key }) => ({ name, selected: !!privileges[key] }))
   }
@@ -223,7 +223,7 @@ export default class Schedule extends Vue {
     this.editDialog = true
   }
 
-  onEdit (member): void {
+  onEdit (member: ICongregationMember): void {
     this.editID = member._id
     const { name, gender, appointment, languageGroup, show, privileges } = member
     Object.assign(this.editMember, {
@@ -238,7 +238,7 @@ export default class Schedule extends Vue {
     this.editDialog = true
   }
 
-  onDelete ({ _id: memberID, name }): void {
+  onDelete ({ _id: memberID, name }: ICongregationMember): void {
     if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
     congregationModule.delete({ memberID })
       .then(() => {
@@ -262,7 +262,7 @@ export default class Schedule extends Vue {
           alertModule.UPDATE_ALERT({ text: `${this.editMember.name} was successfully updated`, color: 'success' })
           this.closeEditor()
         })
-        .catch(err => {
+        .catch((err: Error) => {
           alertModule.UPDATE_ALERT({ text: 'An error occured whilst updating this member', color: 'error' })
           console.error(err)
         })
@@ -272,7 +272,7 @@ export default class Schedule extends Vue {
           alertModule.UPDATE_ALERT({ text: `${this.editMember.name} was successfully added`, color: 'success' })
           this.closeEditor()
         })
-        .catch(err => {
+        .catch((err: Error) => {
           alertModule.UPDATE_ALERT({ text: 'An error occured whilst adding this member', color: 'error' })
           console.error(err)
         })

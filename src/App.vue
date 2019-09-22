@@ -12,20 +12,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import Vue from 'vue'
 
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 import Toolbar from '@/components/Toolbar.vue'
 import Alert from '@/components/Alert.vue'
 
-@Component({
+export default Vue.extend({
+  name: 'App',
+
   components: {
     NavigationDrawer,
     Toolbar,
     Alert
   }
 })
-export default class App extends Vue {}
 </script>
 
 <style lang="stylus">

@@ -5,8 +5,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import Vue from 'vue'
 
-@Component
-export default class Help extends Vue {}
+export default Vue.extend({
+  name: 'Help'
+})
 </script>

@@ -7,12 +7,12 @@ export default class Drawer extends VuexModule {
 
   // Mutations
   @Mutation
-  SET_OPEN (open: boolean) {
+  SET_OPEN (open: boolean): void {
     this.open = open
   }
 
   @Mutation
-  TOGGLE_OPEN () {
+  TOGGLE_OPEN (): void {
     this.open = !this.open
   }
 }

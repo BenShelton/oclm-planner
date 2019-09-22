@@ -1,19 +1,26 @@
-import { ObjectID } from 'mongodb'
+import { ObjectID, Collection } from 'mongodb'
 import assert from 'assert'
 import setup from './setup'
 import scrapeWOL from './scraper'
 import { addAssignment, removeAssignment } from './congregation'
 import { WEEK_TYPES, SUPPORTED_LANGUAGES } from '../src/constants'
+import { ScheduleWeek } from '../src/ts/types'
+import { ICongregationMember } from '../src/ts/interfaces'
+
+interface IWeekWithMembers {
+  week: ScheduleWeek
+  members: ICongregationMember[]
+}
 
 const ASSIGNEE_FIELDS = ['assignee', 'assistant']
 
-const getCollection = new Promise(resolve => {
+const getCollection = new Promise<Collection<ScheduleWeek>>(resolve => {
   setup
     .then(db => db.collection('schedule'))
     .then(resolve)
 })
 
-export const getWeek = async ({ date }) => {
+export const getWeek = async (date: string): Promise<ScheduleWeek> => {
   const coll = await getCollection
   const query = { date }
   const existingWeek = await coll.findOne(query)
@@ -29,7 +36,7 @@ export const getWeek = async ({ date }) => {
   return newWeek
 }
 
-export const getMonth = async ({ month }) => {
+export const getMonth = async ({ month }): Promise<ScheduleWeek[]> => {
   const coll = await getCollection
   // calculate the number of weeks in that month
   let weekCount = 0
@@ -49,9 +56,9 @@ export const getMonth = async ({ month }) => {
   return weeks
 }
 
-export const scrapeWeek = async ({ weekID, language }) => {
+export const scrapeWeek = async ({ weekID, language }): Promise<ScheduleWeek> => {
   const coll = await getCollection
-  const query = { _id: ObjectID(weekID) }
+  const query = { _id: new ObjectID(weekID) }
   const week = await coll.findOne(query)
   assert.notStrictEqual(null, week, 'Week ID does not exist')
   const update = { $set: await scrapeWOL(week.date, language) }
@@ -60,9 +67,9 @@ export const scrapeWeek = async ({ weekID, language }) => {
   return value
 }
 
-export const updateAssignment = async ({ weekID, language, name, assignment }) => {
+export const updateAssignment = async ({ weekID, language, name, assignment }): Promise<IWeekWithMembers> => {
   const coll = await getCollection
-  const query = { _id: ObjectID(weekID) }
+  const query = { _id: new ObjectID(weekID) }
 
   // Remove existing assigned members
   const updatedMembers = []
@@ -101,7 +108,7 @@ export const updateAssignment = async ({ weekID, language, name, assignment }) =
   return { week: value, members: updatedMembers }
 }
 
-export const deleteAssignment = async ({ weekID, language, name }) => {
+export const deleteAssignment = async ({ weekID, language, name }): Promise<IWeekWithMembers> => {
   const coll = await getCollection
   const query = { _id: ObjectID(weekID) }
 
@@ -133,7 +140,7 @@ export const deleteAssignment = async ({ weekID, language, name }) => {
   return { week: value, members: updatedMembers }
 }
 
-export const updateWeekType = async ({ weekID, language, type }) => {
+export const updateWeekType = async ({ weekID, language, type }): Promise<IWeekWithMembers> => {
   const coll = await getCollection
   const query = { _id: ObjectID(weekID) }
 
@@ -185,28 +192,28 @@ export const updateWeekType = async ({ weekID, language, type }) => {
   const updatePath = language + '.type'
   Object.assign(update.$set, { [updatePath]: type })
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
-  assert.notStrictEqual(null, value, 404)
+  assert.notStrictEqual(null, value, '404')
 
   // Return week and any removed assigned members
   return { week: value, members: updatedMembers }
 }
 
-export const updateCOName = async ({ weekID, language, name }) => {
+export const updateCOName = async ({ weekID, language, name }): Promise<ScheduleWeek> => {
   const coll = await getCollection
-  const query = { _id: ObjectID(weekID) }
+  const query = { _id: new ObjectID(weekID) }
   const updatePath = language + '.coName'
   const update = { $set: { [updatePath]: name } }
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
-  assert.notStrictEqual(null, value, 404)
+  assert.notStrictEqual(null, value, '404')
   return value
 }
 
-export const updateCOTitle = async ({ weekID, language, title }) => {
+export const updateCOTitle = async ({ weekID, language, title }): Promise<ScheduleWeek> => {
   const coll = await getCollection
-  const query = { _id: ObjectID(weekID) }
+  const query = { _id: new ObjectID(weekID) }
   const updatePath = language + '.coTitle'
   const update = { $set: { [updatePath]: title } }
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
-  assert.notStrictEqual(null, value, 404)
+  assert.notStrictEqual(null, value, '404')
   return value
 }

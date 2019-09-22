@@ -60,18 +60,29 @@
 import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
 import PDF from 'vue-pdf'
 
+import { TCreatedPdf } from 'pdfmake/build/pdfmake'
+
+interface IPDFWithDefinition extends TCreatedPdf {
+  docDefinition: {
+    info: {
+      title?: string
+    }
+  }
+}
+type PropPDF = IPDFWithDefinition | null
+
 @Component({
   components: { PDF }
 })
 export default class PDFPreview extends Vue {
   // Props
   @Prop({ type: Boolean, required: true }) value!: boolean
-  @Prop({ type: Object, default: null }) pdf: any = null
+  @Prop({ type: Object, default: null }) pdf: PropPDF = null
   @Prop({ type: Boolean, required: true }) error!: boolean
 
   // Data
-  src: Promise<any> | null = null
-  downloadBlob: string | null = null
+  src: ReturnType<typeof PDF.createLoadingTask> | null = null
+  downloadBlob: object | null = null
   downloadSrc: string | null = null
   numPages: number = 0
 
@@ -83,21 +94,21 @@ export default class PDFPreview extends Vue {
     if (!val) this.onClose()
   }
 
-  get downloadTitle (): string {
+  get downloadTitle () {
     if (!this.pdf) return ''
     return this.pdf.docDefinition.info.title + '.pdf'
   }
 
   // Watchers
   @Watch('pdf')
-  onPdfChanged (val: any) {
+  onPdfChanged (val: PropPDF) {
     if (!val) {
       this.src = null
       this.downloadBlob = null
       this.downloadSrc = null
       return
     }
-    val.getBlob(blob => {
+    val.getBlob((blob: object) => {
       this.downloadBlob = blob
       const dataUrl = URL.createObjectURL(blob)
       this.downloadSrc = dataUrl

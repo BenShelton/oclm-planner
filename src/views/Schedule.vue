@@ -24,7 +24,7 @@
     </v-layout>
     <v-layout justify-center fill-height>
       <v-flex
-        v-for="week in visibleWeeks"
+        v-for="week of visibleWeeks"
         :key="week.weekDate"
         class="ma-2 xs12 sm6 md4 lg3 xl2"
       >
@@ -39,6 +39,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { NavigationGuard } from 'vue-router/types/router'
 
 import ScheduleWeek from '@/components/Schedule/ScheduleWeek.vue'
 import { scheduleModule } from '@/store'
@@ -54,7 +55,7 @@ export default class Schedule extends Vue {
   dateDialog: boolean = false
 
   // Hooks
-  beforeRouteLeave (to, from, next) {
+  beforeRouteLeave: NavigationGuard = function (to, from, next) {
     scheduleModule.CLEAR_WEEKS()
     next()
   }
@@ -85,7 +86,7 @@ export default class Schedule extends Vue {
     }
   }
 
-  get visibleWeeks (): { weekDate: string, current: boolean}[] {
+  get visibleWeeks (): { weekDate: string, current: boolean }[] {
     const { bufferBefore, bufferAfter } = this
     const weeks = []
     for (let i = -bufferBefore; i <= bufferAfter; i++) {
@@ -99,29 +100,29 @@ export default class Schedule extends Vue {
   }
 
   // Methods
-  allowedDates (date): boolean {
+  allowedDates (date: string): boolean {
     return new Date(date).getDay() === 1
   }
 
-  weekStart (date): string {
+  weekStart (date: Date): string {
     const outputDate = new Date(date)
     const daysSinceMonday = outputDate.getDay() - 1
     outputDate.setDate(outputDate.getDate() - daysSinceMonday)
     return this.getDateString(outputDate)
   }
 
-  addWeek (date, weeks): string {
+  addWeek (date: string, weeks: number): string {
     const outputDate = new Date(date)
     const days = weeks * 7
     outputDate.setUTCDate(outputDate.getUTCDate() + days)
     return this.getDateString(outputDate)
   }
 
-  shiftCurrentWeek (weeks): void {
+  shiftCurrentWeek (weeks: number): void {
     this.currentWeek = this.addWeek(this.currentWeek, weeks)
   }
 
-  getDateString (date): string {
+  getDateString (date: Date): string {
     return date.toISOString().split('T')[0]
   }
 }

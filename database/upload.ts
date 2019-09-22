@@ -3,6 +3,42 @@ import fs from 'fs'
 import assert from 'assert'
 import { bulkAddMembers } from './congregation'
 import { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES } from '../src/constants'
+import { Genders, Languages, Appointments } from '../src/ts/types'
+
+type BooleanString = 'Y' | 'y' | ''
+
+interface IColumn {
+  name: string
+  appointment: Appointments
+  gender: Genders
+  languageGroup: Languages
+  show: BooleanString
+  'privileges.chairman': BooleanString
+  'privileges.highlights': BooleanString
+  'privileges.gems': BooleanString
+  'privileges.serviceTalk': BooleanString
+  'privileges.congregationBibleStudy': BooleanString
+  'privileges.reader': BooleanString
+  'privileges.prayer': BooleanString
+  'privileges.bibleReading': BooleanString
+  'privileges.ministryVideo': BooleanString
+  'privileges.initialCall': BooleanString
+  'privileges.initialCallAssist': BooleanString
+  'privileges.returnVisit': BooleanString
+  'privileges.returnVisitAssist': BooleanString
+  'privileges.bibleStudy': BooleanString
+  'privileges.bibleStudyAssist': BooleanString
+  'privileges.studentTalk': BooleanString
+}
+
+type ColumnNames = keyof IColumn
+
+interface IColumnHeader {
+  name: ColumnNames
+  noDuplicates?: boolean
+  allowedValues?: readonly string[]
+  boolean?: boolean
+}
 
 const filename = process.argv[2]
 if (!filename) throw new Error('No file argument provided')
@@ -10,14 +46,14 @@ if (!filename) throw new Error('No file argument provided')
 console.log('Loading File...')
 
 const file = fs.readFileSync(filename)
-const data = parse(file, {
+const data: IColumn[] = parse(file, {
   columns: true
 })
 
 console.log('File Loaded, Validating...')
 
 /* Data Sanity Checks */
-const columns = [
+const columns: IColumnHeader[] = [
   { name: 'name', noDuplicates: true },
   { name: 'appointment', allowedValues: APPOINTMENTS },
   { name: 'gender', allowedValues: GENDERS },
@@ -53,7 +89,7 @@ const expectedKeys = columns.map(({ name }) => name).sort()
 assert.deepStrictEqual(rowKeys, expectedKeys, 'Column Names Do Not Match')
 
 // Examining every row...
-const noDuplicateColumns = columns.reduce((acc, { name, noDuplicates }) => noDuplicates ? acc.concat(name) : acc, [])
+const noDuplicateColumns = columns.reduce((acc: ColumnNames[], { name, noDuplicates }) => noDuplicates ? acc.concat(name) : acc, [])
 const duplicates = noDuplicateColumns.reduce((acc, name) => Object.assign(acc, { [name]: [] }), {})
 const restrictedColumns = columns.filter(c => c.allowedValues)
 for (const row of data) {

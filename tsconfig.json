@@ -28,6 +28,8 @@
     ]
   },
   "include": [
+    "database/**/*.ts",
+    "lambda/**/*.ts",
     "src/**/*.ts",
     "src/**/*.vue",
     "tests/**/*.ts"

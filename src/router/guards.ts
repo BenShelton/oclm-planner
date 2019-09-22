@@ -4,7 +4,7 @@ import store from '@/store'
 import routes from './routes'
 
 // Global Guards
-export const authenticationGuard: NavigationGuard = function (to, from, next) {
+export const authenticationGuard: NavigationGuard = function (to, from, next): void {
   // Check if a token is stored (doesn't validate until an api call)
   if (store.getters['auth/hasToken']) {
     // If on Login redirect to Home, otherwise allow anything, any api calls will validate the token
@@ -15,7 +15,7 @@ export const authenticationGuard: NavigationGuard = function (to, from, next) {
   }
 }
 
-export const congregationGuard: NavigationGuard = function (to, from, next) {
+export const congregationGuard: NavigationGuard = function (to, from, next): void {
   if (!to.meta.open && !store.getters['congregation/members'].length) {
     store.dispatch('congregation/load')
   }

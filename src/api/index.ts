@@ -1,7 +1,9 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import store from '@/store'
 import router from '@/router'
 import routes from '@/router/routes'
+import { ICongregationMember } from '@/ts/interfaces'
+import { ScheduleWeek } from '@/ts/types'
 
 const api = axios.create({
   baseURL: '/.netlify/functions/api'
@@ -21,20 +23,22 @@ api.interceptors.response.use(r => r, err => {
   return Promise.reject(err)
 })
 
+type APIResponse<T> = Promise<AxiosResponse<{ result: T }>>
+
 export default {
   auth: {
-    login: ({ password }) => api.post('/auth/login', { password }),
-    logout: () => api.get('/auth/logout')
+    login: ({ password }): APIResponse<{ token: string }> => api.post('/auth/login', { password }),
+    logout: (): APIResponse<void> => api.get('/auth/logout')
   },
   congregation: {
-    members: () => api.get('/congregation/members'),
-    addMember: ({ name, appointment, gender, languageGroup, privileges, show }) => api.post('/congregation/addMember', { name, appointment, gender, languageGroup, privileges, show }),
-    updateMember: ({ memberID, member }) => api.post('/congregation/updateMember', { memberID, member }),
-    deleteMember: ({ memberID }) => api.delete(`/congregation/deleteMember/${memberID}`)
+    members: (): APIResponse<ICongregationMember[]> => api.get('/congregation/members'),
+    addMember: ({ name, appointment, gender, languageGroup, privileges, show }): APIResponse<ICongregationMember> => api.post('/congregation/addMember', { name, appointment, gender, languageGroup, privileges, show }),
+    updateMember: ({ memberID, member }): APIResponse<ICongregationMember> => api.post('/congregation/updateMember', { memberID, member }),
+    deleteMember: ({ memberID }): APIResponse<void> => api.delete(`/congregation/deleteMember/${memberID}`)
   },
   schedule: {
-    week: ({ date }) => api.get(`/schedule/week/${date}`),
-    month: ({ month }) => api.get(`/schedule/month/${month}`),
+    week: ({ date }): APIResponse<ScheduleWeek> => api.get(`/schedule/week/${date}`),
+    month: ({ month }): APIResponse<ScheduleWeek[]> => api.get(`/schedule/month/${month}`),
     scrape: ({ weekID, language }) => api.put(`/schedule/scrape/`, { weekID, language }),
     updateAssignment: ({ weekID, language, name, assignment }) => api.put(`/schedule/updateAssignment`, { weekID, language, name, assignment }),
     deleteAssignment: ({ weekID, language, name }) => api.put(`/schedule/deleteAssignment`, { weekID, language, name }),

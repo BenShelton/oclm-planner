@@ -1,8 +1,8 @@
-export default <const>{
+export default {
   HOME: 'HOME',
   LOGIN: 'LOGIN',
   SCHEDULE: 'SCHEDULE',
   EXPORT: 'EXPORT',
   CONGREGATION: 'CONGREGATION',
   HELP: 'HELP'
-}
+} as const

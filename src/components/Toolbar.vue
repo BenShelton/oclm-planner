@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 
 import routes from '@/router/routes'
 import { authModule, scheduleModule, alertModule, drawerModule } from '@/store'

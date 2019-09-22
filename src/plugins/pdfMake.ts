@@ -3,12 +3,14 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 import store from '@/store'
 import { COLORS, WEEK_TYPES } from '@/constants'
+import { IScheduleTranslationMap, IAssignmentTranslationMap } from '@/ts/interfaces'
+import { PDFGenerator, Languages } from '@/ts/types'
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
-const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const TPO_MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-const SCHEDULE_TRANSLATIONS = {
+const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
+const TPO_MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'] as const
+const SCHEDULE_TRANSLATIONS: { [key in Languages]: IScheduleTranslationMap } = {
   en: {
     startTime: '7:00',
     group: 'CANTON CONGREGATION',
@@ -65,8 +67,9 @@ const SCHEDULE_TRANSLATIONS = {
     conductor: 'Dirigente',
     reader: 'Leitor'
   }
-}
-const ASSIGNMENT_SLIP_TRANSLATIONS = {
+} as const
+
+const ASSIGNMENT_SLIP_TRANSLATIONS: { [key in Languages]: IAssignmentTranslationMap } = {
   en: {
     verticalPadding: 32,
     defaultRoom: 'mainHall',
@@ -135,7 +138,8 @@ const ASSIGNMENT_SLIP_TRANSLATIONS = {
     ],
     footer: 'S-89-TPO     10/18'
   }
-}
+} as const
+
 let timer
 
 function setTime (time) {
@@ -247,7 +251,7 @@ function createScheduleTable (markerColor, rows, expandAssigneeName) {
   }
 }
 
-export function generateSchedule (weeks, month) {
+export const generateSchedule: PDFGenerator = function (weeks, month) {
   const language = store.getters['schedule/language']
   const translation = SCHEDULE_TRANSLATIONS[language]
   if (!translation) throw new Error('Translations not created for the selected language')
@@ -516,7 +520,7 @@ function createAssignmentCheckbox (title, checked) {
   }
 }
 
-export function generateAssignmentSlips (weeks, month) {
+export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
   // variables for the cutting lines
   const pageWidth = 595
   const pageHeight = 842

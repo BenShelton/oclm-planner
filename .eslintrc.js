@@ -7,6 +7,7 @@ module.exports = {
 
   extends: [
     'plugin:vue/recommended',
+    'plugin:@typescript-eslint/recommended',
     '@vue/standard',
     '@vue/typescript'
   ],
@@ -61,9 +62,28 @@ module.exports = {
     'vue/space-infix-ops': 'error',
     'vue/space-unary-ops': 'error',
     'vue/v-on-function-call': 'error',
+    '@typescript-eslint/indent': ['error', 2],
+    '@typescript-eslint/interface-name-prefix': ['error', 'always'],
+    '@typescript-eslint/member-delimiter-style': ['error', {
+      multiline: {
+        delimiter: 'none',
+        requireLast: true
+      },
+      singleline: {
+        delimiter: 'comma'
+      }
+    }],
+    '@typescript-eslint/explicit-function-return-type': ['error', {
+      allowExpressions: true,
+      allowTypedFunctionExpressions: true,
+      allowHigherOrderFunctions: true
+    }],
+    '@typescript-eslint/explicit-member-accessibility': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
+
+  parser: 'vue-eslint-parser',
 
   parserOptions: {
     parser: '@typescript-eslint/parser'
@@ -72,10 +92,13 @@ module.exports = {
   overrides: [
     {
       files: [
-        '**/__tests__/*.{j,t}s'
+        '**/__tests__/*.ts'
       ],
       env: {
         jest: true
+      },
+      rules: {
+        '@typescript-eslint/explicit-function-return-type': 'off'
       }
     }
   ]

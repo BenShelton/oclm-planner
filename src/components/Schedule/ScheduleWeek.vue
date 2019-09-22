@@ -481,7 +481,7 @@ export default class ScheduleWeek extends Vue {
       .finally(() => { this.scrapeLoading = false })
   }
 
-  onEdit (name): void {
+  onEdit (name: string): void {
     this.editName = name
     const { displayName, inherit, details } = this.assignments[name]
     const editDetails = inherit ? this.week.assignments[name] : details
@@ -492,7 +492,7 @@ export default class ScheduleWeek extends Vue {
     this.editDialog = true
   }
 
-  onSettingChange (val): void {
+  onSettingChange (val: boolean): void {
     if (val) {
       if (this.editAssignment.assignee) this.editAssignment.assignee = null
       if (this.editAssignment.assistant) this.editAssignment.assistant = null

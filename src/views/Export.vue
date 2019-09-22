@@ -51,8 +51,10 @@ import { generateSchedule, generateAssignmentSlips } from '@/plugins/pdfMake'
 
 import PDFPreview from '@/components/PDFPreview.vue'
 import { scheduleModule } from '../store'
+import { PDFGenerator } from '@/ts/types'
+import { TCreatedPdf } from 'pdfmake/build/pdfmake'
 
-interface Month {
+interface IMonth {
   text: string
   value: string
 }
@@ -65,7 +67,7 @@ interface Month {
 export default class Export extends Vue {
   // Data
   month: string = (new Date().getMonth() + 1).toString().padStart(2, '0')
-  months: Month[] = [
+  months: IMonth[] = [
     { text: 'January', value: '01' },
     { text: 'February', value: '02' },
     { text: 'March', value: '03' },
@@ -81,12 +83,12 @@ export default class Export extends Vue {
   ]
   year: string = new Date().getFullYear().toString()
   years: string[] = ['2019']
-  pdf: any = null
+  pdf: TCreatedPdf | null = null
   showPreview: boolean = false
   generationError: boolean = false
 
   // Methods
-  previewPDF (generator): Promise<void> {
+  previewPDF (generator: PDFGenerator): Promise<void> {
     this.generationError = false
     this.pdf = null
     this.showPreview = true

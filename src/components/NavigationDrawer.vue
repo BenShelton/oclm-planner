@@ -31,20 +31,18 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { getModule } from 'vuex-module-decorators'
-import { mapState, mapMutations } from 'vuex'
 
 import { drawerModule } from '@/store'
 import routes from '@/router/routes'
 
-interface DrawerItem {
-  title: string,
-  icon: string,
+interface IDrawerItem {
+  title: string
+  icon: string
   link: {
     name: string
-  },
+  }
   label: {
-    text: string,
+    text: string
     color: string
   }
 }
@@ -52,7 +50,7 @@ interface DrawerItem {
 @Component
 export default class NavigationDrawer extends Vue {
   // Data
-  items: DrawerItem[] = [
+  items: IDrawerItem[] = [
     { title: 'Home', icon: 'home', link: { name: routes.HOME }, label: { text: 'Stable', color: 'green' } },
     { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE }, label: { text: 'Stable', color: 'green' } },
     { title: 'Export', icon: 'picture_as_pdf', link: { name: routes.EXPORT }, label: { text: 'Stable', color: 'green' } },

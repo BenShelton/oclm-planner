@@ -1,5 +1,3 @@
-'use strict'
-
 import { app, protocol, BrowserWindow } from 'electron'
 import {
   createProtocol,
@@ -12,14 +10,16 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 let win: BrowserWindow | null
 
 // Standard scheme must be registered before the app is ready
-protocol.registerStandardSchemes(['app'], { secure: true })
-function createWindow () {
+protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true } }])
+function createWindow (): void {
   // Create the browser window.
   win = new BrowserWindow({ width: 800, height: 600 })
 
   if (isDevelopment) {
     // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+    const URL = process.env.WEBPACK_DEV_SERVER_URL
+    if (!URL) throw new Error('Missing Webpack Dev Server URL')
+    win.loadURL(URL)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     createProtocol('app')
