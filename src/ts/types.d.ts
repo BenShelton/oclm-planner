@@ -17,4 +17,4 @@ export type ScheduleWeek = {
 
 export type PDFGenerator = (weeks: ScheduleWeek[], month: string) => TCreatedPdf
 
-export type MongoInterface<T> = Omit<T, '_id'> & { _id: string | ObjectID }
+export type MongoInterface<T> = Omit<T, '_id'> & { _id?: string | ObjectID }

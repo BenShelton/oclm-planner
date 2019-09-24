@@ -1,9 +1,8 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 import store from '@/store'
 import router from '@/router'
 import routes from '@/router/routes'
-import { ICongregationMember } from '@/ts/interfaces'
-import { ScheduleWeek } from '@/ts/types'
+import { APITypes } from 'types'
 
 const api = axios.create({
   baseURL: '/.netlify/functions/api'
@@ -23,27 +22,25 @@ api.interceptors.response.use(r => r, err => {
   return Promise.reject(err)
 })
 
-type APIResponse<T> = Promise<AxiosResponse<{ result: T }>>
-
 export default {
   auth: {
-    login: ({ password }): APIResponse<{ token: string }> => api.post('/auth/login', { password }),
-    logout: (): APIResponse<void> => api.get('/auth/logout')
+    login: (data: APITypes.Auth.Login.Data) => api.post<APITypes.Auth.Login.Response>('/auth/login', data),
+    logout: () => api.get<APITypes.Auth.Logout.Response>('/auth/logout')
   },
   congregation: {
-    members: (): APIResponse<ICongregationMember[]> => api.get('/congregation/members'),
-    addMember: ({ name, appointment, gender, languageGroup, privileges, show }): APIResponse<ICongregationMember> => api.post('/congregation/addMember', { name, appointment, gender, languageGroup, privileges, show }),
-    updateMember: ({ memberID, member }): APIResponse<ICongregationMember> => api.post('/congregation/updateMember', { memberID, member }),
-    deleteMember: ({ memberID }): APIResponse<void> => api.delete(`/congregation/deleteMember/${memberID}`)
+    members: () => api.get<APITypes.Congregation.GetMembers.Response>('/congregation/members'),
+    addMember: (data: APITypes.Congregation.AddMember.Data) => api.post<APITypes.Congregation.AddMember.Response>('/congregation/addMember', data),
+    updateMember: (data: APITypes.Congregation.UpdateMember.Data) => api.post<APITypes.Congregation.UpdateMember.Response>('/congregation/updateMember', data),
+    deleteMember: ({ memberID }: APITypes.Congregation.DeleteMember.Data) => api.delete(`/congregation/deleteMember/${memberID}`)
   },
   schedule: {
-    week: ({ date }): APIResponse<ScheduleWeek> => api.get(`/schedule/week/${date}`),
-    month: ({ month }): APIResponse<ScheduleWeek[]> => api.get(`/schedule/month/${month}`),
-    scrape: ({ weekID, language }) => api.put(`/schedule/scrape/`, { weekID, language }),
-    updateAssignment: ({ weekID, language, name, assignment }) => api.put(`/schedule/updateAssignment`, { weekID, language, name, assignment }),
-    deleteAssignment: ({ weekID, language, name }) => api.put(`/schedule/deleteAssignment`, { weekID, language, name }),
-    updateWeekType: ({ weekID, language, type }) => api.put(`/schedule/updateWeekType`, { weekID, language, type }),
-    updateCOName: ({ weekID, language, name }) => api.put(`/schedule/updateCOName`, { weekID, language, name }),
-    updateCOTitle: ({ weekID, language, title }) => api.put(`/schedule/updateCOTitle`, { weekID, language, title })
+    week: ({ date }: APITypes.Schedule.GetWeek.Data) => api.get<APITypes.Schedule.GetWeek.Response>(`/schedule/week/${date}`),
+    month: ({ month }: APITypes.Schedule.GetMonth.Data) => api.get<APITypes.Schedule.GetMonth.Response>(`/schedule/month/${month}`),
+    scrape: (data: APITypes.Schedule.ScrapeWeek.Data) => api.put<APITypes.Schedule.ScrapeWeek.Response>(`/schedule/scrape/`, data),
+    updateAssignment: (data: APITypes.Schedule.UpdateAssignment.Data) => api.put<APITypes.Schedule.UpdateAssignment.Response>(`/schedule/updateAssignment`, data),
+    deleteAssignment: (data: APITypes.Schedule.DeleteAssignment.Data) => api.put<APITypes.Schedule.DeleteAssignment.Response>(`/schedule/deleteAssignment`, data),
+    updateWeekType: (data: APITypes.Schedule.UpdateWeekType.Data) => api.put<APITypes.Schedule.UpdateWeekType.Response>(`/schedule/updateWeekType`, data),
+    updateCOName: (data: APITypes.Schedule.UpdateCOName.Data) => api.put<APITypes.Schedule.UpdateCOName.Response>(`/schedule/updateCOName`, data),
+    updateCOTitle: (data: APITypes.Schedule.UpdateCOTitle.Data) => api.put<APITypes.Schedule.UpdateCOTitle.Response>(`/schedule/updateCOTitle`, data)
   }
 }

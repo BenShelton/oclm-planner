@@ -71,7 +71,7 @@ export default class Schedule extends VuexModule {
   }
 
   @Action
-  async updateWeekType ({ weekID, type }: { weekID: string, type: string }): Promise<ScheduleWeek> {
+  async updateWeekType ({ weekID, type }: { weekID: string, type: number }): Promise<ScheduleWeek> {
     const { commit } = this.context
     const { language } = this
     const res = await api.schedule.updateWeekType({ weekID, language, type })

@@ -28,6 +28,7 @@
     ]
   },
   "include": [
+    "types/**/*.ts",
     "database/**/*.ts",
     "lambda/**/*.ts",
     "src/**/*.ts",

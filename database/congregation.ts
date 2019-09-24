@@ -16,14 +16,14 @@ const getCollection = new Promise<Collection<CollCongregationMember>>((resolve):
 export const getMembers = async (): Promise<ICongregationMember[]> => {
   const coll = await getCollection
   const members = await coll.find().toArray()
-  return members
+  return members as ICongregationMember[]
 }
 
-export const addMember = async (member: ICongregationMember): Promise<ICongregationMember> => {
+export const addMember = async (member: CollCongregationMember): Promise<ICongregationMember> => {
   const coll = await getCollection
   const newMemberResult = await coll.insertOne(member)
-  const newMember = newMemberResult && newMemberResult.ops && newMemberResult.ops[0]
-  assert.notStrictEqual(null, newMember, 'Adding New Member was unsuccessful')
+  const newMember: ICongregationMember | null = newMemberResult && newMemberResult.ops && newMemberResult.ops[0]
+  if (!newMember) throw new Error('Adding New Member was unsuccessful')
   return newMember
 }
 

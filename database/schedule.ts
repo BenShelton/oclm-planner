@@ -5,12 +5,7 @@ import scrapeWOL from './scraper'
 import { addAssignment, removeAssignment } from './congregation'
 import { WEEK_TYPES, SUPPORTED_LANGUAGES } from '../src/constants'
 import { ScheduleWeek } from '../src/ts/types'
-import { ICongregationMember } from '../src/ts/interfaces'
-
-interface IWeekWithMembers {
-  week: ScheduleWeek
-  members: ICongregationMember[]
-}
+import { IWeekWithMembers } from 'types'
 
 const ASSIGNEE_FIELDS = ['assignee', 'assistant']
 
