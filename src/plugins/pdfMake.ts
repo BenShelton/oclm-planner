@@ -474,7 +474,7 @@ function createAssignmentCheckbox (title: string, checked = false): Content {
 }
 
 function createSlip (translation: IAssignmentTranslationMap, assignment?: IScheduleAssignment, date = ''): Content {
-  const { title, type, assignee, assistant, studyPoint } = assignment || {}
+  const { title = '', type = '', assignee = '', assistant = '', studyPoint = '' } = assignment || {}
   const [y, m, d] = date.split('-')
   const prettyDate = [d, translation.months[+m - 1], y].join(' ')
   return {

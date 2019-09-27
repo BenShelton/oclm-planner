@@ -18,7 +18,7 @@ module.exports = {
   },
 
   transformIgnorePatterns: [
-    'node_modules/(?!(babel-jest|jest-vue-preprocessor|vuetify)/)'
+    'node_modules/(?!(babel-jest|jest-vue-preprocessor|vuetify|vue-pdf|vue-resize-sensor)/)'
   ],
 
   moduleNameMapper: {
