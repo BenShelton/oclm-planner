@@ -5,32 +5,38 @@ export interface IScheduleWeekLanguage {
   weeklyBibleReading: string
   type: number
   songs: string[]
-  assignments: {
-    bibleReading: IScheduleAssignment
-    chairman: IScheduleAssignment
-    closingPrayer: IScheduleAssignment
-    congregationBibleStudy: IScheduleAssignment
-    gems: IScheduleAssignment
-    highlights: IScheduleAssignment
-    openingPrayer: IScheduleAssignment
-    reader: IScheduleAssignment
-    serviceTalk1: IScheduleAssignment
-    serviceTalk2?: IScheduleAssignment
-    studentTalk1: IScheduleAssignment
-    studentTalk2: IScheduleAssignment
-    studentTalk3?: IScheduleAssignment
-    studentTalk4?: IScheduleAssignment
-  }
+  coTitle?: string
+  coName?: string
+  assignments: IScheduleWeekAssignments
+}
+
+export interface IScheduleWeekAssignments {
+  bibleReading: IScheduleAssignment
+  chairman: IScheduleAssignment
+  closingPrayer: IScheduleAssignment
+  congregationBibleStudy: IScheduleAssignment
+  gems: IScheduleAssignment
+  highlights: IScheduleAssignment
+  openingPrayer: IScheduleAssignment
+  reader: IScheduleAssignment
+  serviceTalk1: IScheduleAssignment
+  serviceTalk2?: IScheduleAssignment
+  studentTalk1: IScheduleAssignment
+  studentTalk2: IScheduleAssignment
+  studentTalk3?: IScheduleAssignment
+  studentTalk4?: IScheduleAssignment
 }
 
 export interface IScheduleAssignment {
-  inherit: boolean
   studyPoint: string
   text: string
   time: string
   title: string
   type: Privileges
-  assignee: string
+  assignee?: string
+  assistant?: string
+  inherit?: boolean
+  stream?: boolean
 }
 
 export interface IMemberAssignment {
@@ -83,7 +89,7 @@ export interface IScheduleTranslationMap {
 export interface IAssignmentTranslationMap {
   verticalPadding: number
   defaultRoom: string
-  months: readonly string[]
+  months: string[]
   title: string
   name: string
   assistant: string
@@ -103,6 +109,6 @@ export interface IAssignmentTranslationMap {
   bibleStudy: string
   studentTalk: string
   other: string
-  note: readonly { text: string, bold?: boolean, italics?: boolean }[]
+  note: { text: string, bold?: boolean, italics?: boolean }[]
   footer: string
 }

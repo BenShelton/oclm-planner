@@ -7,6 +7,7 @@ import * as congregation from '../database/congregation'
 import * as schedule from '../database/schedule'
 import { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES, WEEK_TYPES } from '../src/constants'
 import { APITypes } from 'types'
+import { ICongregationMember } from '@/ts/interfaces'
 
 // Initialize express app
 const app = express()
@@ -69,7 +70,7 @@ router.get('/congregation/members', (req, res) => {
 })
 
 const languageCodes = SUPPORTED_LANGUAGES.map(({ value }) => value)
-function validateMember (member: any): string | null {
+function validateMember (member: Omit<ICongregationMember, '_id'>): string | null {
   const { name, appointment, gender, languageGroup, privileges, show } = member
   if (!name) return 'Name is required'
   if (!APPOINTMENTS.includes(appointment)) return 'Appointment must be one of the following: ' + APPOINTMENTS.join(', ')
@@ -95,7 +96,7 @@ router.post('/congregation/updateMember', (req, res) => {
   if (!memberID || !member) return res.status(400).json({ message: 'MemberID & Member are required' })
   const validationError = validateMember(member)
   if (validationError) return res.status(400).json({ message: 'Invalid Member: ' + validationError })
-  congregation.updateMember({ memberID, member })
+  congregation.updateMember(memberID, member)
     .then(returnResult<APITypes.Congregation.UpdateMember.Result>(res))
     .catch(handleErrors(res))
 })
@@ -103,7 +104,7 @@ router.post('/congregation/updateMember', (req, res) => {
 router.delete('/congregation/deleteMember/:memberID', (req, res) => {
   const { memberID } = req.params
   if (!memberID) return res.status(400).json({ message: 'No MemberID provided' })
-  congregation.deleteMember({ memberID })
+  congregation.deleteMember(memberID)
     .then(() => res.status(200).json({ message: 'Member Successfully Deleted' } as APITypes.Congregation.DeleteMember.Result))
     .catch(handleErrors(res))
 })

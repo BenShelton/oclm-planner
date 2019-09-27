@@ -1,15 +1,17 @@
-import pdfMake from 'pdfmake/build/pdfmake'
+import pdfMake, { Content, CurrentNode, TDocumentDefinitions, PageSize } from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
-import store from '@/store'
+import { congregationModule, scheduleModule } from '@/store'
 import { COLORS, WEEK_TYPES } from '@/constants'
-import { IScheduleTranslationMap, IAssignmentTranslationMap } from '@/ts/interfaces'
-import { PDFGenerator, Languages } from '@/ts/types'
+import { IScheduleTranslationMap, IAssignmentTranslationMap, IScheduleAssignment, IScheduleWeekAssignments } from '@/ts/interfaces'
+import { PDFGenerator, Languages, ScheduleWeek } from '@/ts/types'
+
+type ScheduleTableRow = [string | null, string, string | null, string | null, string | null, boolean?] | null
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
-const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
-const TPO_MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'] as const
+const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const TPO_MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 const SCHEDULE_TRANSLATIONS: { [key in Languages]: IScheduleTranslationMap } = {
   en: {
     startTime: '7:00',
@@ -67,7 +69,7 @@ const SCHEDULE_TRANSLATIONS: { [key in Languages]: IScheduleTranslationMap } = {
     conductor: 'Dirigente',
     reader: 'Leitor'
   }
-} as const
+}
 
 const ASSIGNMENT_SLIP_TRANSLATIONS: { [key in Languages]: IAssignmentTranslationMap } = {
   en: {
@@ -138,17 +140,17 @@ const ASSIGNMENT_SLIP_TRANSLATIONS: { [key in Languages]: IAssignmentTranslation
     ],
     footer: 'S-89-TPO     10/18'
   }
-} as const
+}
 
-let timer
+let timer: string
 
-function setTime (time) {
+function setTime (time: string): string {
   timer = time
   return time
 }
 
-function addTime (minutes) {
-  const mins = /\d+/.exec(minutes) || [0]
+function addTime (minutes: string | number): string {
+  const mins = /\d+/.exec(minutes.toString()) || ['0']
   const toAdd = parseInt(mins[0])
   let [h, m] = timer.split(':').map(Number)
   m += toAdd
@@ -161,19 +163,18 @@ function addTime (minutes) {
   return time
 }
 
-function getAssigneeName (assignee, defaultValue = '') {
+function getAssigneeName (assignee?: string, defaultValue = ''): string {
   if (!assignee) return defaultValue
-  const idMap = store.getters['congregation/idMap']
-  const mappedAssignee = idMap[assignee]
+  const mappedAssignee = congregationModule.idMap[assignee]
   return mappedAssignee ? mappedAssignee.name : defaultValue
 }
 
-function getAssignmentTitle (assignment) {
+function getAssignmentTitle (assignment: IScheduleAssignment): string {
   const { title, time } = assignment
   return `${title} (${time})`
 }
 
-function getScheduleAssignees (assignment) {
+function getScheduleAssignees (assignment: IScheduleAssignment): string {
   if (assignment.stream) return '(Video Stream)'
   let assignees = getAssigneeName(assignment.assignee, '-')
   if (['initialCall', 'returnVisit', 'bibleStudy'].includes(assignment.type)) {
@@ -182,7 +183,7 @@ function getScheduleAssignees (assignment) {
   return assignees
 }
 
-function createScheduleSubheader (text, fillColor) {
+function createScheduleSubheader (text: string, fillColor: string): Content {
   return {
     margin: [-8, 0],
     layout: 'noBorders',
@@ -195,7 +196,7 @@ function createScheduleSubheader (text, fillColor) {
   }
 }
 
-function createScheduleSeparator (pageStart) {
+function createScheduleSeparator (pageStart = false): Content {
   return {
     id: pageStart ? 'PageStartSeparator' : null,
     margin: [0, 0, 0, 8],
@@ -206,10 +207,10 @@ function createScheduleSeparator (pageStart) {
   }
 }
 
-function createScheduleTable (markerColor, rows, expandAssigneeName) {
+function createScheduleTable (markerColor: string, rows: ScheduleTableRow[], expandAssigneeName = false): Content {
   const body = []
   for (const row of rows) {
-    const bodyRow = []
+    const bodyRow: Content[] = []
     body.push(bodyRow)
     if (!row) {
       bodyRow.push({ text: '', colSpan: 7 })
@@ -217,30 +218,31 @@ function createScheduleTable (markerColor, rows, expandAssigneeName) {
     }
     const [timeOn, title, assigneeTitle, assigneeName, timeOff] = row
     bodyRow.push(
-      { text: timeOn },
+      { text: timeOn || '' },
       { text: '•', fontSize: 24, color: markerColor, margin: [0, -8] },
       { text: title, paddingLeft: 0, colSpan: expandAssigneeName ? 1 : 2 }
     )
     if (!expandAssigneeName) bodyRow.push({ text: '' })
     bodyRow.push(
-      { text: assigneeTitle, fontSize: 8, color: '#6F6F6F', alignment: 'right', margin: [0, 1, 0, 0] },
-      { text: assigneeName, colSpan: expandAssigneeName ? 2 : 1 }
+      { text: assigneeTitle || '', fontSize: 8, color: '#6F6F6F', alignment: 'right', margin: [0, 1, 0, 0] },
+      { text: assigneeName || '', colSpan: expandAssigneeName ? 2 : 1 }
     )
     if (expandAssigneeName) bodyRow.push({ text: '' })
-    bodyRow.push({ text: timeOff, alignment: 'right' })
+    bodyRow.push({ text: timeOff || '', alignment: 'right' })
   }
   return {
     margin: [0, 2, 0, 8],
     layout: {
       defaultBorder: false,
-      fillColor: (rowIndex, node, columnIndex) => {
+      fillColor: (rowIndex: number, node: CurrentNode, columnIndex: number) => {
         if (columnIndex > 1) {
-          if (rows[rowIndex][5]) return '#E3F2FD' // inherited flag
+          const row = rows[rowIndex]
+          if (row && row[5]) return '#E3F2FD' // inherited flag
           if (rowIndex % 2 === 1) return '#DEDEDE' // alternate rows
         }
         return null
       },
-      paddingLeft: columnIndex => columnIndex === 2 ? 0 : 2,
+      paddingLeft: (columnIndex: number) => columnIndex === 2 ? 0 : 2,
       paddingTop: () => 1,
       paddingBottom: () => 1
     },
@@ -252,24 +254,24 @@ function createScheduleTable (markerColor, rows, expandAssigneeName) {
 }
 
 export const generateSchedule: PDFGenerator = function (weeks, month) {
-  const language = store.getters['schedule/language']
+  const language = scheduleModule.language
   const translation = SCHEDULE_TRANSLATIONS[language]
   if (!translation) throw new Error('Translations not created for the selected language')
-  const stack = []
-  const docDefinition = {
+  const stack: Content[] = []
+  const docDefinition: TDocumentDefinitions = {
     info: {
       title: 'OCLM Schedule ' + month,
       author: 'OCLM Planner',
       subject: 'OCLM Schedule'
     },
-    pageSize: 'A4',
+    pageSize: PageSize.A4,
     pageMargins: [36, 62, 36, 44],
-    pageBreakBefore: ({ id }) => id === 'PageStartSeparator',
+    pageBreakBefore: (node?: CurrentNode) => Boolean(node && node.id === 'PageStartSeparator'),
     defaultStyle: {
       fontSize: 9,
       noWrap: true
     },
-    header: {
+    header: () => ({
       margin: [44, 36, 44, 0],
       stack: [
         {
@@ -279,8 +281,8 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
           ]
         }
       ]
-    },
-    footer (currentPage) {
+    }),
+    footer (currentPage: number) {
       const startingWeek = currentPage * 2 - 1
       const text = startingWeek === weeks.length ? `${translation.week} ${startingWeek}` : `${translation.weeks} ${startingWeek} & ${startingWeek + 1}`
       return { text, margin: [0, 0, 44, 36], alignment: 'right', bold: true }
@@ -291,11 +293,11 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
   }
 
   stack.push(createScheduleSeparator(false))
-  weeks.forEach((baseWeek, index) => {
+  weeks.forEach((baseWeek: ScheduleWeek, index) => {
     const { date } = baseWeek
     const week = baseWeek[language]
     if (!week) throw new Error('Week not created for the selected language')
-    const { type, weeklyBibleReading, songs, assignments, coTitle, coName } = week
+    const { type, weeklyBibleReading, songs, assignments, coTitle = '', coName = '' } = week
 
     // Week Title & Information
     if (index > 0 && index % 2 === 0) stack.push(createScheduleSeparator(true))
@@ -315,15 +317,23 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
       return
     }
 
+    // If no assignments & not a special week then this isn't created
+    if (!assignments) throw new Error('Week not created for the selected language')
+
     // Extract assignments from the correct language
-    const baseAssignments = baseWeek.en.assignments || {}
-    const assignmentMap = Object.entries(assignments || {})
+    const baseAssignments = baseWeek.en.assignments
+    const assignmentMap = ((Object.entries(assignments) as unknown) as [keyof IScheduleWeekAssignments, IScheduleAssignment][])
       .reduce((acc, [k, v]) => {
         if (!v) return acc
-        const { assignee, assistant } = baseAssignments[k]
-        const a = v.inherit ? { ...v, assignee, assistant } : v
-        return Object.assign(acc, { [k]: a })
-      }, {})
+        const assignment: IScheduleAssignment = { ...v }
+        if (v.inherit) {
+          const baseAssignment = baseAssignments && baseAssignments[k]
+          if (!baseAssignment) throw new Error('Could not inherit an assignment as it does not exist on the base schedule')
+          const { assignee, assistant } = baseAssignment
+          Object.assign(assignment, { assignee, assistant })
+        }
+        return Object.assign(acc, { [k]: assignment })
+      }, {}) as IScheduleWeekAssignments
     const {
       openingPrayer,
       chairman,
@@ -361,9 +371,10 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
 
     // MINISTRY Section
     stack.push(createScheduleSubheader(translation.ministry, COLORS.MINISTRY))
-    const ministryTableRows = []
+    const ministryTableRows: ScheduleTableRow[] = []
     for (let i = 1; i <= 4; i++) {
-      const studentTalk = assignmentMap['studentTalk' + i]
+      const index = 'studentTalk' + i as 'studentTalk1' | 'studentTalk2' | 'studentTalk3' | 'studentTalk4'
+      const studentTalk = assignmentMap[index]
       if (!studentTalk) {
         ministryTableRows.push(null)
         continue
@@ -378,7 +389,7 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
     // LIVING Section
     stack.push(createScheduleSubheader(translation.living, COLORS.LIVING))
     setTime(translation.startTime)
-    const livingTableRows = [
+    const livingTableRows: ScheduleTableRow[] = [
       [addTime(47), songs[1], null, null, addTime(5), chairman.inherit],
       [timer, getAssignmentTitle(serviceTalk1), null, getScheduleAssignees(serviceTalk1), addTime(serviceTalk1.time), serviceTalk1.inherit],
       null
@@ -399,7 +410,11 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
       )
     }
     const livingTable = createScheduleTable(COLORS.LIVING, livingTableRows)
-    if (type !== WEEK_TYPES.coVisit.value) Object.assign(livingTable.table.body[3][1], { rowSpan: 2 })
+    if (type !== WEEK_TYPES.coVisit.value) {
+      const coTalk = livingTable.table && livingTable.table.body && livingTable.table.body[3] && livingTable.table.body[3][1]
+      if (!coTalk) throw new Error('Could not reformat according to CO week')
+      Object.assign(coTalk, { rowSpan: 2 })
+    }
     stack.push(livingTable)
     stack.push(createScheduleSeparator())
   })
@@ -407,7 +422,58 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
   return pdfMake.createPdf(docDefinition)
 }
 
-function createSlip (translation, assignment, date = '') {
+function createAssignmentInput (title: string, content?: string): Content {
+  return {
+    margin: [0, 0, 0, 8],
+    columns: [
+      {
+        width: 'auto',
+        text: title,
+        bold: true,
+        fontSize: 12,
+        margin: [0, 1, 4, 0]
+      },
+      {
+        width: '*',
+        fontSize: 10,
+        layout: {
+          hLineStyle: () => ({ dash: { length: 2, space: 1 } }),
+          paddingTop: () => 0,
+          paddingBottom: () => 0
+        },
+        table: {
+          heights: [11],
+          widths: ['*'],
+          body: [[{
+            text: content || '',
+            border: [false, false, false, true]
+          }]]
+        }
+      }
+    ]
+  }
+}
+
+function createAssignmentCheckbox (title: string, checked = false): Content {
+  const checkbox = {
+    width: 28,
+    canvas: [{ type: 'rect', x: 12, y: 2, w: 8, h: 8, lineWidth: 1 }]
+  }
+  if (checked) {
+    checkbox.canvas.push(
+      { type: 'line', x: 14, y: 5, w: 1, h: 3, lineWidth: 1 },
+      { type: 'line', x: 15, y: 4, w: 3, h: 4, lineWidth: 1 }
+    )
+  }
+  return {
+    columns: [
+      checkbox,
+      { text: title }
+    ]
+  }
+}
+
+function createSlip (translation: IAssignmentTranslationMap, assignment?: IScheduleAssignment, date = ''): Content {
   const { title, type, assignee, assistant, studyPoint } = assignment || {}
   const [y, m, d] = date.split('-')
   const prettyDate = [d, translation.months[+m - 1], y].join(' ')
@@ -436,8 +502,8 @@ function createSlip (translation, assignment, date = '') {
               { text: translation.assignment + ':', bold: true, margin: [0, 0, 0, 1] },
               createAssignmentCheckbox(translation.bibleReading, type === 'bibleReading'),
               createAssignmentCheckbox(translation.initialCall, type === 'initialCall'),
-              createAssignmentCheckbox(translation.firstReturnVisit, type === 'returnVisit' && title.includes(translation.first)),
-              createAssignmentCheckbox(translation.secondReturnVisit, type === 'returnVisit' && title.includes(translation.second)),
+              createAssignmentCheckbox(translation.firstReturnVisit, Boolean(type === 'returnVisit' && title && title.includes(translation.first))),
+              createAssignmentCheckbox(translation.secondReturnVisit, Boolean(type === 'returnVisit' && title && title.includes(translation.second))),
               { text: translation.givenIn + ':', bold: true, margin: [0, 4, 0, 1] },
               createAssignmentCheckbox(translation.mainHall, assignment && translation.defaultRoom === 'mainHall'),
               createAssignmentCheckbox(translation.class1, assignment && translation.defaultRoom === 'class1'),
@@ -469,57 +535,6 @@ function createSlip (translation, assignment, date = '') {
   }
 }
 
-function createAssignmentInput (title, content) {
-  return {
-    margin: [0, 0, 0, 8],
-    columns: [
-      {
-        width: 'auto',
-        text: title,
-        bold: true,
-        fontSize: 12,
-        margin: [0, 1, 4, 0]
-      },
-      {
-        width: '*',
-        fontSize: 10,
-        layout: {
-          hLineStyle: () => ({ dash: { length: 2, space: 1 } }),
-          paddingTop: () => 0,
-          paddingBottom: () => 0
-        },
-        table: {
-          heights: 11,
-          widths: ['*'],
-          body: [[{
-            text: content,
-            border: [false, false, false, true]
-          }]]
-        }
-      }
-    ]
-  }
-}
-
-function createAssignmentCheckbox (title, checked) {
-  const checkbox = {
-    width: 28,
-    canvas: [{ type: 'rect', x: 12, y: 2, w: 8, h: 8, lineWidth: 1 }]
-  }
-  if (checked) {
-    checkbox.canvas.push(
-      { type: 'line', x1: 14, y1: 5, x2: 15, y2: 8, lineWidth: 1 },
-      { type: 'line', x1: 15, y1: 8, x2: 18, y2: 4, lineWidth: 1 }
-    )
-  }
-  return {
-    columns: [
-      checkbox,
-      { text: title }
-    ]
-  }
-}
-
 export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
   // variables for the cutting lines
   const pageWidth = 595
@@ -528,17 +543,17 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
   const midY = pageHeight / 2
   const lineLength = 36
 
-  const content = []
-  const docDefinition = {
+  const content: Content[] = []
+  const docDefinition: TDocumentDefinitions = {
     info: {
       title: 'Assignment Slips ' + month,
       author: 'OCLM Planner',
       subject: 'Assignment Slips'
     },
     pageMargins: [0, 0, 0, 0],
-    pageSize: 'A4',
-    pageBreakBefore: ({ id }) => id === 'TopSlips',
-    background: {
+    pageSize: PageSize.A4,
+    pageBreakBefore: (node?: CurrentNode) => Boolean(node && node.id === 'TopSlips'),
+    background: () => ({
       canvas: [
         // we don't go all the way to the edge otherwise it can overflow and not show anything
         { type: 'line', x1: 1, y1: midY, x2: lineLength, y2: midY, lineWidth: 0.5 }, // left
@@ -546,13 +561,13 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
         { type: 'line', x1: pageWidth - lineLength, y1: midY, x2: pageWidth - 1, y2: midY, lineWidth: 0.5 }, // right
         { type: 'line', x1: midX, y1: pageHeight - lineLength, x2: midX, y2: pageHeight - 1, lineWidth: 0.5 } // bottom
       ]
-    },
+    }),
     content
   }
 
   const slips = []
   const VALID_TYPES = ['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
-  const language = store.getters['schedule/language']
+  const language = scheduleModule.language
   const translation = ASSIGNMENT_SLIP_TRANSLATIONS[language]
   if (!translation) throw new Error('Translations not created for the selected language')
   for (const baseWeek of weeks) {
@@ -563,7 +578,8 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
     if (type === WEEK_TYPES.assembly.value || type === WEEK_TYPES.memorial.value) continue
     for (let i = 0; i <= 4; i++) {
       // treat index 0 as the bibleReading, else extract a student talk
-      const talk = i === 0 ? assignments.bibleReading : assignments['studentTalk' + i]
+      const index = i === 0 ? 'bibleReading' : 'studentTalk' + i as 'bibleReading' | 'studentTalk1' | 'studentTalk2' | 'studentTalk3' | 'studentTalk4'
+      const talk: IScheduleAssignment | undefined = assignments[index]
       if (!talk || talk.inherit || !(VALID_TYPES.includes(talk.type))) continue
       slips.push(createSlip(translation, talk, date))
     }

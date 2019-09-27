@@ -1,8 +1,7 @@
 import { ObjectID, Collection } from 'mongodb'
-import assert from 'assert'
 import setup from './setup'
 
-import { ICongregationMember } from '../src/ts/interfaces'
+import { ICongregationMember, IMemberAssignment } from '../src/ts/interfaces'
 import { MongoInterface } from '@/ts/types'
 
 type CollCongregationMember = MongoInterface<ICongregationMember>
@@ -24,45 +23,45 @@ export const addMember = async (member: CollCongregationMember): Promise<ICongre
   const newMemberResult = await coll.insertOne(member)
   const newMember: ICongregationMember | null = newMemberResult && newMemberResult.ops && newMemberResult.ops[0]
   if (!newMember) throw new Error('Adding New Member was unsuccessful')
-  return newMember
+  return newMember as ICongregationMember
 }
 
-export const updateMember = async ({ memberID, member }): Promise<ICongregationMember> => {
+export const updateMember = async (memberID: string, member: ICongregationMember): Promise<ICongregationMember> => {
   const coll = await getCollection
   const query = { _id: new ObjectID(memberID) }
   const update = { $set: member }
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
-  assert.notStrictEqual(null, value, '404')
-  return value
+  if (!value) throw new Error('404')
+  return value as ICongregationMember
 }
 
 // TODO: We also need to remove all assignments that a member is assigned to
-export const deleteMember = async ({ memberID }): Promise<void> => {
+export const deleteMember = async (memberID: string): Promise<void> => {
   const coll = await getCollection
   const query = { _id: new ObjectID(memberID) }
   const { deletedCount } = await coll.deleteOne(query)
-  assert.strictEqual(deletedCount, 1, '404')
+  if (deletedCount !== 1) throw new Error('404')
 }
 
-export const addAssignment = async ({ memberID, assignment }): Promise<ICongregationMember> => {
+export const addAssignment = async (memberID: string, assignment: IMemberAssignment): Promise<ICongregationMember> => {
   const coll = await getCollection
   const query = { _id: new ObjectID(memberID) }
   const update = { $addToSet: { assignments: assignment } }
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
-  assert.notStrictEqual(null, value, '404')
-  return value
+  if (!value) throw new Error('404')
+  return value as ICongregationMember
 }
 
-export const removeAssignment = async ({ memberID, assignment }): Promise<ICongregationMember> => {
+export const removeAssignment = async (memberID: string, assignment: IMemberAssignment): Promise<ICongregationMember> => {
   const coll = await getCollection
   const query = { _id: new ObjectID(memberID) }
   const update = { $pull: { assignments: assignment } }
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
-  assert.notStrictEqual(null, value, '404')
-  return value
+  if (!value) throw new Error('404')
+  return value as ICongregationMember
 }
 
-export const bulkAddMembers = async (members): Promise<void> => {
+export const bulkAddMembers = async (members: ICongregationMember[]): Promise<void> => {
   const coll = await getCollection
   await coll.insertMany(members)
 }

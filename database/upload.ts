@@ -4,6 +4,7 @@ import assert from 'assert'
 import { bulkAddMembers } from './congregation'
 import { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES } from '../src/constants'
 import { Genders, Languages, Appointments } from '../src/ts/types'
+import { ICongregationMember } from '@/ts/interfaces'
 
 type BooleanString = 'Y' | 'y' | ''
 
@@ -39,6 +40,8 @@ interface IColumnHeader {
   allowedValues?: readonly string[]
   boolean?: boolean
 }
+
+type Duplicates = { [key in ColumnNames]: string[] }
 
 const filename = process.argv[2]
 if (!filename) throw new Error('No file argument provided')
@@ -90,8 +93,7 @@ assert.deepStrictEqual(rowKeys, expectedKeys, 'Column Names Do Not Match')
 
 // Examining every row...
 const noDuplicateColumns = columns.reduce((acc: ColumnNames[], { name, noDuplicates }) => noDuplicates ? acc.concat(name) : acc, [])
-const duplicates = noDuplicateColumns.reduce((acc, name) => Object.assign(acc, { [name]: [] }), {})
-const restrictedColumns = columns.filter(c => c.allowedValues)
+const duplicates = columns.reduce((acc, { name }) => Object.assign(acc, { [name]: [] }), {}) as Duplicates
 for (const row of data) {
   // No duplicates in noDuplicate columns
   for (const name of noDuplicateColumns) {
@@ -102,7 +104,8 @@ for (const row of data) {
   }
 
   // Fields are restricted to their value lists
-  for (const { name, allowedValues } of restrictedColumns) {
+  for (const { name, allowedValues } of columns) {
+    if (!allowedValues) continue
     const rowValue = row[name]
     assert(allowedValues.includes(rowValue), `Invalid Value In Field "${name}": ${rowValue}`)
   }
@@ -110,25 +113,36 @@ for (const row of data) {
 
 console.log('File Valid, Converting...')
 
-for (const row of data) {
-  // Convert Boolean Values
-  for (const { name } of booleanColumns) {
-    Object.assign(row, { [name]: !!row[name] })
+const members: ICongregationMember[] = data.map(row => ({
+  _id: '',
+  name: row.name,
+  appointment: row.appointment,
+  gender: row.gender,
+  languageGroup: row.languageGroup,
+  show: !!row.show,
+  privileges: {
+    chairman: !!row['privileges.chairman'],
+    highlights: !!row['privileges.highlights'],
+    gems: !!row['privileges.gems'],
+    serviceTalk: !!row['privileges.serviceTalk'],
+    congregationBibleStudy: !!row['privileges.congregationBibleStudy'],
+    reader: !!row['privileges.reader'],
+    prayer: !!row['privileges.prayer'],
+    bibleReading: !!row['privileges.bibleReading'],
+    ministryVideo: !!row['privileges.ministryVideo'],
+    initialCall: !!row['privileges.initialCall'],
+    initialCallAssist: !!row['privileges.initialCallAssist'],
+    returnVisit: !!row['privileges.returnVisit'],
+    returnVisitAssist: !!row['privileges.returnVisitAssist'],
+    bibleStudy: !!row['privileges.bibleStudy'],
+    bibleStudyAssist: !!row['privileges.bibleStudyAssist'],
+    studentTalk: !!row['privileges.studentTalk']
   }
-
-  // Properly Nest Values
-  Object.keys(row).forEach(key => {
-    if (key.includes('.')) {
-      const [parent, child] = key.split('.')
-      row[parent] = Object.assign(row[parent] || {}, { [child]: row[key] })
-      delete row[key]
-    }
-  })
-}
+}))
 
 console.log('File Converted, Uploading...')
 
-bulkAddMembers(data)
+bulkAddMembers(members)
   .then(() => {
     console.log('Upload Complete')
     process.exit()
