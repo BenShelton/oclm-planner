@@ -1,14 +1,12 @@
 import rp from 'request-promise'
 import cheerio from 'cheerio'
 
-import { Languages } from '@/ts/types'
-
-type Assignments = 'chairman' | 'openingPrayer' | 'closingPrayer' | 'gems' | 'reader' | 'highlights' | 'bibleReading' | 'studentTalk' | 'serviceTalk' | 'congregationBibleStudy'
+import { Languages, AssignmentTypes } from '@/ts/types'
 
 interface ILanguageOptions {
   months: string[]
   addressConstructor: (date: string) => string[]
-  inherit: Assignments[]
+  inherit: AssignmentTypes[]
   cbsTitle: string
   talkRegexes: {
     ministryVideo: RegExp

@@ -123,7 +123,7 @@ router.get('/schedule/month/:month', (req, res) => {
   const { month } = req.params
   if (!month) return res.status(400).json({ message: 'No month provided' })
   if (!(/^\d{4}-\d{2}$/.test(month))) return res.status(400).json({ message: 'Month should be in yyyy-mm format' })
-  schedule.getMonth({ month })
+  schedule.getMonth(month)
     .then(returnResult<APITypes.Schedule.GetMonth.Result>(res))
     .catch(handleErrors(res))
 })
@@ -132,7 +132,7 @@ router.put('/schedule/scrape', (req, res) => {
   const { weekID, language } = req.body as APITypes.Schedule.ScrapeWeek.Data
   if (!weekID) return res.status(400).json({ message: 'weekID is required' })
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
-  schedule.scrapeWeek({ weekID, language })
+  schedule.scrapeWeek(weekID, language)
     .then(returnResult<APITypes.Schedule.ScrapeWeek.Result>(res))
     .catch(err => {
       const errorHandler = handleErrors(res)
@@ -147,7 +147,7 @@ router.put('/schedule/updateAssignment', (req, res) => {
     return res.status(400).json({ message: 'Required Fields are: weekID, language, name, assignment' })
   }
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
-  schedule.updateAssignment({ weekID, language, name, assignment })
+  schedule.updateAssignment(weekID, language, name, assignment)
     .then(returnResult<APITypes.Schedule.UpdateAssignment.Result>(res))
     .catch(handleErrors(res))
 })
@@ -158,7 +158,7 @@ router.put('/schedule/deleteAssignment', (req, res) => {
     return res.status(400).json({ message: 'Required Fields are: weekID, language, name' })
   }
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
-  schedule.deleteAssignment({ weekID, language, name })
+  schedule.deleteAssignment(weekID, language, name)
     .then(returnResult<APITypes.Schedule.DeleteAssignment.Result>(res))
     .catch(handleErrors(res))
 })
@@ -168,7 +168,7 @@ router.put('/schedule/updateWeekType', (req, res) => {
   if (!weekID || !language || type === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, type' })
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
   if (!(Object.values(WEEK_TYPES).some(t => t.value === type))) return res.status(400).json({ message: 'Invalid Type' })
-  schedule.updateWeekType({ weekID, language, type })
+  schedule.updateWeekType(weekID, language, type)
     .then(returnResult<APITypes.Schedule.UpdateWeekType.Result>(res))
     .catch(handleErrors(res))
 })
@@ -177,7 +177,7 @@ router.put('/schedule/updateCOName', (req, res) => {
   const { weekID, language, name } = req.body as APITypes.Schedule.UpdateCOName.Data
   if (!weekID || !language || name === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, name' })
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
-  schedule.updateCOName({ weekID, language, name })
+  schedule.updateCOName(weekID, language, name)
     .then(returnResult<APITypes.Schedule.UpdateCOName.Result>(res))
     .catch(handleErrors(res))
 })
@@ -186,7 +186,7 @@ router.put('/schedule/updateCOTitle', (req, res) => {
   const { weekID, language, title } = req.body as APITypes.Schedule.UpdateCOTitle.Data
   if (!weekID || !language || title === undefined) return res.status(400).json({ message: 'Required Fields are: weekID, language, title' })
   if (!validLanguage(language)) return res.status(400).json({ message: 'Invalid language' })
-  schedule.updateCOTitle({ weekID, language, title })
+  schedule.updateCOTitle(weekID, language, title)
     .then(returnResult<APITypes.Schedule.UpdateCOTitle.Result>(res))
     .catch(handleErrors(res))
 })

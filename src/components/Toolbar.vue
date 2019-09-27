@@ -50,6 +50,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import routes from '@/router/routes'
 import { authModule, scheduleModule, alertModule, drawerModule } from '@/store'
 import { SUPPORTED_LANGUAGES } from '@/constants'
+import { Languages } from '@/ts/types'
 
 @Component
 export default class Toolbar extends Vue {
@@ -62,10 +63,10 @@ export default class Toolbar extends Vue {
     return authModule.hasToken
   }
 
-  get languageModel (): string {
+  get languageModel (): Languages {
     return scheduleModule.language
   }
-  set languageModel (val) {
+  set languageModel (val: Languages) {
     scheduleModule.UPDATE_LANGUAGE(val)
   }
 

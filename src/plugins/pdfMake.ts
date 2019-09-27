@@ -297,7 +297,7 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
     const { date } = baseWeek
     const week = baseWeek[language]
     if (!week) throw new Error('Week not created for the selected language')
-    const { type, weeklyBibleReading, songs, assignments, coTitle = '', coName = '' } = week
+    const { type, weeklyBibleReading, songs = [], assignments, coTitle = '', coName = '' } = week
 
     // Week Title & Information
     if (index > 0 && index % 2 === 0) stack.push(createScheduleSeparator(true))

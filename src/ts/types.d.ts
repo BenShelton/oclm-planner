@@ -1,5 +1,5 @@
 import { GENDERS, APPOINTMENTS, SUPPORTED_LANGUAGES, PRIVILEGES } from '@/constants'
-import { IScheduleWeekLanguage } from './interfaces'
+import { IScheduleWeekLanguage, IScheduleWeekAssignments } from './interfaces'
 import { TCreatedPdf } from 'pdfmake/build/pdfmake'
 import { ObjectID } from 'mongodb'
 
@@ -14,6 +14,9 @@ export type ScheduleWeek = {
   _id: string
   date: string
 }
+
+export type Assignments = keyof IScheduleWeekAssignments
+export type AssignmentTypes = 'chairman' | 'openingPrayer' | 'closingPrayer' | 'gems' | 'reader' | 'highlights' | 'bibleReading' | 'studentTalk' | 'serviceTalk' | 'congregationBibleStudy'
 
 export type PDFGenerator = (weeks: ScheduleWeek[], month: string) => TCreatedPdf
 

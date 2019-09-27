@@ -1,13 +1,13 @@
 import { Genders, Appointments, Languages, Privileges } from './types'
 
 export interface IScheduleWeekLanguage {
-  scraped: boolean
-  weeklyBibleReading: string
-  type: number
-  songs: string[]
+  scraped?: boolean
+  weeklyBibleReading?: string
+  type?: number
+  songs?: string[]
   coTitle?: string
   coName?: string
-  assignments: IScheduleWeekAssignments
+  assignments: Partial<IScheduleWeekAssignments>
 }
 
 export interface IScheduleWeekAssignments {
@@ -20,11 +20,11 @@ export interface IScheduleWeekAssignments {
   openingPrayer: IScheduleAssignment
   reader: IScheduleAssignment
   serviceTalk1: IScheduleAssignment
-  serviceTalk2?: IScheduleAssignment
+  serviceTalk2: IScheduleAssignment
   studentTalk1: IScheduleAssignment
   studentTalk2: IScheduleAssignment
-  studentTalk3?: IScheduleAssignment
-  studentTalk4?: IScheduleAssignment
+  studentTalk3: IScheduleAssignment
+  studentTalk4: IScheduleAssignment
 }
 
 export interface IScheduleAssignment {

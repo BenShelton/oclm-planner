@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/interface-name-prefix */
-import { ICongregationMember } from '@/ts/interfaces'
-import { ScheduleWeek, Languages } from '@/ts/types'
+import { ICongregationMember, IScheduleAssignment } from '@/ts/interfaces'
+import { ScheduleWeek, Languages, Assignments } from '@/ts/types'
 
 interface APIResponseMessage { message: string }
 interface APIResponse<T> { result: T }
@@ -62,12 +62,12 @@ declare namespace APITypes {
       type Response = APIResponse<Result>
     }
     namespace UpdateAssignment {
-      interface Data { weekID: string, language: Languages, name: string, assignment: string }
+      interface Data { weekID: string, language: Languages, name: Assignments, assignment: IScheduleAssignment }
       type Result = IWeekWithMembers
       type Response = APIResponse<Result>
     }
     namespace DeleteAssignment {
-      interface Data { weekID: string, language: Languages, name: string }
+      interface Data { weekID: string, language: Languages, name: Assignments }
       type Result = IWeekWithMembers
       type Response = APIResponse<Result>
     }
@@ -77,7 +77,7 @@ declare namespace APITypes {
       type Response = APIResponse<Result>
     }
     namespace UpdateCOName {
-      interface Data { weekID: string, language: Languages, name: string }
+      interface Data { weekID: string, language: Languages, name: Assignments }
       type Result = ScheduleWeek
       type Response = APIResponse<Result>
     }

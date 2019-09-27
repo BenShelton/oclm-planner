@@ -305,7 +305,7 @@ import AssigneeSelect from '@/components/AssigneeSelect.vue'
 
 import { alertModule, scheduleModule } from '@/store'
 import { ASSIGNMENT_TYPE_MAP, WEEK_TYPES } from '@/constants'
-import { Languages } from '@/ts/types'
+import { Languages, AssignmentTypes } from '@/ts/types'
 
 @Component({
   components: {
@@ -448,11 +448,11 @@ export default class ScheduleWeek extends Vue {
   }
 
   // Methods
-  loadLocalWeek (week): void {
+  loadLocalWeek (week: ScheduleWeek): void {
     this.localWeek = Object.assign({}, { loaded: true }, week)
   }
 
-  onUpdateCOName (name): void {
+  onUpdateCOName (name: string): void {
     scheduleModule.updateCOName({ weekID: this.weekID, name })
       .then(this.loadLocalWeek)
       .catch(() => {
@@ -460,7 +460,7 @@ export default class ScheduleWeek extends Vue {
       })
   }
 
-  onUpdateCOTitle (title): void {
+  onUpdateCOTitle (title: string): void {
     scheduleModule.updateCOTitle({ weekID: this.weekID, title })
       .then(this.loadLocalWeek)
       .catch(() => {
@@ -481,7 +481,7 @@ export default class ScheduleWeek extends Vue {
       .finally(() => { this.scrapeLoading = false })
   }
 
-  onEdit (name: string): void {
+  onEdit (name: AssignmentTypes): void {
     this.editName = name
     const { displayName, inherit, details } = this.assignments[name]
     const editDetails = inherit ? this.week.assignments[name] : details
@@ -507,7 +507,7 @@ export default class ScheduleWeek extends Vue {
     })
       .then(this.loadLocalWeek)
       .then(this.closeEditor)
-      .catch(err => {
+      .catch((err: Error) => {
         console.error(err)
       })
       .finally(() => {
@@ -528,7 +528,7 @@ export default class ScheduleWeek extends Vue {
     })
       .then(this.loadLocalWeek)
       .then(this.closeEditor)
-      .catch(err => {
+      .catch((err: Error) => {
         console.error(err)
       })
       .finally(() => {
