@@ -1,8 +1,8 @@
 module.exports = {
   env: {
-    mocha: true
+    jest: true
   },
   rules: {
-    'no-unused-expressions': 'off'
+    '@typescript-eslint/explicit-function-return-type': 'off'
   }
 }

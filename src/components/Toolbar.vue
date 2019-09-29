@@ -1,35 +1,35 @@
 <template>
-  <VToolbar app>
-    <VToolbarSideIcon v-if="loggedIn" @click.stop="toggleDrawer" />
-    <VToolbarTitle v-text="title" />
-    <VSpacer />
-    <VToolbarItems>
-      <VBtn
-        v-if="!loggedIn"
+  <v-toolbar app>
+    <v-toolbar-side-icon v-if="loggedIn" @click.stop="toggleDrawer" />
+    <v-toolbar-title v-text="title" />
+    <v-spacer />
+    <v-toolbar-items>
+      <v-btn
+        v-if="showLogin"
         flat
         :disabled="loading"
         :loading="loading"
         @click="onLogin"
       >
         Login
-      </VBtn>
-      <VMenu
-        v-else
+      </v-btn>
+      <v-menu
+        v-if="loggedIn"
         offset-y
         :close-on-content-click="false"
         :min-width="200"
         :max-width="200"
       >
-        <VBtn slot="activator" icon>
-          <VIcon>settings</VIcon>
-        </VBtn>
-        <VCard class="pa-3">
-          <VSelect
+        <v-btn slot="activator" icon>
+          <v-icon>settings</v-icon>
+        </v-btn>
+        <v-card class="pa-3">
+          <v-select
             v-model="languageModel"
             label="Language"
             :items="items"
           />
-          <VBtn
+          <v-btn
             block
             color="error"
             :disabled="loading"
@@ -37,83 +37,78 @@
             @click="onLogout"
           >
             Logout
-          </VBtn>
-        </VCard>
-      </VMenu>
-    </VToolbarItems>
-  </VToolbar>
+          </v-btn>
+        </v-card>
+      </v-menu>
+    </v-toolbar-items>
+  </v-toolbar>
 </template>
 
-<script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
 import routes from '@/router/routes'
+import { authModule, scheduleModule, alertModule, drawerModule } from '@/store'
 import { SUPPORTED_LANGUAGES } from '@/constants'
+import { Languages } from 'types'
 
-export default {
-  name: 'Toolbar',
+@Component
+export default class Toolbar extends Vue {
+  // Data
+  loading: boolean = false
+  items = SUPPORTED_LANGUAGES
 
-  data () {
-    return {
-      loading: false,
-      items: SUPPORTED_LANGUAGES
+  // Computed
+  get loggedIn (): boolean {
+    return authModule.hasToken
+  }
+
+  get languageModel (): Languages {
+    return scheduleModule.language
+  }
+  set languageModel (val: Languages) {
+    scheduleModule.UPDATE_LANGUAGE(val)
+  }
+
+  get title (): string {
+    const prefix = this.$vuetify.breakpoint.smAndDown ? '' : 'OCLM Planner | '
+    let title = 'Untitled'
+    switch (this.$route.name) {
+      case routes.HOME: title = 'Home'; break
+      case routes.LOGIN: title = 'Login'; break
+      case routes.SCHEDULE: title = 'Schedule'; break
+      case routes.EXPORT: title = 'Export'; break
+      case routes.CONGREGATION: title = 'Congregation'; break
+      case routes.HELP: title = 'Help'; break
     }
-  },
+    return prefix + title
+  }
 
-  computed: {
-    ...mapGetters({
-      loggedIn: 'auth/hasToken',
-      language: 'schedule/language'
-    }),
-    languageModel: {
-      get () {
-        return this.language
-      },
-      set (val) {
-        this.updateLanguage(val)
-      }
-    },
-    title () {
-      const prefix = this.$vuetify.breakpoint.smAndDown ? '' : 'OCLM Planner | '
-      let title = 'Untitled'
-      switch (this.$route.name) {
-        case routes.HOME: title = 'Home'; break
-        case routes.LOGIN: title = 'Login'; break
-        case routes.SCHEDULE: title = 'Schedule'; break
-        case routes.EXPORT: title = 'Export'; break
-        case routes.CONGREGATION: title = 'Congregation'; break
-        case routes.HELP: title = 'Help'; break
-      }
-      return prefix + title
-    }
-  },
+  get showLogin (): boolean {
+    return !this.loggedIn && this.$route.name !== routes.LOGIN
+  }
 
-  methods: {
-    ...mapActions({
-      logout: 'auth/logout'
-    }),
-    ...mapMutations({
-      toggleDrawer: 'drawer/TOGGLE_OPEN',
-      alert: 'alert/UPDATE_ALERT',
-      updateLanguage: 'schedule/UPDATE_LANGUAGE'
-    }),
-    onLogin () {
-      this.$router.push({ name: routes.LOGIN })
-    },
-    onLogout () {
-      this.loading = true
-      this.logout()
-        .then(() => {
-          this.alert({ text: 'Successfully logged out', color: 'success' })
-          this.$router.push({ name: routes.HOME })
-        })
-        .catch(err => {
-          this.alert({ text: 'Logout failed', color: 'error' })
-          console.error(err)
-        })
-        .finally(() => {
-          this.loading = false
-        })
-    }
+  // Methods
+  toggleDrawer = drawerModule.TOGGLE_OPEN
+
+  onLogin (): void {
+    this.$router.push({ name: routes.LOGIN })
+  }
+
+  onLogout (): void {
+    this.loading = true
+    authModule.logout()
+      .then(() => {
+        alertModule.UPDATE_ALERT({ text: 'Successfully logged out', color: 'success' })
+        this.$router.push({ name: routes.HOME })
+      })
+      .catch(err => {
+        alertModule.UPDATE_ALERT({ text: 'Logout failed', color: 'error' })
+        console.error(err)
+      })
+      .finally(() => {
+        this.loading = false
+      })
   }
 }
 </script>

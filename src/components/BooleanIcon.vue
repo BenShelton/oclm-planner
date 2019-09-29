@@ -1,26 +1,25 @@
 <template>
-  <VIcon
+  <v-icon
     :color="color"
     v-text="icon"
   />
 </template>
 
-<script>
-export default {
-  name: 'BooleanIcon',
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
 
-  props: {
-    value: { type: Boolean, default: false }
-  },
+@Component
+export default class BooleanIcon extends Vue {
+  // Props
+  @Prop(Boolean) readonly value!: boolean
 
-  computed: {
-    color () {
-      return this.value ? 'green' : 'red'
-    },
+  // Computed
+  get color (): string {
+    return this.value ? 'green' : 'red'
+  }
 
-    icon () {
-      return this.value ? 'check' : 'clear'
-    }
+  get icon (): string {
+    return this.value ? 'check' : 'clear'
   }
 }
 </script>

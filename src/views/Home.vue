@@ -1,5 +1,5 @@
 <template>
-  <VLayout column fill-height>
+  <v-layout column fill-height>
     <h1 class="mb-3">
       Welcome to OCLM Planner
     </h1>
@@ -7,12 +7,13 @@
     <p>Everything!</p>
     <p>Click the LOGIN button on the top right to log in</p>
     <p>If you are logged in, use the navigation menu on the top left to view what's available</p>
-  </VLayout>
+  </v-layout>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 
-export default {
+export default Vue.extend({
   name: 'Home'
-}
+})
 </script>

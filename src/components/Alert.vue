@@ -1,46 +1,44 @@
 <template>
-  <VSnackbar
+  <v-snackbar
     v-model="showAlert"
     :color="color"
     :timeout="6000"
   >
     {{ text }}
-    <VBtn
+    <v-btn
       dark
       flat
       @click="setVisibility(false)"
     >
       Close
-    </VBtn>
-  </VSnackbar>
+    </v-btn>
+  </v-snackbar>
 </template>
 
-<script>
-import { mapState, mapMutations } from 'vuex'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 
-export default {
-  name: 'Alert',
+import { alertModule } from '@/store'
 
-  computed: {
-    ...mapState('alert', [
-      'text',
-      'color',
-      'visible'
-    ]),
-    showAlert: {
-      get () {
-        return this.visible
-      },
-      set (v) {
-        this.setVisibility(v)
-      }
-    }
-  },
-
-  methods: {
-    ...mapMutations({
-      setVisibility: 'alert/UPDATE_VISIBILITY'
-    })
+@Component
+export default class Alert extends Vue {
+  // Computed
+  get text (): string {
+    return alertModule.text
   }
+
+  get color (): string {
+    return alertModule.color
+  }
+
+  get showAlert (): boolean {
+    return alertModule.visible
+  }
+  set showAlert (v) {
+    this.setVisibility(v)
+  }
+
+  // Methods
+  setVisibility = alertModule.UPDATE_VISIBILITY
 }
 </script>
