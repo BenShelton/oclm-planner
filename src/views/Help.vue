@@ -1,11 +1,13 @@
 <template>
-  <VLayout column fill-height>
+  <v-layout column fill-height>
     <p>Coming soon...</p>
-  </VLayout>
+  </v-layout>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
   name: 'Help'
-}
+})
 </script>

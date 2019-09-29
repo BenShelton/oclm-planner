@@ -1,12 +1,17 @@
 module.exports = {
   root: true,
+
   env: {
     node: true
   },
+
   extends: [
     'plugin:vue/recommended',
-    '@vue/standard'
+    'plugin:@typescript-eslint/recommended',
+    '@vue/standard',
+    '@vue/typescript'
   ],
+
   rules: {
     'vue/max-attributes-per-line': ['error', {
       singleline: 3,
@@ -37,11 +42,64 @@ module.exports = {
         'renderError'
       ]
     }],
-    'vue/no-spaces-around-equal-signs-in-attribute': 'error',
+    'vue/array-bracket-spacing': 'error',
+    'vue/arrow-spacing': 'error',
+    'vue/block-spacing': 'error',
+    'vue/camelcase': 'error',
+    'vue/comma-dangle': 'error',
+    'vue/component-name-in-template-casing': ['error', 'PascalCase', {
+      registeredComponentsOnly: true
+    }],
+    'vue/eqeqeq': 'error',
+    'vue/key-spacing': 'error',
+    'vue/match-component-file-name': ['error', {
+      extensions: ['vue'],
+      shouldMatchCase: true
+    }],
+    'vue/no-boolean-default': 'error',
+    'vue/no-restricted-syntax': 'error',
+    'vue/object-curly-spacing': ['error', 'always'],
+    'vue/space-infix-ops': 'error',
+    'vue/space-unary-ops': 'error',
+    'vue/v-on-function-call': 'error',
+    '@typescript-eslint/indent': ['error', 2],
+    '@typescript-eslint/interface-name-prefix': ['error', 'always'],
+    '@typescript-eslint/member-delimiter-style': ['error', {
+      multiline: {
+        delimiter: 'none',
+        requireLast: true
+      },
+      singleline: {
+        delimiter: 'comma'
+      }
+    }],
+    '@typescript-eslint/explicit-function-return-type': ['error', {
+      allowExpressions: true,
+      allowTypedFunctionExpressions: true,
+      allowHigherOrderFunctions: true
+    }],
+    '@typescript-eslint/explicit-member-accessibility': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
+
+  parser: 'vue-eslint-parser',
+
   parserOptions: {
-    parser: 'babel-eslint'
-  }
+    parser: '@typescript-eslint/parser'
+  },
+
+  overrides: [
+    {
+      files: [
+        '**/__tests__/*.ts'
+      ],
+      env: {
+        jest: true
+      },
+      rules: {
+        '@typescript-eslint/explicit-function-return-type': 'off'
+      }
+    }
+  ]
 }

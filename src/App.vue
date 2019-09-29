@@ -1,22 +1,24 @@
 <template>
-  <VApp>
+  <v-app>
     <NavigationDrawer />
     <Toolbar />
-    <VContent>
-      <VContainer fluid fill-height>
-        <RouterView />
-      </VContainer>
+    <v-content>
+      <v-container fluid fill-height>
+        <router-view />
+      </v-container>
       <Alert />
-    </VContent>
-  </VApp>
+    </v-content>
+  </v-app>
 </template>
 
-<script>
-import NavigationDrawer from '@/components/NavigationDrawer'
-import Toolbar from '@/components/Toolbar'
-import Alert from '@/components/Alert'
+<script lang="ts">
+import Vue from 'vue'
 
-export default {
+import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import Toolbar from '@/components/Toolbar.vue'
+import Alert from '@/components/Alert.vue'
+
+export default Vue.extend({
   name: 'App',
 
   components: {
@@ -24,7 +26,7 @@ export default {
     Toolbar,
     Alert
   }
-}
+})
 </script>
 
 <style lang="stylus">

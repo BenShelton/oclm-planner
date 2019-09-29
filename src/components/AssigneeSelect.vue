@@ -1,6 +1,6 @@
 <template>
-  <VLayout align-center>
-    <VSelect
+  <v-layout align-center>
+    <v-select
       clearable
       item-text="name"
       item-value="_id"
@@ -12,8 +12,8 @@
       :value="value"
       @input="onInput"
     />
-    <VTooltip top>
-      <VBtn
+    <v-tooltip top>
+      <v-btn
         slot="activator"
         icon
         small
@@ -22,83 +22,82 @@
         :disabled="inputDisabled"
         @click="onToggleLanguage"
       >
-        <VIcon small v-text="restrictLanguage ? 'person' : 'group'" />
-      </VBtn>
+        <v-icon small v-text="restrictLanguage ? 'person' : 'group'" />
+      </v-btn>
       <span v-text="restrictLanguage ? 'Only include this language group' : 'Include all language groups'" />
-    </VTooltip>
-  </VLayout>
+    </v-tooltip>
+  </v-layout>
 </template>
 
-<script>
-import { mapGetters } from 'vuex'
+<script lang="ts">
+import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
 
+import { congregationModule, scheduleModule } from '@/store'
 import { PRIVILEGES } from '@/constants'
+import { ICongregationMember, Privileges } from 'types'
 
-export default {
-  name: 'AssigneeSelect',
+@Component
+export default class AssigneeSelect extends Vue {
+  // Props
+  @Prop({ type: String, default: '' }) readonly value!: string
+  @Prop({ type: String, required: true }) readonly label!: string
+  @Prop({ type: String, default: '' }) readonly type!: Privileges | ''
+  @Prop({ type: Boolean, required: true }) readonly disabled!: boolean
 
-  props: {
-    value: { type: String, default: '' },
-    label: { type: String, required: true },
-    type: { type: String, default: '' },
-    disabled: { type: Boolean, required: true }
-  },
+  // Data
+  restrictLanguage: boolean = true
 
-  data () {
-    return {
-      restrictLanguage: true
-    }
-  },
+  // Computed
+  get loading (): boolean {
+    return congregationModule.loading
+  }
 
-  computed: {
-    ...mapGetters({
-      activeMembers: 'congregation/activeMembers',
-      loading: 'congregation/loading',
-      language: 'schedule/language'
-    }),
-    inputDisabled () {
-      const { type, disabled } = this
-      return disabled || !(PRIVILEGES.some(p => p.key === type))
-    },
-    privilegedMembers () {
-      const { inputDisabled, activeMembers, type, language, restrictLanguage } = this
-      if (inputDisabled) return []
-      return activeMembers.filter(({ privileges, languageGroup }) => {
-        if (restrictLanguage && languageGroup !== language) return false
-        return privileges[type]
-      })
-    },
-    lastAssignmentMap () {
-      const { privilegedMembers, type } = this
-      return privilegedMembers.reduce((acc, m) => {
-        const assignments = m.assignments || []
-        const lastAssignment = assignments
-          .reduce((acc, a) => a.type === type ? acc.concat(a.date) : acc, [])
-          .sort((a, b) => a === b ? 0 : a > b ? 1 : -1)
-          .pop()
-        return Object.assign(acc, { [m._id]: lastAssignment })
-      }, {})
-    },
-    items () {
-      const { privilegedMembers, lastAssignmentMap } = this
-      return privilegedMembers.sort((a, b) => {
-        const aDate = lastAssignmentMap[a._id] || ''
-        const bDate = lastAssignmentMap[b._id] || ''
-        if (aDate === bDate) return 0
-        return aDate > bDate ? 1 : -1
-      })
-    }
-  },
+  get inputDisabled (): boolean {
+    const { type, disabled } = this
+    return disabled || !(PRIVILEGES.some(p => p.key === type))
+  }
 
-  methods: {
-    onToggleLanguage () {
-      this.restrictLanguage = !this.restrictLanguage
-      const { privilegedMembers, value } = this
-      if (privilegedMembers.every(({ _id }) => _id !== value)) this.onInput(null)
-    },
-    onInput (val) {
-      this.$emit('input', val)
-    }
+  get privilegedMembers (): ICongregationMember[] {
+    const { inputDisabled, type, restrictLanguage } = this
+    if (inputDisabled || !type) return []
+    return congregationModule.activeMembers.filter(({ privileges, languageGroup }) => {
+      if (restrictLanguage && languageGroup !== scheduleModule.language) return false
+      return privileges[type]
+    })
+  }
+
+  get lastAssignmentMap (): { [key: string]: string } {
+    const { privilegedMembers, type } = this
+    return privilegedMembers.reduce((acc: { [key: string]: string }, m) => {
+      const assignments = m.assignments || []
+      const lastAssignment = assignments
+        .reduce((acc: string[], a) => a.type === type ? acc.concat(a.date) : acc, [])
+        .sort((a, b) => a === b ? 0 : a > b ? 1 : -1)
+        .pop()
+      return Object.assign(acc, { [m._id]: lastAssignment })
+    }, {})
+  }
+
+  get items (): ICongregationMember[] {
+    const { privilegedMembers, lastAssignmentMap } = this
+    return privilegedMembers.sort((a, b) => {
+      const aDate = lastAssignmentMap[a._id] || ''
+      const bDate = lastAssignmentMap[b._id] || ''
+      if (aDate === bDate) return 0
+      return aDate > bDate ? 1 : -1
+    })
+  }
+
+  // Methods
+  onToggleLanguage (): void {
+    this.restrictLanguage = !this.restrictLanguage
+    const { privilegedMembers, value } = this
+    if (privilegedMembers.every(({ _id }) => _id !== value)) this.onInput(null)
+  }
+
+  @Emit('input')
+  onInput (val: string | null) {
+    return val
   }
 }
 </script>

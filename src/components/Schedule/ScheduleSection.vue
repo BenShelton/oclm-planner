@@ -1,46 +1,42 @@
 <template>
   <div>
-    <VSubheader
+    <v-subheader
       class="schedule-section white--text"
       :style="{ backgroundColor }"
       @click="toggleShow"
     >
       <span v-text="title" />
-      <VSpacer />
-      <VIcon color="white" v-text="show ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
-    </VSubheader>
-    <VDivider />
+      <v-spacer />
+      <v-icon color="white" v-text="show ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" />
+    </v-subheader>
+    <v-divider />
     <slot v-if="show" />
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator'
+
 import { COLORS } from '@/constants'
+import { Colors } from 'types'
 
-export default {
-  name: 'ScheduleSection',
+@Component
+export default class ScheduleSection extends Vue {
+  // Props
+  @Prop({ type: String, required: true }) readonly title!: string
+  @Prop({ type: String, required: true }) readonly color!: Colors
 
-  props: {
-    title: { type: String, required: true },
-    color: { type: String, required: true }
-  },
+  // Data
+  show: boolean = true
 
-  data () {
-    return {
-      show: true
-    }
-  },
+  // Computed
+  get backgroundColor (): string {
+    return COLORS[this.color]
+  }
 
-  computed: {
-    backgroundColor () {
-      return COLORS[this.color] || this.color
-    }
-  },
-
-  methods: {
-    toggleShow () {
-      this.show = !this.show
-    }
+  // Methods
+  toggleShow (): void {
+    this.show = !this.show
   }
 }
 </script>
