@@ -50,7 +50,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import routes from '@/router/routes'
 import { authModule, scheduleModule, alertModule, drawerModule } from '@/store'
 import { SUPPORTED_LANGUAGES } from '@/constants'
-import { Languages } from '@/ts/types'
+import { Languages } from 'types'
 
 @Component
 export default class Toolbar extends Vue {

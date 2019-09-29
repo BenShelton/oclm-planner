@@ -34,15 +34,15 @@ import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
 
 import { congregationModule, scheduleModule } from '@/store'
 import { PRIVILEGES } from '@/constants'
-import { ICongregationMember } from '@/ts/interfaces'
+import { ICongregationMember, Privileges } from 'types'
 
 @Component
 export default class AssigneeSelect extends Vue {
   // Props
-  @Prop({ type: String, default: '' }) value: string = ''
-  @Prop({ type: String, required: true }) label!: string
-  @Prop({ type: String, default: '' }) type: string = ''
-  @Prop({ type: Boolean, required: true }) disabled!: boolean
+  @Prop({ type: String, default: '' }) readonly value!: string
+  @Prop({ type: String, required: true }) readonly label!: string
+  @Prop({ type: String, default: '' }) readonly type!: Privileges | ''
+  @Prop({ type: Boolean, required: true }) readonly disabled!: boolean
 
   // Data
   restrictLanguage: boolean = true
@@ -59,19 +59,19 @@ export default class AssigneeSelect extends Vue {
 
   get privilegedMembers (): ICongregationMember[] {
     const { inputDisabled, type, restrictLanguage } = this
-    if (inputDisabled) return []
+    if (inputDisabled || !type) return []
     return congregationModule.activeMembers.filter(({ privileges, languageGroup }) => {
       if (restrictLanguage && languageGroup !== scheduleModule.language) return false
       return privileges[type]
     })
   }
 
-  get lastAssignmentMap (): any {
+  get lastAssignmentMap (): { [key: string]: string } {
     const { privilegedMembers, type } = this
-    return privilegedMembers.reduce((acc, m) => {
+    return privilegedMembers.reduce((acc: { [key: string]: string }, m) => {
       const assignments = m.assignments || []
       const lastAssignment = assignments
-        .reduce((acc, a) => a.type === type ? acc.concat(a.date) : acc, [])
+        .reduce((acc: string[], a) => a.type === type ? acc.concat(a.date) : acc, [])
         .sort((a, b) => a === b ? 0 : a > b ? 1 : -1)
         .pop()
       return Object.assign(acc, { [m._id]: lastAssignment })

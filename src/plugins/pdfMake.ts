@@ -3,8 +3,15 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 import { congregationModule, scheduleModule } from '@/store'
 import { COLORS, WEEK_TYPES } from '@/constants'
-import { IScheduleTranslationMap, IAssignmentTranslationMap, IScheduleAssignment, IScheduleWeekAssignments } from '@/ts/interfaces'
-import { PDFGenerator, Languages, ScheduleWeek } from '@/ts/types'
+import {
+  IScheduleTranslationMap,
+  IAssignmentTranslationMap,
+  IScheduleAssignment,
+  IScheduleWeekAssignments,
+  PDFGenerator,
+  Languages,
+  ScheduleWeek
+} from 'types'
 
 type ScheduleTableRow = [string | null, string, string | null, string | null, string | null, boolean?] | null
 
@@ -149,7 +156,8 @@ function setTime (time: string): string {
   return time
 }
 
-function addTime (minutes: string | number): string {
+function addTime (minutes?: string | number): string {
+  if (!minutes) return timer
   const mins = /\d+/.exec(minutes.toString()) || ['0']
   const toAdd = parseInt(mins[0])
   let [h, m] = timer.split(':').map(Number)

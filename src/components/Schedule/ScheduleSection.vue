@@ -18,19 +18,20 @@
 import { Component, Vue, Prop } from 'vue-property-decorator'
 
 import { COLORS } from '@/constants'
+import { Colors } from 'types'
 
 @Component
 export default class ScheduleSection extends Vue {
   // Props
-  @Prop({ type: String, required: true }) title!: string
-  @Prop({ type: String, required: true }) color!: string
+  @Prop({ type: String, required: true }) readonly title!: string
+  @Prop({ type: String, required: true }) readonly color!: Colors
 
   // Data
   show: boolean = true
 
   // Computed
   get backgroundColor (): string {
-    return COLORS[this.color] || this.color
+    return COLORS[this.color]
   }
 
   // Methods

@@ -1,12 +1,12 @@
 import { NavigationGuard } from 'vue-router/types/router'
 
-import store from '@/store'
+import { authModule, congregationModule } from '@/store'
 import routes from './routes'
 
 // Global Guards
 export const authenticationGuard: NavigationGuard = function (to, from, next): void {
   // Check if a token is stored (doesn't validate until an api call)
-  if (store.getters['auth/hasToken']) {
+  if (authModule.hasToken) {
     // If on Login redirect to Home, otherwise allow anything, any api calls will validate the token
     next(to.name === routes.LOGIN ? { name: routes.HOME } : undefined)
   } else {
@@ -16,8 +16,8 @@ export const authenticationGuard: NavigationGuard = function (to, from, next): v
 }
 
 export const congregationGuard: NavigationGuard = function (to, from, next): void {
-  if (!to.meta.open && !store.getters['congregation/members'].length) {
-    store.dispatch('congregation/load')
+  if (!to.meta.open && !congregationModule.members.length) {
+    congregationModule.load()
   }
   next()
 }

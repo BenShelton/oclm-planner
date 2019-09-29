@@ -6,8 +6,7 @@ import * as auth from '../database/auth'
 import * as congregation from '../database/congregation'
 import * as schedule from '../database/schedule'
 import { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES, WEEK_TYPES } from '../src/constants'
-import { APITypes } from 'types'
-import { ICongregationMember } from '@/ts/interfaces'
+import { ICongregationMember, APITypes } from 'types'
 
 // Initialize express app
 const app = express()

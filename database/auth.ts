@@ -2,7 +2,7 @@ import { ObjectID, Collection, Db } from 'mongodb'
 import jwt from 'jsonwebtoken'
 import assert from 'assert'
 import setup from './setup'
-import { MongoInterface } from '@/ts/types'
+import { MongoInterface } from 'types'
 
 interface IToken {
   _id: string

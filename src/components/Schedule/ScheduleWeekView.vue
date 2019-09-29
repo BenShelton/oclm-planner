@@ -4,7 +4,7 @@
       <v-toolbar-title v-text="prettyDate" />
       <v-spacer />
       <v-menu
-        v-if="localWeek.loaded && !localWeek.unavailable"
+        v-if="localWeekLoaded && !localWeekUnavailable"
         v-model="settingsMenu"
         lazy
         left
@@ -64,7 +64,7 @@
     <v-divider />
 
     <!-- Loading Week Display -->
-    <v-layout v-if="!localWeek.loaded" justify-center class="pa-3">
+    <v-layout v-if="!localWeekLoaded" justify-center class="pa-3">
       <v-layout v-if="loadError" column align-center>
         <v-icon color="red">
           warning
@@ -77,7 +77,7 @@
     </v-layout>
 
     <!-- Unavailable Week Display -->
-    <v-layout v-else-if="localWeek.unavailable" justify-center class="pa-3">
+    <v-layout v-else-if="localWeekUnavailable" justify-center class="pa-3">
       <v-layout column align-center>
         <v-icon color="primary">
           info
@@ -305,7 +305,9 @@ import AssigneeSelect from '@/components/AssigneeSelect.vue'
 
 import { alertModule, scheduleModule } from '@/store'
 import { ASSIGNMENT_TYPE_MAP, WEEK_TYPES } from '@/constants'
-import { Languages, AssignmentTypes } from '@/ts/types'
+import { IScheduleWeekLanguage, Languages, ScheduleWeek, Assignments, IScheduleWeekViewAssignment, IScheduleAssignment } from 'types'
+
+type ScheduleWeekViewAssignmentMap = { [key in Assignments]: IScheduleWeekViewAssignment }
 
 @Component({
   components: {
@@ -314,20 +316,22 @@ import { Languages, AssignmentTypes } from '@/ts/types'
     AssigneeSelect
   }
 })
-export default class ScheduleWeek extends Vue {
+export default class ScheduleWeekView extends Vue {
   // Props
-  @Prop({ type: String, required: true }) weekDate!: string
-  @Prop({ type: Boolean, required: true }) current!: boolean
+  @Prop({ type: String, required: true }) readonly weekDate!: string
+  @Prop({ type: Boolean, required: true }) readonly current!: boolean
 
   // Hooks
   mounted () {
     if (this.weekDate < '2019-01-07') {
-      Object.assign(this.localWeek, { date: this.weekDate, loaded: true, unavailable: true })
+      Object.assign(this.localWeek, { date: this.weekDate })
+      this.localWeekLoaded = true
+      this.localWeekUnavailable = true
       return
     }
     scheduleModule.loadWeek({ date: this.weekDate })
       .then(this.loadLocalWeek)
-      .catch(err => {
+      .catch((err: Error) => {
         this.loadError = true
         console.error(err)
       })
@@ -336,16 +340,18 @@ export default class ScheduleWeek extends Vue {
   // Data
   WEEK_TYPES = WEEK_TYPES
   fieldClass: string = 'xs12 md6 xl4'
-  localWeek = { _id: null, loaded: false }
+  localWeek: ScheduleWeek = { _id: '', date: '', en: { assignments: {} }, tpo: { assignments: {} } }
+  localWeekLoaded = false
+  localWeekUnavailable = false
   loadError: boolean = false
   scrapeLoading: boolean = false
   scrapeError: boolean = false
   settingsMenu: boolean = false
   weekTypeLoading: boolean = false
   editDialog: boolean = false
-  editName: string = ''
+  editName: Assignments = 'bibleReading'
   editTitle: string = ''
-  editAssignment: any = {}
+  editAssignment: IScheduleAssignment = { title: '', type: 'bibleReading' }
   editLoading: boolean = false
 
   // Computed
@@ -353,7 +359,7 @@ export default class ScheduleWeek extends Vue {
     return scheduleModule.language
   }
 
-  get week (): any {
+  get week (): IScheduleWeekLanguage {
     return this.localWeek[this.language] || {}
   }
 
@@ -364,7 +370,7 @@ export default class ScheduleWeek extends Vue {
   get weekType (): number {
     return this.week.type || 0
   }
-  set weekType (val) {
+  set weekType (val: number) {
     const prev = this.weekType
     this.$set(this.week, 'type', val)
     // wait for the animation to finish
@@ -380,7 +386,7 @@ export default class ScheduleWeek extends Vue {
           alertModule.UPDATE_ALERT({ text: 'Week Type successfully updated', color: 'success' })
           this.settingsMenu = false
         })
-        .catch(err => {
+        .catch((err: Error) => {
           this.week.type = prev
           alertModule.UPDATE_ALERT({ text: 'Week Type could not be toggled', color: 'error' })
           console.error(err)
@@ -396,12 +402,12 @@ export default class ScheduleWeek extends Vue {
   get prettyDate (): string {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     const [year, month, day] = this.weekDate.split('-')
-    return `${day} ${months[month - 1]} ${year}`
+    return `${day} ${months[+month - 1]} ${year}`
   }
 
-  get assignments (): any {
+  get assignments (): ScheduleWeekViewAssignmentMap {
     const { assignments } = this.week
-    const assignmentRefs = [
+    const assignmentRefs: { name: Assignments, displayName: string }[] = [
       { name: 'chairman', displayName: 'Chairman' },
       { name: 'openingPrayer', displayName: 'Opening Prayer' },
       { name: 'highlights', displayName: 'Highlights' },
@@ -429,7 +435,7 @@ export default class ScheduleWeek extends Vue {
           details
         }
       })
-    }, {})
+    }, {}) as ScheduleWeekViewAssignmentMap
   }
 
   get coVisit (): boolean {
@@ -449,7 +455,8 @@ export default class ScheduleWeek extends Vue {
 
   // Methods
   loadLocalWeek (week: ScheduleWeek): void {
-    this.localWeek = Object.assign({}, { loaded: true }, week)
+    this.localWeek = week
+    this.localWeekLoaded = true
   }
 
   onUpdateCOName (name: string): void {
@@ -481,10 +488,11 @@ export default class ScheduleWeek extends Vue {
       .finally(() => { this.scrapeLoading = false })
   }
 
-  onEdit (name: AssignmentTypes): void {
+  onEdit (name: Assignments): void {
     this.editName = name
     const { displayName, inherit, details } = this.assignments[name]
     const editDetails = inherit ? this.week.assignments[name] : details
+    if (!editDetails) return
     this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
     const assignment = { ...editDetails }
     if (!assignment.type) assignment.type = ASSIGNMENT_TYPE_MAP[name]
@@ -494,8 +502,8 @@ export default class ScheduleWeek extends Vue {
 
   onSettingChange (val: boolean): void {
     if (val) {
-      if (this.editAssignment.assignee) this.editAssignment.assignee = null
-      if (this.editAssignment.assistant) this.editAssignment.assistant = null
+      if (this.editAssignment.assignee) this.editAssignment.assignee = undefined
+      if (this.editAssignment.assistant) this.editAssignment.assistant = undefined
     }
   }
 

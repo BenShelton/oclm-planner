@@ -51,7 +51,7 @@ import { generateSchedule, generateAssignmentSlips } from '@/plugins/pdfMake'
 
 import PDFPreview from '@/components/PDFPreview.vue'
 import { scheduleModule } from '../store'
-import { PDFGenerator } from '@/ts/types'
+import { PDFGenerator } from 'types'
 import { TCreatedPdf } from 'pdfmake/build/pdfmake'
 
 interface IMonth {

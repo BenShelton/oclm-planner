@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/interface-name-prefix */
-import { ICongregationMember, IScheduleAssignment } from '@/ts/interfaces'
-import { ScheduleWeek, Languages, Assignments } from '@/ts/types'
+import { ICongregationMember, IScheduleAssignment } from './interfaces'
+import { ScheduleWeek, Languages, Assignments } from './types'
 
 interface APIResponseMessage { message: string }
 interface APIResponse<T> { result: T }
@@ -77,7 +77,7 @@ declare namespace APITypes {
       type Response = APIResponse<Result>
     }
     namespace UpdateCOName {
-      interface Data { weekID: string, language: Languages, name: Assignments }
+      interface Data { weekID: string, language: Languages, name: string }
       type Result = ScheduleWeek
       type Response = APIResponse<Result>
     }

@@ -9,7 +9,7 @@ module.exports = {
     exprContextCritical: false,
     rules: [
       {
-        test: /\.js?$/,
+        test: /\.(js|ts)$/,
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',

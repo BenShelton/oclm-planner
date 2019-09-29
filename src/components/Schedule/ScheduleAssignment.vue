@@ -2,7 +2,7 @@
   <v-layout
     column
     class="schedule-assignment"
-    :class="{ grey: !assignment.details, 'blue lighten-5': assignment.inherit || assignment.stream }"
+    :class="{ grey: !assignment.details, 'blue lighten-5': assignment.inherit || (assignment.details && assignment.details.stream) }"
   >
     <v-btn
       icon
@@ -57,14 +57,14 @@
 import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
 
 import ScheduleAssignee from '@/components/Schedule/ScheduleAssignee.vue'
-import { IScheduleAssignment } from '@/ts/interfaces'
+import { IScheduleWeekViewAssignment } from 'types'
 
 @Component({
   components: { ScheduleAssignee }
 })
 export default class ScheduleAssignment extends Vue {
   // Props
-  @Prop({ type: Object, required: true }) assignment!: IScheduleAssignment
+  @Prop({ type: Object, required: true }) readonly assignment!: IScheduleWeekViewAssignment
 
   // Computed
   get hasAssistant (): boolean {

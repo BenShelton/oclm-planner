@@ -1,8 +1,7 @@
-import { ObjectID, Collection } from 'mongodb'
+import { ObjectID, Collection, UpdateQuery } from 'mongodb'
 import setup from './setup'
 
-import { ICongregationMember, IMemberAssignment } from '../src/ts/interfaces'
-import { MongoInterface } from '@/ts/types'
+import { ICongregationMember, IMemberAssignment, MongoInterface } from 'types'
 
 type CollCongregationMember = MongoInterface<ICongregationMember>
 
@@ -29,7 +28,9 @@ export const addMember = async (member: CollCongregationMember): Promise<ICongre
 export const updateMember = async (memberID: string, member: ICongregationMember): Promise<ICongregationMember> => {
   const coll = await getCollection
   const query = { _id: new ObjectID(memberID) }
-  const update = { $set: member }
+  const updateMember = { ...member }
+  delete updateMember._id
+  const update: UpdateQuery<CollCongregationMember> = { $set: updateMember }
   const { value } = await coll.findOneAndUpdate(query, update, { returnOriginal: false })
   if (!value) throw new Error('404')
   return value as ICongregationMember

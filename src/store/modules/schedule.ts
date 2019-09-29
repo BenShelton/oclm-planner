@@ -1,8 +1,7 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 
-import { ScheduleWeek, Languages, Assignments } from '@/ts/types'
 import api from '@/api'
-import { IScheduleAssignment } from '@/ts/interfaces'
+import { IScheduleAssignment, ScheduleWeek, Languages, Assignments } from 'types'
 
 @Module({ namespaced: true, name: 'schedule' })
 export default class Schedule extends VuexModule {
@@ -85,7 +84,7 @@ export default class Schedule extends VuexModule {
   }
 
   @Action
-  async updateCOName ({ weekID, name }: { weekID: string, name: Assignments }): Promise<ScheduleWeek> {
+  async updateCOName ({ weekID, name }: { weekID: string, name: string }): Promise<ScheduleWeek> {
     const { commit } = this.context
     const { language } = this
     const res = await api.schedule.updateCOName({ weekID, language, name })

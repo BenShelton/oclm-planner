@@ -76,9 +76,9 @@ type PropPDF = IPDFWithDefinition | null
 })
 export default class PDFPreview extends Vue {
   // Props
-  @Prop({ type: Boolean, required: true }) value!: boolean
-  @Prop({ type: Object, default: null }) pdf: PropPDF = null
-  @Prop({ type: Boolean, required: true }) error!: boolean
+  @Prop({ type: Boolean, required: true }) readonly value!: boolean
+  @Prop({ type: Object, default: null }) readonly pdf!: PropPDF
+  @Prop({ type: Boolean, required: true }) readonly error!: boolean
 
   // Data
   src: ReturnType<typeof PDF.createLoadingTask> | null = null

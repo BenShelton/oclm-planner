@@ -148,7 +148,7 @@ import {
   SUPPORTED_LANGUAGES,
   PRIVILEGES
 } from '@/constants'
-import { ICongregationMember } from '@/ts/interfaces'
+import { ICongregationMember } from 'types'
 
 @Component({
   components: {

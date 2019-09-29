@@ -1,6 +1,6 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 
-import { ICongregationMember } from '@/ts/interfaces'
+import { ICongregationMember } from 'types'
 import api from '@/api'
 
 interface IIdMap {

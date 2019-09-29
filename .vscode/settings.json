@@ -8,5 +8,6 @@
   "eslint.autoFixOnSave": true,
   "jest.pathToJest": "npm run test:unit --",
   "jest.pathToConfig": "jest.config.js",
-  "vetur.experimental.templateInterpolationService": true
+  "vetur.experimental.templateInterpolationService": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

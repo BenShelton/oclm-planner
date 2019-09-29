@@ -1,4 +1,4 @@
-import { Genders, Appointments, Languages, Privileges } from './types'
+import { Genders, Appointments, Languages, Privileges, Assignments } from './types'
 
 export interface IScheduleWeekLanguage {
   scraped?: boolean
@@ -28,15 +28,22 @@ export interface IScheduleWeekAssignments {
 }
 
 export interface IScheduleAssignment {
-  studyPoint: string
-  text: string
-  time: string
+  studyPoint?: string
+  text?: string
+  time?: string
   title: string
-  type: Privileges
+  type: Privileges | ''
   assignee?: string
   assistant?: string
   inherit?: boolean
   stream?: boolean
+}
+
+export interface IScheduleWeekViewAssignment {
+  name: Assignments
+  displayName: string
+  inherit: boolean
+  details?: IScheduleAssignment
 }
 
 export interface IMemberAssignment {

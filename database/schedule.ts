@@ -4,9 +4,15 @@ import setup from './setup'
 import scrapeWOL from './scraper'
 import { addAssignment, removeAssignment } from './congregation'
 import { WEEK_TYPES, SUPPORTED_LANGUAGES } from '../src/constants'
-import { ScheduleWeek, MongoInterface, Languages, Assignments } from '../src/ts/types'
-import { IWeekWithMembers } from 'types'
-import { IScheduleAssignment, IScheduleWeekLanguage } from '@/ts/interfaces'
+import {
+  IScheduleAssignment,
+  IScheduleWeekLanguage,
+  IWeekWithMembers,
+  ScheduleWeek,
+  MongoInterface,
+  Languages,
+  Assignments
+} from 'types'
 
 const ASSIGNEE_FIELDS = ['assignee', 'assistant'] as const
 
@@ -162,7 +168,7 @@ export const updateWeekType = async (weekID: string, language: Languages, type: 
               const member = await removeAssignment(memberID, { type: v.type, date: baseWeek.date })
               updatedMembers.push(member)
               const assignmentPath = `${language}.assignments.${k}.${field}`
-              update.$set[assignmentPath] = null
+              Object.assign(update.$set, { [assignmentPath]: null })
             }
           }
         }
@@ -170,7 +176,7 @@ export const updateWeekType = async (weekID: string, language: Languages, type: 
       break
 
     case WEEK_TYPES.coVisit.value:
-      for (const assignmentName of ['congregationBibleStudy', 'reader']) {
+      for (const assignmentName of ['congregationBibleStudy', 'reader'] as const) {
         const assignment = week.assignments[assignmentName]
         if (assignment) {
           for (const field of ASSIGNEE_FIELDS) {
@@ -179,7 +185,7 @@ export const updateWeekType = async (weekID: string, language: Languages, type: 
               const member = await removeAssignment(memberID, { type: assignment.type, date: baseWeek.date })
               updatedMembers.push(member)
               const assignmentPath = `${language}.assignments.${assignmentName}.${field}`
-              update.$set[assignmentPath] = null
+              Object.assign(update.$set, { [assignmentPath]: null })
             }
           }
         }

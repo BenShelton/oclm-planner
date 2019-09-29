@@ -28,7 +28,7 @@
         :key="week.weekDate"
         class="ma-2 xs12 sm6 md4 lg3 xl2"
       >
-        <ScheduleWeek
+        <ScheduleWeekView
           :week-date="week.weekDate"
           :current="week.current"
         />
@@ -41,12 +41,12 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { NavigationGuard } from 'vue-router/types/router'
 
-import ScheduleWeek from '@/components/Schedule/ScheduleWeek.vue'
+import ScheduleWeekView from '@/components/Schedule/ScheduleWeekView.vue'
 import { scheduleModule } from '@/store'
 
 @Component({
   components: {
-    ScheduleWeek
+    ScheduleWeekView
   }
 })
 export default class Schedule extends Vue {
