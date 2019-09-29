@@ -492,9 +492,8 @@ export default class ScheduleWeekView extends Vue {
     this.editName = name
     const { displayName, inherit, details } = this.assignments[name]
     const editDetails = inherit ? this.week.assignments[name] : details
-    if (!editDetails) return
     this.editTitle = `Editing ${displayName} for week ${this.prettyDate}`
-    const assignment = { ...editDetails }
+    const assignment: IScheduleAssignment = { title: '', type: '', ...editDetails }
     if (!assignment.type) assignment.type = ASSIGNMENT_TYPE_MAP[name]
     this.editAssignment = assignment
     this.editDialog = true

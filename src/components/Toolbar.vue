@@ -5,7 +5,7 @@
     <v-spacer />
     <v-toolbar-items>
       <v-btn
-        v-if="!loggedIn"
+        v-if="showLogin"
         flat
         :disabled="loading"
         :loading="loading"
@@ -14,7 +14,7 @@
         Login
       </v-btn>
       <v-menu
-        v-else
+        v-if="loggedIn"
         offset-y
         :close-on-content-click="false"
         :min-width="200"
@@ -82,6 +82,10 @@ export default class Toolbar extends Vue {
       case routes.HELP: title = 'Help'; break
     }
     return prefix + title
+  }
+
+  get showLogin (): boolean {
+    return !this.loggedIn && this.$route.name !== routes.LOGIN
   }
 
   // Methods

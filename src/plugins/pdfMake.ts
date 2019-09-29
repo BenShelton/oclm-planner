@@ -1,4 +1,4 @@
-import pdfMake, { Content, CurrentNode, TDocumentDefinitions, PageSize } from 'pdfmake/build/pdfmake'
+import pdfMake, { Content, CurrentNode, TDocumentDefinitions } from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 import { congregationModule, scheduleModule } from '@/store'
@@ -182,7 +182,8 @@ function getAssignmentTitle (assignment: IScheduleAssignment): string {
   return `${title} (${time})`
 }
 
-function getScheduleAssignees (assignment: IScheduleAssignment): string {
+function getScheduleAssignees (assignment?: IScheduleAssignment): string {
+  if (!assignment) return ''
   if (assignment.stream) return '(Video Stream)'
   let assignees = getAssigneeName(assignment.assignee, '-')
   if (['initialCall', 'returnVisit', 'bibleStudy'].includes(assignment.type)) {
@@ -272,7 +273,8 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
       author: 'OCLM Planner',
       subject: 'OCLM Schedule'
     },
-    pageSize: PageSize.A4,
+    // @ts-ignore This only accepts the enum which isn't transpiled at runtime
+    pageSize: 'A4',
     pageMargins: [36, 62, 36, 44],
     pageBreakBefore: (node?: CurrentNode) => Boolean(node && node.id === 'PageStartSeparator'),
     defaultStyle: {
@@ -334,7 +336,7 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
       .reduce((acc, [k, v]) => {
         if (!v) return acc
         const assignment: IScheduleAssignment = { ...v }
-        if (v.inherit) {
+        if (assignment.inherit) {
           const baseAssignment = baseAssignments && baseAssignments[k]
           if (!baseAssignment) throw new Error('Could not inherit an assignment as it does not exist on the base schedule')
           const { assignee, assistant } = baseAssignment
@@ -469,8 +471,9 @@ function createAssignmentCheckbox (title: string, checked = false): Content {
   }
   if (checked) {
     checkbox.canvas.push(
-      { type: 'line', x: 14, y: 5, w: 1, h: 3, lineWidth: 1 },
-      { type: 'line', x: 15, y: 4, w: 3, h: 4, lineWidth: 1 }
+      // @ts-ignore Line types aren't added yet
+      { type: 'line', x1: 14, y1: 5, x2: 15, y2: 8, lineWidth: 1 },
+      { type: 'line', x1: 15, y1: 8, x2: 18, y2: 4, lineWidth: 1 }
     )
   }
   return {
@@ -559,7 +562,8 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
       subject: 'Assignment Slips'
     },
     pageMargins: [0, 0, 0, 0],
-    pageSize: PageSize.A4,
+    // @ts-ignore This only accepts the enum which isn't transpiled at runtime
+    pageSize: 'A4',
     pageBreakBefore: (node?: CurrentNode) => Boolean(node && node.id === 'TopSlips'),
     background: () => ({
       canvas: [
