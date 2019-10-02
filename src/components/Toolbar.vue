@@ -5,6 +5,7 @@
     <v-spacer />
     <v-toolbar-items>
       <v-select
+        v-if="items.length > 1"
         v-model="languageModel"
         :items="items"
         :style="{ width: '120px' }"
@@ -18,14 +19,20 @@ import Vue from 'vue'
 
 import routes from '@/router/routes'
 import { scheduleModule, drawerModule } from '@/store'
-import { SUPPORTED_LANGUAGES } from '@/constants'
+import { USED_LANGUAGES } from '@/constants'
 import { Languages } from 'types'
 
 export default Vue.extend({
   name: 'Toolbar',
 
+  created () {
+    if (this.items.length < 2) {
+      this.languageModel = (this.items[0] && this.items[0].value) || 'en'
+    }
+  },
+
   data: () => ({
-    items: SUPPORTED_LANGUAGES
+    items: USED_LANGUAGES
   }),
 
   computed: {
