@@ -50,6 +50,10 @@ export const SUPPORTED_LANGUAGES = [
   { text: 'Portuguese', value: 'tpo' }
 ] as const
 
+export const USED_LANGUAGES = (process.env.VUE_APP_LANGUAGES || 'en')
+  .split(',')
+  .map(l => SUPPORTED_LANGUAGES.find(s => s.value === l))
+
 export const WEEK_TYPES = {
   normal: { label: 'Normal', value: 0 },
   assembly: { label: 'Assembly', value: 1 },
