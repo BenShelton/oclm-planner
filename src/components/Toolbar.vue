@@ -45,32 +45,34 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import Vue from 'vue'
 
 import routes from '@/router/routes'
 import { authModule, scheduleModule, alertModule, drawerModule } from '@/store'
 import { SUPPORTED_LANGUAGES } from '@/constants'
 import { Languages } from 'types'
 
-@Component
-export default class Toolbar extends Vue {
-  // Data
-  loading: boolean = false
-  items = SUPPORTED_LANGUAGES
+export default Vue.extend({
+  name: 'Toolbar',
 
-  // Computed
-  get loggedIn (): boolean {
+  data: () => ({
+    loading: false,
+    items: SUPPORTED_LANGUAGES
+  }),
+
+  computed: {
+    loggedIn (): boolean {
     return authModule.hasToken
-  }
-
-  get languageModel (): Languages {
+    },
+    languageModel: {
+      get (): Languages {
     return scheduleModule.language
-  }
-  set languageModel (val: Languages) {
+      },
+      set (val: Languages) {
     scheduleModule.UPDATE_LANGUAGE(val)
   }
-
-  get title (): string {
+    },
+    title (): string {
     const prefix = this.$vuetify.breakpoint.smAndDown ? '' : 'OCLM Planner | '
     let title = 'Untitled'
     switch (this.$route.name) {
@@ -82,19 +84,17 @@ export default class Toolbar extends Vue {
       case routes.HELP: title = 'Help'; break
     }
     return prefix + title
-  }
-
-  get showLogin (): boolean {
+    },
+    showLogin (): boolean {
     return !this.loggedIn && this.$route.name !== routes.LOGIN
   }
+  },
 
-  // Methods
-  toggleDrawer = drawerModule.TOGGLE_OPEN
-
+  methods: {
+    toggleDrawer: drawerModule.TOGGLE_OPEN,
   onLogin (): void {
     this.$router.push({ name: routes.LOGIN })
-  }
-
+    },
   onLogout (): void {
     this.loading = true
     authModule.logout()
@@ -111,4 +111,5 @@ export default class Toolbar extends Vue {
       })
   }
 }
+})
 </script>
