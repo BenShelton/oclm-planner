@@ -243,9 +243,12 @@
                 Warning:
               </span>
               <span>
-                Assignee is already on the following assignments this week:
+                The following are already on other assignments this week:
               </span>
-              <span class="font-italic" v-text="multipleAssignments.join(', ')" />
+              <div v-for="duplicate of multipleAssignments" :key="duplicate.name" class="ml-2">
+                <span class="font-weight-bold" v-text="duplicate.name + ': '" />
+                <span class="font-italic" v-text="duplicate.assignments.join(', ')" />
+              </div>
             </v-alert>
             <v-alert
               :value="editAssignment.text !== 'N/A'"
@@ -303,7 +306,7 @@ import ScheduleSection from '@/components/Schedule/ScheduleSection.vue'
 import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment.vue'
 import AssigneeSelect from '@/components/AssigneeSelect.vue'
 
-import { alertModule, scheduleModule } from '@/store'
+import { alertModule, scheduleModule, congregationModule } from '@/store'
 import { ASSIGNMENT_TYPE_MAP, WEEK_TYPES } from '@/constants'
 import { IScheduleWeekLanguage, Languages, ScheduleWeek, Assignments, IScheduleWeekViewAssignment, IScheduleAssignment } from 'types'
 
@@ -442,15 +445,23 @@ export default class ScheduleWeekView extends Vue {
     return this.weekType === WEEK_TYPES.coVisit.value
   }
 
-  get multipleAssignments (): string[] {
-    const { type, assignee } = this.editAssignment || {}
-    if (!assignee) return []
-    const multipleAssignments: string[] = []
+  get multipleAssignments (): { name: string, assignments: string[] }[] {
+    const assignmentFields = ['assignee', 'assistant'] as const
+    const assignmentFieldsToCheck = assignmentFields.reduce((acc: string[], a) => acc.concat(this.editAssignment[a] || []), [])
+    if (!assignmentFieldsToCheck.length) return []
+    const multipleAssignments: string[][] = new Array(assignmentFieldsToCheck.length).fill(null).map(() => [])
     for (const assignment of Object.values(this.assignments)) {
-      if (!assignment.details) continue
-      if (assignment.details.type !== type && assignment.details.assignee === assignee) multipleAssignments.push(assignment.displayName)
+      const { details } = assignment
+      if (!details || details.type === this.editAssignment.type) continue
+      assignmentFieldsToCheck.forEach((field, i) => {
+        if (assignmentFields.some(a => details[a] === field)) multipleAssignments[i].push(assignment.displayName)
+      })
     }
-    return multipleAssignments
+    return multipleAssignments.reduce((acc: { name: string, assignments: string[] }[], m, i) => {
+      if (!m.length) return acc
+      const { name } = congregationModule.idMap[assignmentFieldsToCheck[i]]
+      return acc.concat({ name, assignments: m })
+    }, [])
   }
 
   // Methods
