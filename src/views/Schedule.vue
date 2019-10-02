@@ -9,7 +9,7 @@
       </v-btn>
       <v-spacer />
       <v-dialog v-model="dateDialog" lazy width="290px">
-        <v-btn slot="activator" color="primary" @click="dateDialog = true">
+        <v-btn slot="activator" color="primary">
           Select Week
         </v-btn>
         <v-date-picker v-model="currentWeek" :allowed-dates="allowedDates" @input="dateDialog = false" />
