@@ -16,6 +16,9 @@
     "test:unit": "vue-cli-service test:unit",
     "upload": "babel-node --config-file=./upload.config.js database/upload"
   },
+  "gitHooks": {
+    "prepare-commit-msg": "exec < /dev/tty && git cz --hook"
+  },
   "main": "background.js",
   "dependencies": {
     "axios": "^0.19.0",
@@ -65,8 +68,10 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
+    "commitizen": "^4.0.3",
     "cross-env": "^5.2.1",
     "csv-parse": "^4.4.6",
+    "cz-conventional-changelog": "^3.0.2",
     "electron": "^6.0.7",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.2.3",
@@ -80,5 +85,10 @@
     "vue-cli-plugin-vuetify": "^0.6.3",
     "vue-template-compiler": "^2.6.10"
   },
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }
