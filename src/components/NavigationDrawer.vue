@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import Vue from 'vue'
 
 import { drawerModule } from '@/store'
 import routes from '@/router/routes'
@@ -47,30 +47,35 @@ interface IDrawerItem {
   }
 }
 
-@Component
-export default class NavigationDrawer extends Vue {
-  // Data
-  items: IDrawerItem[] = [
-    { title: 'Home', icon: 'home', link: { name: routes.HOME }, label: { text: 'Stable', color: 'green' } },
-    { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE }, label: { text: 'Stable', color: 'green' } },
-    { title: 'Export', icon: 'picture_as_pdf', link: { name: routes.EXPORT }, label: { text: 'Stable', color: 'green' } },
-    { title: 'Congregation', icon: 'people', link: { name: routes.CONGREGATION }, label: { text: 'Stable', color: 'green' } },
-    { title: 'Help', icon: 'help', link: { name: routes.HELP }, label: { text: 'Incomplete', color: 'yellow' } }
-  ]
+export default Vue.extend({
+  name: 'NavigationDrawer',
 
-  // Computed
-  get drawer (): boolean {
-    return drawerModule.open
-  }
-  set drawer (val) {
-    this.setOpen(val)
-  }
+  computed: {
+    items (): IDrawerItem[] {
+      return [
+        { title: 'Home', icon: 'home', link: { name: routes.HOME }, label: { text: 'Stable', color: 'green' } },
+        { title: 'Schedule', icon: 'assignment', link: { name: routes.SCHEDULE }, label: { text: 'Stable', color: 'green' } },
+        { title: 'Export', icon: 'picture_as_pdf', link: { name: routes.EXPORT }, label: { text: 'Stable', color: 'green' } },
+        { title: 'Congregation', icon: 'people', link: { name: routes.CONGREGATION }, label: { text: 'Stable', color: 'green' } },
+        { title: 'Help', icon: 'help', link: { name: routes.HELP }, label: { text: 'Incomplete', color: 'yellow' } }
+      ]
+    },
+    drawer: {
+      get (): boolean {
+        return drawerModule.open
+      },
+      set (val: boolean) {
+        this.setOpen(val)
+      }
+    }
+  },
 
-  // Methods
-  setOpen (val: boolean): void {
-    drawerModule.SET_OPEN(val)
+  methods: {
+    setOpen (val: boolean): void {
+      drawerModule.SET_OPEN(val)
+    }
   }
-}
+})
 </script>
 
 <style lang="stylus" scoped>
