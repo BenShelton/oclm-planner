@@ -30,74 +30,78 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
+import Vue, { PropType } from 'vue'
 
 import { congregationModule, scheduleModule } from '@/store'
 import { PRIVILEGES } from '@/constants'
 import { ICongregationMember, Privileges } from 'types'
 
-@Component
-export default class AssigneeSelect extends Vue {
-  // Props
-  @Prop({ type: String, default: '' }) readonly value!: string
-  @Prop({ type: String, required: true }) readonly label!: string
-  @Prop({ type: String, default: '' }) readonly type!: Privileges | ''
-  @Prop({ type: Boolean, required: true }) readonly disabled!: boolean
+export default Vue.extend({
+  name: 'AssigneeSelect',
 
-  // Data
-  restrictLanguage: boolean = true
+  props: {
+    value: { type: String, default: '' },
+    label: { type: String, required: true },
+    type: { type: String as PropType<Privileges>, default: '' as Privileges },
+    disabled: { type: Boolean, required: true }
+  },
 
-  // Computed
-  get loading (): boolean {
-    return congregationModule.loading
+  data: () => ({
+    restrictLanguage: true
+  }),
+
+  computed: {
+    loading (): boolean {
+      return congregationModule.loading
+    },
+
+    inputDisabled (): boolean {
+      const { type, disabled } = this
+      return disabled || !(PRIVILEGES.some(p => p.key === type))
+    },
+
+    privilegedMembers (): ICongregationMember[] {
+      const { inputDisabled, type, restrictLanguage } = this
+      if (inputDisabled || !type) return []
+      return congregationModule.activeMembers.filter(({ privileges, languageGroup }) => {
+        if (restrictLanguage && languageGroup !== scheduleModule.language) return false
+        return privileges[type]
+      })
+    },
+
+    lastAssignmentMap (): { [key: string]: string } {
+      const { privilegedMembers, type } = this
+      return privilegedMembers.reduce((acc: { [key: string]: string }, m) => {
+        const assignments = m.assignments || []
+        const lastAssignment = assignments
+          .reduce((acc: string[], a) => a.type === type ? acc.concat(a.date) : acc, [])
+          .sort((a, b) => a === b ? 0 : a > b ? 1 : -1)
+          .pop()
+        return Object.assign(acc, { [m._id]: lastAssignment })
+      }, {})
+    },
+
+    items (): ICongregationMember[] {
+      const { privilegedMembers, lastAssignmentMap } = this
+      return privilegedMembers.sort((a, b) => {
+        const aDate = lastAssignmentMap[a._id] || ''
+        const bDate = lastAssignmentMap[b._id] || ''
+        if (aDate === bDate) return 0
+        return aDate > bDate ? 1 : -1
+      })
+    }
+  },
+
+  methods: {
+    onToggleLanguage (): void {
+      this.restrictLanguage = !this.restrictLanguage
+      const { privilegedMembers, value } = this
+      if (privilegedMembers.every(({ _id }) => _id !== value)) this.onInput(null)
+    },
+
+    onInput (val: string | null): void {
+      this.$emit('input', val)
+    }
   }
-
-  get inputDisabled (): boolean {
-    const { type, disabled } = this
-    return disabled || !(PRIVILEGES.some(p => p.key === type))
-  }
-
-  get privilegedMembers (): ICongregationMember[] {
-    const { inputDisabled, type, restrictLanguage } = this
-    if (inputDisabled || !type) return []
-    return congregationModule.activeMembers.filter(({ privileges, languageGroup }) => {
-      if (restrictLanguage && languageGroup !== scheduleModule.language) return false
-      return privileges[type]
-    })
-  }
-
-  get lastAssignmentMap (): { [key: string]: string } {
-    const { privilegedMembers, type } = this
-    return privilegedMembers.reduce((acc: { [key: string]: string }, m) => {
-      const assignments = m.assignments || []
-      const lastAssignment = assignments
-        .reduce((acc: string[], a) => a.type === type ? acc.concat(a.date) : acc, [])
-        .sort((a, b) => a === b ? 0 : a > b ? 1 : -1)
-        .pop()
-      return Object.assign(acc, { [m._id]: lastAssignment })
-    }, {})
-  }
-
-  get items (): ICongregationMember[] {
-    const { privilegedMembers, lastAssignmentMap } = this
-    return privilegedMembers.sort((a, b) => {
-      const aDate = lastAssignmentMap[a._id] || ''
-      const bDate = lastAssignmentMap[b._id] || ''
-      if (aDate === bDate) return 0
-      return aDate > bDate ? 1 : -1
-    })
-  }
-
-  // Methods
-  onToggleLanguage (): void {
-    this.restrictLanguage = !this.restrictLanguage
-    const { privilegedMembers, value } = this
-    if (privilegedMembers.every(({ _id }) => _id !== value)) this.onInput(null)
-  }
-
-  @Emit('input')
-  onInput (val: string | null) {
-    return val
-  }
-}
+})
 </script>
