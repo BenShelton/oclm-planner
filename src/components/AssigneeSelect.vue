@@ -1,31 +1,36 @@
 <template>
   <v-layout align-center>
-    <v-select
-      clearable
-      item-text="name"
-      item-value="_id"
-      no-data-text="No Assignees Available"
-      :label="label"
-      :loading="loading"
-      :disabled="inputDisabled"
-      :items="items"
-      :value="value"
-      @input="onInput"
-    />
-    <v-tooltip top>
-      <v-btn
-        slot="activator"
-        icon
-        small
-        outline
-        color="primary"
+    <v-flex>
+      <v-select
+        clearable
+        item-text="name"
+        item-value="_id"
+        no-data-text="No Assignees Available"
+        :label="label"
+        :loading="loading"
         :disabled="inputDisabled"
-        @click="onToggleLanguage"
-      >
-        <v-icon small v-text="restrictLanguage ? 'person' : 'group'" />
-      </v-btn>
-      <span v-text="restrictLanguage ? 'Only include this language group' : 'Include all language groups'" />
-    </v-tooltip>
+        :items="items"
+        :value="value"
+        @input="onInput"
+      />
+    </v-flex>
+    <v-flex v-if="multiLanguage" xs1>
+      <v-tooltip top>
+        <v-btn
+          slot="activator"
+          class="ma-0"
+          icon
+          small
+          outline
+          color="primary"
+          :disabled="inputDisabled"
+          @click="onToggleLanguage"
+        >
+          <v-icon small v-text="restrictLanguage ? 'person' : 'group'" />
+        </v-btn>
+        <span v-text="restrictLanguage ? 'Only include this language group' : 'Include all language groups'" />
+      </v-tooltip>
+    </v-flex>
   </v-layout>
 </template>
 
@@ -33,7 +38,7 @@
 import Vue, { PropType } from 'vue'
 
 import { congregationModule, scheduleModule } from '@/store'
-import { PRIVILEGES } from '@/constants'
+import { PRIVILEGES, USED_LANGUAGES } from '@/constants'
 import { ICongregationMember, Privileges } from 'types'
 
 export default Vue.extend({
@@ -54,12 +59,10 @@ export default Vue.extend({
     loading (): boolean {
       return congregationModule.loading
     },
-
     inputDisabled (): boolean {
       const { type, disabled } = this
       return disabled || !(PRIVILEGES.some(p => p.key === type))
     },
-
     privilegedMembers (): ICongregationMember[] {
       const { inputDisabled, type, restrictLanguage } = this
       if (inputDisabled || !type) return []
@@ -68,7 +71,6 @@ export default Vue.extend({
         return privileges[type]
       })
     },
-
     lastAssignmentMap (): { [key: string]: string } {
       const { privilegedMembers, type } = this
       return privilegedMembers.reduce((acc: { [key: string]: string }, m) => {
@@ -80,7 +82,6 @@ export default Vue.extend({
         return Object.assign(acc, { [m._id]: lastAssignment })
       }, {})
     },
-
     items (): ICongregationMember[] {
       const { privilegedMembers, lastAssignmentMap } = this
       return privilegedMembers.sort((a, b) => {
@@ -89,6 +90,9 @@ export default Vue.extend({
         if (aDate === bDate) return 0
         return aDate > bDate ? 1 : -1
       })
+    },
+    multiLanguage (): boolean {
+      return USED_LANGUAGES.length > 1
     }
   },
 
@@ -98,7 +102,6 @@ export default Vue.extend({
       const { privilegedMembers, value } = this
       if (privilegedMembers.every(({ _id }) => _id !== value)) this.onInput(null)
     },
-
     onInput (val: string | null): void {
       this.$emit('input', val)
     }
