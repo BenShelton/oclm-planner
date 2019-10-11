@@ -14,7 +14,7 @@ import {
   Assignments
 } from 'types'
 
-const ASSIGNEE_FIELDS = ['assignee', 'assistant'] as const
+const ASSIGNEE_FIELDS = ['assignee', 'assistant', 'assignee2', 'assistant2'] as const
 
 type CollScheduleWeek = MongoInterface<ScheduleWeek>
 
