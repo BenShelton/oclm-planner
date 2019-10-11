@@ -66,6 +66,11 @@ export default Vue.extend({
     PDFPreview
   },
 
+  beforeRouteLeave (to, from, next) {
+    scheduleModule.CLEAR_MONTH()
+    next()
+  },
+
   data: () => ({
     month: (new Date().getMonth() + 1).toString().padStart(2, '0'),
     months: [
