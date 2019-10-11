@@ -40,7 +40,7 @@
           </v-layout>
           <v-layout v-if="hasSecondSchool">
             <ScheduleAssignee class="mr-1" :assignee="assignment.details.assignee2" />
-            <ScheduleAssignee assistant :assignee="assignment.details.assistant2" />
+            <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant2" />
           </v-layout>
         </v-layout>
       </v-layout>
@@ -81,7 +81,9 @@ export default Vue.extend({
       return ['initialCall', 'returnVisit', 'bibleStudy'].includes(details.type)
     },
     hasSecondSchool (): boolean {
-      return SECOND_SCHOOL && this.hasAssistant
+      const { details } = this.assignment
+      if (!details) return false
+      return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(details.type)
     }
   },
 

@@ -219,7 +219,7 @@
                     :disabled="!!(editAssignment.stream || editAssignment.inherit)"
                   />
                 </v-flex>
-                <v-flex :class="fieldClass">
+                <v-flex v-if="hasAssistant" :class="fieldClass">
                   <AssigneeSelect
                     v-model="editAssignment.assistant2"
                     label="Assistant (2)"
@@ -487,7 +487,7 @@ export default class ScheduleWeekView extends Vue {
   }
 
   get hasSecondSchool (): boolean {
-    return SECOND_SCHOOL && this.hasAssistant
+    return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(this.editAssignment.type)
   }
 
   // Methods
