@@ -2,7 +2,7 @@ import pdfMake, { Content, CurrentNode, TDocumentDefinitions } from 'pdfmake/bui
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 import { congregationModule, scheduleModule } from '@/store'
-import { COLORS, WEEK_TYPES } from '@/constants'
+import { COLORS, WEEK_TYPES, SECOND_SCHOOL } from '@/constants'
 import {
   IScheduleTranslationMap,
   IAssignmentTranslationMap,
@@ -484,8 +484,18 @@ function createAssignmentCheckbox (title: string, checked = false): Content {
   }
 }
 
-function createSlip (translation: IAssignmentTranslationMap, assignment?: IScheduleAssignment, date = ''): Content {
-  const { title = '', type = '', assignee = '', assistant = '', studyPoint = '' } = assignment || {}
+function createSlip (translation: IAssignmentTranslationMap, assignment?: IScheduleAssignment, secondSchool?: boolean, date = ''): Content {
+  const {
+    title = '',
+    type = '',
+    assignee: assignee1 = '',
+    assistant: assistant1 = '',
+    assignee2 = '',
+    assistant2 = '',
+    studyPoint = ''
+  } = assignment || {}
+  const assignee = secondSchool ? assignee2 : assignee1
+  const assistant = secondSchool ? assistant2 : assistant1
   const [y, m, d] = date.split('-')
   const prettyDate = [d, translation.months[+m - 1], y].join(' ')
   return {
@@ -516,8 +526,8 @@ function createSlip (translation: IAssignmentTranslationMap, assignment?: ISched
               createAssignmentCheckbox(translation.firstReturnVisit, Boolean(type === 'returnVisit' && title && title.includes(translation.first))),
               createAssignmentCheckbox(translation.secondReturnVisit, Boolean(type === 'returnVisit' && title && title.includes(translation.second))),
               { text: translation.givenIn + ':', bold: true, margin: [0, 4, 0, 1] },
-              createAssignmentCheckbox(translation.mainHall, assignment && translation.defaultRoom === 'mainHall'),
-              createAssignmentCheckbox(translation.class1, assignment && translation.defaultRoom === 'class1'),
+              createAssignmentCheckbox(translation.mainHall, assignment && !secondSchool && translation.defaultRoom === 'mainHall'),
+              createAssignmentCheckbox(translation.class1, assignment && (secondSchool || translation.defaultRoom === 'class1')),
               createAssignmentCheckbox(translation.class2, assignment && translation.defaultRoom === 'class2')
             ]
           },
@@ -579,6 +589,7 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
 
   const slips = []
   const VALID_TYPES = ['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
+  const SECOND_SCHOOL_TYPES = ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
   const language = scheduleModule.language
   const translation = ASSIGNMENT_SLIP_TRANSLATIONS[language]
   if (!translation) throw new Error('Translations not created for the selected language')
@@ -593,7 +604,8 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
       const index = i === 0 ? 'bibleReading' : 'studentTalk' + i as 'bibleReading' | 'studentTalk1' | 'studentTalk2' | 'studentTalk3' | 'studentTalk4'
       const talk: IScheduleAssignment | undefined = assignments[index]
       if (!talk || talk.inherit || !(VALID_TYPES.includes(talk.type))) continue
-      slips.push(createSlip(translation, talk, date))
+      slips.push(createSlip(translation, talk, false, date))
+      if (SECOND_SCHOOL && SECOND_SCHOOL_TYPES.includes(talk.type)) slips.push(createSlip(translation, talk, true, date))
     }
   }
 
