@@ -171,10 +171,14 @@ function addTime (minutes?: string | number): string {
   return time
 }
 
-function getAssigneeName (assignee?: string, defaultValue = ''): string {
+function getAssigneeName (assignee?: string, defaultValue = '', shorten?: boolean): string {
   if (!assignee) return defaultValue
   const mappedAssignee = congregationModule.idMap[assignee]
-  return mappedAssignee ? mappedAssignee.name : defaultValue
+  if (!mappedAssignee || !mappedAssignee.name) return defaultValue
+  if (!shorten) return mappedAssignee.name
+  const nameParts = mappedAssignee.name.split(' ')
+  nameParts[0] = nameParts[0].charAt(0).toUpperCase() + '.'
+  return nameParts.join(' ')
 }
 
 function getAssignmentTitle (assignment: IScheduleAssignment): string {
@@ -185,11 +189,19 @@ function getAssignmentTitle (assignment: IScheduleAssignment): string {
 function getScheduleAssignees (assignment?: IScheduleAssignment): string {
   if (!assignment) return ''
   if (assignment.stream) return '(Video Stream)'
-  let assignees = getAssigneeName(assignment.assignee, '-')
-  if (['initialCall', 'returnVisit', 'bibleStudy'].includes(assignment.type)) {
-    assignees += ' / ' + getAssigneeName(assignment.assistant, '-')
+  const { type, assignee, assistant, assignee2, assistant2 } = assignment
+  if (SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(type)) {
+    if (['initialCall', 'returnVisit', 'bibleStudy'].includes(type)) {
+      return getAssigneeName(assignee, '-', true) + ' & ' + getAssigneeName(assistant, '-', true) + ' | ' + getAssigneeName(assignee2, '-', true) + ' & ' + getAssigneeName(assistant2, '-', true)
+    } else {
+      return getAssigneeName(assignee, '-', true) + ' | ' + getAssigneeName(assignee2, '-', true)
+    }
   }
-  return assignees
+  if (['initialCall', 'returnVisit', 'bibleStudy'].includes(type)) {
+    return getAssigneeName(assignee, '-') + ' & ' + getAssigneeName(assistant, '-')
+  } else {
+    return getAssigneeName(assignee, '-')
+  }
 }
 
 function createScheduleSubheader (text: string, fillColor: string): Content {
@@ -231,12 +243,14 @@ function createScheduleTable (markerColor: string, rows: ScheduleTableRow[], exp
       { text: '•', fontSize: 24, color: markerColor, margin: [0, -8] },
       { text: title, paddingLeft: 0, colSpan: expandAssigneeName ? 1 : 2 }
     )
-    if (!expandAssigneeName) bodyRow.push({ text: '' })
-    bodyRow.push(
-      { text: assigneeTitle || '', fontSize: 8, color: '#6F6F6F', alignment: 'right', margin: [0, 1, 0, 0] },
-      { text: assigneeName || '', colSpan: expandAssigneeName ? 2 : 1 }
-    )
-    if (expandAssigneeName) bodyRow.push({ text: '' })
+    if (SECOND_SCHOOL && expandAssigneeName) {
+      bodyRow.push({ text: assigneeName || '', colSpan: 3 }, { text: '' }, { text: '' })
+    } else {
+      if (!expandAssigneeName) bodyRow.push({ text: '' })
+      bodyRow.push({ text: assigneeTitle || '', fontSize: 8, color: '#6F6F6F', alignment: 'right', margin: [0, 1, 0, 0] })
+      bodyRow.push({ text: assigneeName || '', colSpan: expandAssigneeName ? 2 : 1 })
+      if (expandAssigneeName) bodyRow.push({ text: '' })
+    }
     bodyRow.push({ text: timeOff || '', alignment: 'right' })
   }
   return {
