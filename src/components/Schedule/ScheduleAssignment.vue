@@ -33,10 +33,15 @@
         >
           Streaming
         </v-chip>
-        <v-layout v-else>
-          <ScheduleAssignee class="mr-1" :assignee="assignment.details.assignee" />
-          <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant" />
-          <v-spacer />
+        <v-layout v-else column>
+          <v-layout>
+            <ScheduleAssignee class="mr-1" :assignee="assignment.details.assignee" />
+            <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant" />
+          </v-layout>
+          <v-layout v-if="hasSecondSchool">
+            <ScheduleAssignee class="mr-1" :assignee="assignment.details.assignee2" />
+            <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant2" />
+          </v-layout>
         </v-layout>
       </v-layout>
       <v-layout justify-center class="mx-3">
@@ -54,35 +59,44 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
+import Vue, { PropType } from 'vue'
 
 import ScheduleAssignee from '@/components/Schedule/ScheduleAssignee.vue'
+import { SECOND_SCHOOL } from '@/constants'
 import { IScheduleWeekViewAssignment } from 'types'
 
-@Component({
-  components: { ScheduleAssignee }
+export default Vue.extend({
+  name: 'ScheduleAssignment',
+
+  components: { ScheduleAssignee },
+
+  props: {
+    assignment: { type: Object as PropType<IScheduleWeekViewAssignment>, required: true }
+  },
+
+  computed: {
+    hasAssistant (): boolean {
+      const { details } = this.assignment
+      if (!details) return false
+      return ['initialCall', 'returnVisit', 'bibleStudy'].includes(details.type)
+    },
+    hasSecondSchool (): boolean {
+      const { details } = this.assignment
+      if (!details) return false
+      return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(details.type)
+    }
+  },
+
+  methods: {
+    onEdit (): void {
+      this.$emit('edit', this.assignment.name)
+    }
+  }
 })
-export default class ScheduleAssignment extends Vue {
-  // Props
-  @Prop({ type: Object, required: true }) readonly assignment!: IScheduleWeekViewAssignment
-
-  // Computed
-  get hasAssistant (): boolean {
-    const { details } = this.assignment
-    if (!details) return false
-    return ['initialCall', 'returnVisit', 'bibleStudy'].includes(details.type)
-  }
-
-  // Methods
-  @Emit('edit')
-  onEdit (): string {
-    return this.assignment.name
-  }
-}
 </script>
 
 <style lang="stylus" scoped>
 .schedule-assignment
-  height 100px
+  min-height 100px
   position relative
 </style>

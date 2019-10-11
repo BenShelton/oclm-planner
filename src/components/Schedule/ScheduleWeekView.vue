@@ -202,7 +202,7 @@
                   :disabled="!!(editAssignment.stream || editAssignment.inherit)"
                 />
               </v-flex>
-              <v-flex v-if="['initialCall', 'returnVisit', 'bibleStudy'].includes(editAssignment.type)" :class="fieldClass">
+              <v-flex v-if="hasAssistant" :class="fieldClass">
                 <AssigneeSelect
                   v-model="editAssignment.assistant"
                   label="Assistant"
@@ -210,6 +210,24 @@
                   :disabled="!!(editAssignment.stream || editAssignment.inherit)"
                 />
               </v-flex>
+              <template v-if="hasSecondSchool">
+                <v-flex :class="fieldClass">
+                  <AssigneeSelect
+                    v-model="editAssignment.assignee2"
+                    label="Assignee (2)"
+                    :type="editAssignment.type"
+                    :disabled="!!(editAssignment.stream || editAssignment.inherit)"
+                  />
+                </v-flex>
+                <v-flex v-if="hasAssistant" :class="fieldClass">
+                  <AssigneeSelect
+                    v-model="editAssignment.assistant2"
+                    label="Assistant (2)"
+                    :type="editAssignment.type + 'Assist'"
+                    :disabled="!!(editAssignment.stream || editAssignment.inherit)"
+                  />
+                </v-flex>
+              </template>
               <v-flex v-if="editName.includes('studentTalk')" :class="fieldClass">
                 <v-select
                   v-model="editAssignment.type"
@@ -307,7 +325,7 @@ import ScheduleAssignment from '@/components/Schedule/ScheduleAssignment.vue'
 import AssigneeSelect from '@/components/AssigneeSelect.vue'
 
 import { alertModule, scheduleModule, congregationModule } from '@/store'
-import { ASSIGNMENT_TYPE_MAP, WEEK_TYPES } from '@/constants'
+import { ASSIGNMENT_TYPE_MAP, WEEK_TYPES, SECOND_SCHOOL } from '@/constants'
 import { IScheduleWeekLanguage, Languages, ScheduleWeek, Assignments, IScheduleWeekViewAssignment, IScheduleAssignment } from 'types'
 
 type ScheduleWeekViewAssignmentMap = { [key in Assignments]: IScheduleWeekViewAssignment }
@@ -446,13 +464,13 @@ export default class ScheduleWeekView extends Vue {
   }
 
   get multipleAssignments (): { name: string, assignments: string[] }[] {
-    const assignmentFields = ['assignee', 'assistant'] as const
+    const assignmentFields = ['assignee', 'assistant', 'assignee2', 'assistant2'] as const
     const assignmentFieldsToCheck = assignmentFields.reduce((acc: string[], a) => acc.concat(this.editAssignment[a] || []), [])
     if (!assignmentFieldsToCheck.length) return []
     const multipleAssignments: string[][] = new Array(assignmentFieldsToCheck.length).fill(null).map(() => [])
     for (const assignment of Object.values(this.assignments)) {
       const { details } = assignment
-      if (!details || details.type === this.editAssignment.type) continue
+      if (!details || assignment.name === this.editName) continue
       assignmentFieldsToCheck.forEach((field, i) => {
         if (assignmentFields.some(a => details[a] === field)) multipleAssignments[i].push(assignment.displayName)
       })
@@ -462,6 +480,14 @@ export default class ScheduleWeekView extends Vue {
       const { name } = congregationModule.idMap[assignmentFieldsToCheck[i]]
       return acc.concat({ name, assignments: m })
     }, [])
+  }
+
+  get hasAssistant (): boolean {
+    return ['initialCall', 'returnVisit', 'bibleStudy'].includes(this.editAssignment.type)
+  }
+
+  get hasSecondSchool (): boolean {
+    return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(this.editAssignment.type)
   }
 
   // Methods
@@ -514,6 +540,8 @@ export default class ScheduleWeekView extends Vue {
     if (val) {
       if (this.editAssignment.assignee) this.editAssignment.assignee = undefined
       if (this.editAssignment.assistant) this.editAssignment.assistant = undefined
+      if (this.editAssignment.assignee2) this.editAssignment.assignee2 = undefined
+      if (this.editAssignment.assistant2) this.editAssignment.assistant2 = undefined
     }
   }
 

@@ -128,6 +128,11 @@ export default class Schedule extends VuexModule {
   }
 
   @Mutation
+  CLEAR_MONTH (): void {
+    this.month = []
+  }
+
+  @Mutation
   UPDATE_SELECTED_ASSIGNEE (payload: string): void {
     this.selectedAssignee = payload
   }

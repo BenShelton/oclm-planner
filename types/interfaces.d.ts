@@ -35,6 +35,8 @@ export interface IScheduleAssignment {
   type: Privileges | ''
   assignee?: string
   assistant?: string
+  assignee2?: string
+  assistant2?: string
   inherit?: boolean
   stream?: boolean
 }

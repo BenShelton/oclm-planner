@@ -15,30 +15,35 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import Vue, { PropType } from 'vue'
 
 import { COLORS } from '@/constants'
 import { Colors } from 'types'
 
-@Component
-export default class ScheduleSection extends Vue {
-  // Props
-  @Prop({ type: String, required: true }) readonly title!: string
-  @Prop({ type: String, required: true }) readonly color!: Colors
+export default Vue.extend({
+  name: 'ScheduleSection',
 
-  // Data
-  show: boolean = true
+  props: {
+    title: { type: String, required: true },
+    color: { type: String as PropType<Colors>, required: true }
+  },
 
-  // Computed
-  get backgroundColor (): string {
-    return COLORS[this.color]
+  data: () => ({
+    show: true
+  }),
+
+  computed: {
+    backgroundColor (): string {
+      return COLORS[this.color]
+    }
+  },
+
+  methods: {
+    toggleShow (): void {
+      this.show = !this.show
+    }
   }
-
-  // Methods
-  toggleShow (): void {
-    this.show = !this.show
-  }
-}
+})
 </script>
 
 <style lang="stylus" scoped>

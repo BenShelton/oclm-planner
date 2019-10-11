@@ -2,7 +2,7 @@ import pdfMake, { Content, CurrentNode, TDocumentDefinitions } from 'pdfmake/bui
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 import { congregationModule, scheduleModule } from '@/store'
-import { COLORS, WEEK_TYPES } from '@/constants'
+import { COLORS, WEEK_TYPES, SECOND_SCHOOL } from '@/constants'
 import {
   IScheduleTranslationMap,
   IAssignmentTranslationMap,
@@ -171,10 +171,14 @@ function addTime (minutes?: string | number): string {
   return time
 }
 
-function getAssigneeName (assignee?: string, defaultValue = ''): string {
+function getAssigneeName (assignee?: string, defaultValue = '', shorten?: boolean): string {
   if (!assignee) return defaultValue
   const mappedAssignee = congregationModule.idMap[assignee]
-  return mappedAssignee ? mappedAssignee.name : defaultValue
+  if (!mappedAssignee || !mappedAssignee.name) return defaultValue
+  if (!shorten) return mappedAssignee.name
+  const nameParts = mappedAssignee.name.split(' ')
+  nameParts[0] = nameParts[0].charAt(0).toUpperCase() + '.'
+  return nameParts.join(' ')
 }
 
 function getAssignmentTitle (assignment: IScheduleAssignment): string {
@@ -185,11 +189,19 @@ function getAssignmentTitle (assignment: IScheduleAssignment): string {
 function getScheduleAssignees (assignment?: IScheduleAssignment): string {
   if (!assignment) return ''
   if (assignment.stream) return '(Video Stream)'
-  let assignees = getAssigneeName(assignment.assignee, '-')
-  if (['initialCall', 'returnVisit', 'bibleStudy'].includes(assignment.type)) {
-    assignees += ' / ' + getAssigneeName(assignment.assistant, '-')
+  const { type, assignee, assistant, assignee2, assistant2 } = assignment
+  if (SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(type)) {
+    if (['initialCall', 'returnVisit', 'bibleStudy'].includes(type)) {
+      return getAssigneeName(assignee, '-', true) + ' & ' + getAssigneeName(assistant, '-', true) + ' | ' + getAssigneeName(assignee2, '-', true) + ' & ' + getAssigneeName(assistant2, '-', true)
+    } else {
+      return getAssigneeName(assignee, '-', true) + ' | ' + getAssigneeName(assignee2, '-', true)
+    }
   }
-  return assignees
+  if (['initialCall', 'returnVisit', 'bibleStudy'].includes(type)) {
+    return getAssigneeName(assignee, '-') + ' & ' + getAssigneeName(assistant, '-')
+  } else {
+    return getAssigneeName(assignee, '-')
+  }
 }
 
 function createScheduleSubheader (text: string, fillColor: string): Content {
@@ -231,12 +243,14 @@ function createScheduleTable (markerColor: string, rows: ScheduleTableRow[], exp
       { text: '•', fontSize: 24, color: markerColor, margin: [0, -8] },
       { text: title, paddingLeft: 0, colSpan: expandAssigneeName ? 1 : 2 }
     )
-    if (!expandAssigneeName) bodyRow.push({ text: '' })
-    bodyRow.push(
-      { text: assigneeTitle || '', fontSize: 8, color: '#6F6F6F', alignment: 'right', margin: [0, 1, 0, 0] },
-      { text: assigneeName || '', colSpan: expandAssigneeName ? 2 : 1 }
-    )
-    if (expandAssigneeName) bodyRow.push({ text: '' })
+    if (SECOND_SCHOOL && expandAssigneeName) {
+      bodyRow.push({ text: assigneeName || '', colSpan: 3 }, { text: '' }, { text: '' })
+    } else {
+      if (!expandAssigneeName) bodyRow.push({ text: '' })
+      bodyRow.push({ text: assigneeTitle || '', fontSize: 8, color: '#6F6F6F', alignment: 'right', margin: [0, 1, 0, 0] })
+      bodyRow.push({ text: assigneeName || '', colSpan: expandAssigneeName ? 2 : 1 })
+      if (expandAssigneeName) bodyRow.push({ text: '' })
+    }
     bodyRow.push({ text: timeOff || '', alignment: 'right' })
   }
   return {
@@ -484,8 +498,18 @@ function createAssignmentCheckbox (title: string, checked = false): Content {
   }
 }
 
-function createSlip (translation: IAssignmentTranslationMap, assignment?: IScheduleAssignment, date = ''): Content {
-  const { title = '', type = '', assignee = '', assistant = '', studyPoint = '' } = assignment || {}
+function createSlip (translation: IAssignmentTranslationMap, assignment?: IScheduleAssignment, secondSchool?: boolean, date = ''): Content {
+  const {
+    title = '',
+    type = '',
+    assignee: assignee1 = '',
+    assistant: assistant1 = '',
+    assignee2 = '',
+    assistant2 = '',
+    studyPoint = ''
+  } = assignment || {}
+  const assignee = secondSchool ? assignee2 : assignee1
+  const assistant = secondSchool ? assistant2 : assistant1
   const [y, m, d] = date.split('-')
   const prettyDate = [d, translation.months[+m - 1], y].join(' ')
   return {
@@ -516,8 +540,8 @@ function createSlip (translation: IAssignmentTranslationMap, assignment?: ISched
               createAssignmentCheckbox(translation.firstReturnVisit, Boolean(type === 'returnVisit' && title && title.includes(translation.first))),
               createAssignmentCheckbox(translation.secondReturnVisit, Boolean(type === 'returnVisit' && title && title.includes(translation.second))),
               { text: translation.givenIn + ':', bold: true, margin: [0, 4, 0, 1] },
-              createAssignmentCheckbox(translation.mainHall, assignment && translation.defaultRoom === 'mainHall'),
-              createAssignmentCheckbox(translation.class1, assignment && translation.defaultRoom === 'class1'),
+              createAssignmentCheckbox(translation.mainHall, assignment && !secondSchool && translation.defaultRoom === 'mainHall'),
+              createAssignmentCheckbox(translation.class1, assignment && (secondSchool || translation.defaultRoom === 'class1')),
               createAssignmentCheckbox(translation.class2, assignment && translation.defaultRoom === 'class2')
             ]
           },
@@ -579,6 +603,7 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
 
   const slips = []
   const VALID_TYPES = ['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
+  const SECOND_SCHOOL_TYPES = ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
   const language = scheduleModule.language
   const translation = ASSIGNMENT_SLIP_TRANSLATIONS[language]
   if (!translation) throw new Error('Translations not created for the selected language')
@@ -593,7 +618,8 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
       const index = i === 0 ? 'bibleReading' : 'studentTalk' + i as 'bibleReading' | 'studentTalk1' | 'studentTalk2' | 'studentTalk3' | 'studentTalk4'
       const talk: IScheduleAssignment | undefined = assignments[index]
       if (!talk || talk.inherit || !(VALID_TYPES.includes(talk.type))) continue
-      slips.push(createSlip(translation, talk, date))
+      slips.push(createSlip(translation, talk, false, date))
+      if (SECOND_SCHOOL && SECOND_SCHOOL_TYPES.includes(talk.type)) slips.push(createSlip(translation, talk, true, date))
     }
   }
 

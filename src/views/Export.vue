@@ -46,11 +46,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import Vue from 'vue'
 import { generateSchedule, generateAssignmentSlips } from '@/plugins/pdfMake'
 
 import PDFPreview from '@/components/PDFPreview.vue'
-import { scheduleModule } from '../store'
+import { scheduleModule } from '@/store'
 import { PDFGenerator } from 'types'
 import { TCreatedPdf } from 'pdfmake/build/pdfmake'
 
@@ -59,55 +59,61 @@ interface IMonth {
   value: string
 }
 
-@Component({
+export default Vue.extend({
+  name: 'Export',
+
   components: {
     PDFPreview
+  },
+
+  beforeRouteLeave (to, from, next) {
+    scheduleModule.CLEAR_MONTH()
+    next()
+  },
+
+  data: () => ({
+    month: (new Date().getMonth() + 1).toString().padStart(2, '0'),
+    months: [
+      { text: 'January', value: '01' },
+      { text: 'February', value: '02' },
+      { text: 'March', value: '03' },
+      { text: 'April', value: '04' },
+      { text: 'May', value: '05' },
+      { text: 'June', value: '06' },
+      { text: 'July', value: '07' },
+      { text: 'August', value: '08' },
+      { text: 'September', value: '09' },
+      { text: 'October', value: '10' },
+      { text: 'November', value: '11' },
+      { text: 'December', value: '12' }
+    ] as IMonth[],
+    year: new Date().getFullYear().toString(),
+    years: ['2019'],
+    pdf: null as TCreatedPdf | null,
+    showPreview: false,
+    generationError: false
+  }),
+
+  methods: {
+    previewPDF (generator: PDFGenerator): Promise<void> {
+      this.generationError = false
+      this.pdf = null
+      this.showPreview = true
+      const month = this.year + '-' + this.month
+      return scheduleModule.loadMonth({ month })
+        .then(weeks => generator(weeks, month))
+        .then(pdf => { this.pdf = pdf })
+        .catch(err => {
+          this.generationError = true
+          console.error(err)
+        })
+    },
+    previewSchedule (): void {
+      this.previewPDF(generateSchedule)
+    },
+    previewAssignmentSlips (): void {
+      this.previewPDF(generateAssignmentSlips)
+    }
   }
 })
-export default class Export extends Vue {
-  // Data
-  month: string = (new Date().getMonth() + 1).toString().padStart(2, '0')
-  months: IMonth[] = [
-    { text: 'January', value: '01' },
-    { text: 'February', value: '02' },
-    { text: 'March', value: '03' },
-    { text: 'April', value: '04' },
-    { text: 'May', value: '05' },
-    { text: 'June', value: '06' },
-    { text: 'July', value: '07' },
-    { text: 'August', value: '08' },
-    { text: 'September', value: '09' },
-    { text: 'October', value: '10' },
-    { text: 'November', value: '11' },
-    { text: 'December', value: '12' }
-  ]
-  year: string = new Date().getFullYear().toString()
-  years: string[] = ['2019']
-  pdf: TCreatedPdf | null = null
-  showPreview: boolean = false
-  generationError: boolean = false
-
-  // Methods
-  previewPDF (generator: PDFGenerator): Promise<void> {
-    this.generationError = false
-    this.pdf = null
-    this.showPreview = true
-    const month = this.year + '-' + this.month
-    return scheduleModule.loadMonth({ month })
-      .then(weeks => generator(weeks, month))
-      .then(pdf => { this.pdf = pdf })
-      .catch(err => {
-        this.generationError = true
-        console.error(err)
-      })
-  }
-
-  previewSchedule (): void {
-    this.previewPDF(generateSchedule)
-  }
-
-  previewAssignmentSlips (): void {
-    this.previewPDF(generateAssignmentSlips)
-  }
-}
 </script>
