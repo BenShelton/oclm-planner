@@ -33,10 +33,15 @@
         >
           Streaming
         </v-chip>
-        <v-layout v-else>
-          <ScheduleAssignee class="mr-1" :assignee="assignment.details.assignee" />
-          <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant" />
-          <v-spacer />
+        <v-layout v-else column>
+          <v-layout>
+            <ScheduleAssignee class="mr-1" :assignee="assignment.details.assignee" />
+            <ScheduleAssignee v-if="hasAssistant" assistant :assignee="assignment.details.assistant" />
+          </v-layout>
+          <v-layout v-if="hasSecondSchool">
+            <ScheduleAssignee class="mr-1" :assignee="assignment.details.assignee2" />
+            <ScheduleAssignee assistant :assignee="assignment.details.assistant2" />
+          </v-layout>
         </v-layout>
       </v-layout>
       <v-layout justify-center class="mx-3">
@@ -57,6 +62,7 @@
 import Vue, { PropType } from 'vue'
 
 import ScheduleAssignee from '@/components/Schedule/ScheduleAssignee.vue'
+import { SECOND_SCHOOL } from '@/constants'
 import { IScheduleWeekViewAssignment } from 'types'
 
 export default Vue.extend({
@@ -70,22 +76,25 @@ export default Vue.extend({
 
   computed: {
     hasAssistant (): boolean {
-    const { details } = this.assignment
-    if (!details) return false
-    return ['initialCall', 'returnVisit', 'bibleStudy'].includes(details.type)
-  }
+      const { details } = this.assignment
+      if (!details) return false
+      return ['initialCall', 'returnVisit', 'bibleStudy'].includes(details.type)
+    },
+    hasSecondSchool (): boolean {
+      return SECOND_SCHOOL && this.hasAssistant
+    }
   },
 
   methods: {
     onEdit (): void {
       this.$emit('edit', this.assignment.name)
+    }
   }
-}
 })
 </script>
 
 <style lang="stylus" scoped>
 .schedule-assignment
-  height 100px
+  min-height 100px
   position relative
 </style>
