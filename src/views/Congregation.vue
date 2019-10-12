@@ -46,7 +46,7 @@
               </p>
               <v-layout wrap>
                 <v-flex
-                  v-for="privilege in PRIVILEGES"
+                  v-for="privilege of PRIVILEGES"
                   :key="privilege.key"
                   xs12
                   sm6
@@ -137,7 +137,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import Vue from 'vue'
 
 import { alertModule, congregationModule } from '@/store'
 import BooleanIcon from '@/components/BooleanIcon.vue'
@@ -148,135 +148,148 @@ import {
   SUPPORTED_LANGUAGES,
   PRIVILEGES
 } from '@/constants'
-import { ICongregationMember } from 'types'
+import { ICongregationMember, Languages } from 'types'
 
-@Component({
+export default Vue.extend({
+  name: 'Congregation',
+
   components: {
     BooleanIcon
-  }
-})
-export default class Schedule extends Vue {
-  // Data
-  GENDERS = GENDERS
-  APPOINTMENTS = APPOINTMENTS
-  SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES
-  PRIVILEGES = PRIVILEGES
-  languageGroups = SUPPORTED_LANGUAGES.reduce((acc, { text, value }) => Object.assign(acc, { [value]: text }), {})
-  headers = [
-    { text: 'Name', value: 'name' },
-    { text: 'Gender', value: 'gender' },
-    { text: 'Appointment', value: 'appointment' },
-    { text: 'Language Group', value: 'languageGroup' },
-    { text: 'Show On Schedule', value: 'show', align: 'center' },
-    { text: 'Privileges', value: '', align: 'center', sortable: false },
-    { text: 'Actions', value: '', align: 'center', sortable: false }
-  ]
-  rowsPerPageItems = [20, 50, 100, { text: 'All', value: -1 }]
-  search: string = ''
-  editDialog: boolean = false
-  editID: string | null = null
-  editTitle: string = ''
-  editMember: ICongregationMember = {
-    _id: '',
-    name: '',
-    gender: GENDERS[0],
-    appointment: APPOINTMENTS[0],
-    languageGroup: SUPPORTED_LANGUAGES[0].value,
-    show: true,
-    privileges: {}
-  }
+  },
 
-  // Computed
-  get members (): ICongregationMember[] {
-    return congregationModule.members
-  }
-
-  get loading (): boolean {
-    return congregationModule.loading
-  }
-
-  // Methods
-  expandRow (props: { expanded: boolean }): void {
-    props.expanded = !props.expanded
-  }
-
-  closeEditor (): void {
-    this.editDialog = false
-  }
-
-  prettyPrivileges (privileges: ICongregationMember['privileges']): { name: string, selected: boolean}[] {
-    if (!privileges) return []
-    return PRIVILEGES.map(({ name, key }) => ({ name, selected: !!privileges[key] }))
-  }
-
-  onAdd (): void {
-    this.editID = null
-    Object.assign(this.editMember, {
+  data: () => ({
+    search: '',
+    editDialog: false,
+    editID: null as string | null,
+    editTitle: '',
+    editMember: {
+      _id: '',
       name: '',
       gender: GENDERS[0],
       appointment: APPOINTMENTS[0],
       languageGroup: SUPPORTED_LANGUAGES[0].value,
       show: true,
       privileges: {}
-    })
-    this.editTitle = 'Add New Congregation Member'
-    this.editDialog = true
-  }
+    } as unknown as ICongregationMember
+  }),
 
-  onEdit (member: ICongregationMember): void {
-    this.editID = member._id
-    const { name, gender, appointment, languageGroup, show, privileges } = member
-    Object.assign(this.editMember, {
-      name,
-      gender,
-      appointment,
-      languageGroup,
-      show,
-      privileges: { ...privileges }
-    })
-    this.editTitle = 'Edit Existing Congregation Member'
-    this.editDialog = true
-  }
-
-  onDelete ({ _id: memberID, name }: ICongregationMember): void {
-    if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
-    congregationModule.delete({ memberID })
-      .then(() => {
-        alertModule.UPDATE_ALERT({ text: `${name} was successfully deleted`, color: 'success' })
-        this.closeEditor()
-      })
-      .catch(err => {
-        alertModule.UPDATE_ALERT({ text: 'An error occured whilst deleting this member', color: 'error' })
-        console.error(err)
-      })
-  }
-
-  onSave (): void {
-    if (!this.editMember.name) {
-      alertModule.UPDATE_ALERT({ text: 'Name is required', color: 'error' })
-      return
+  computed: {
+    members (): ICongregationMember[] {
+      return congregationModule.members
+    },
+    loading (): boolean {
+      return congregationModule.loading
+    },
+    GENDERS (): typeof GENDERS {
+      return GENDERS
+    },
+    APPOINTMENTS (): typeof APPOINTMENTS {
+      return APPOINTMENTS
+    },
+    SUPPORTED_LANGUAGES (): typeof SUPPORTED_LANGUAGES {
+      return SUPPORTED_LANGUAGES
+    },
+    PRIVILEGES (): typeof PRIVILEGES {
+      return PRIVILEGES
+    },
+    languageGroups (): { [key in Languages]: string } {
+      return SUPPORTED_LANGUAGES.reduce((acc, { text, value }) => Object.assign(acc, { [value]: text }), {}) as { [key in Languages]: string }
+    },
+    headers (): { text: string, value: string, align?: string, sortable?: boolean }[] {
+      return [
+        { text: 'Name', value: 'name' },
+        { text: 'Gender', value: 'gender' },
+        { text: 'Appointment', value: 'appointment' },
+        { text: 'Language Group', value: 'languageGroup' },
+        { text: 'Show On Schedule', value: 'show', align: 'center' },
+        { text: 'Privileges', value: '', align: 'center', sortable: false },
+        { text: 'Actions', value: '', align: 'center', sortable: false }
+      ]
+    },
+    rowsPerPageItems (): (number | { text: string, value: number })[] {
+      return [20, 50, 100, { text: 'All', value: -1 }]
     }
-    if (this.editID) {
-      congregationModule.update({ memberID: this.editID, member: this.editMember })
+  },
+
+  methods: {
+    expandRow (props: { expanded: boolean }): void {
+      props.expanded = !props.expanded
+    },
+    closeEditor (): void {
+      this.editDialog = false
+    },
+    prettyPrivileges (privileges: ICongregationMember['privileges']): { name: string, selected: boolean }[] {
+      if (!privileges) return []
+      return PRIVILEGES.map(({ name, key }) => ({ name, selected: !!privileges[key] }))
+    },
+    onAdd (): void {
+      this.editID = null
+      const baseProperties: Partial<ICongregationMember> = {
+        name: '',
+        gender: GENDERS[0],
+        appointment: APPOINTMENTS[0],
+        languageGroup: SUPPORTED_LANGUAGES[0].value,
+        show: true,
+        privileges: {}
+      }
+      Object.assign(this.editMember, baseProperties)
+      this.editTitle = 'Add New Congregation Member'
+      this.editDialog = true
+    },
+    onEdit (member: ICongregationMember): void {
+      this.editID = member._id
+      const { name, gender, appointment, languageGroup, show, privileges } = member
+      const updateProperties: Partial<ICongregationMember> = {
+        name,
+        gender,
+        appointment,
+        languageGroup,
+        show,
+        privileges: { ...privileges }
+      }
+      Object.assign(this.editMember, updateProperties)
+      this.editTitle = 'Edit Existing Congregation Member'
+      this.editDialog = true
+    },
+    onDelete ({ _id: memberID, name }: ICongregationMember): void {
+      if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
+      congregationModule.delete({ memberID })
         .then(() => {
-          alertModule.UPDATE_ALERT({ text: `${this.editMember.name} was successfully updated`, color: 'success' })
+          alertModule.UPDATE_ALERT({ text: `${name} was successfully deleted`, color: 'success' })
           this.closeEditor()
         })
-        .catch((err: Error) => {
-          alertModule.UPDATE_ALERT({ text: 'An error occured whilst updating this member', color: 'error' })
+        .catch(err => {
+          alertModule.UPDATE_ALERT({ text: 'An error occured whilst deleting this member', color: 'error' })
           console.error(err)
         })
-    } else {
-      congregationModule.add(this.editMember)
-        .then(() => {
-          alertModule.UPDATE_ALERT({ text: `${this.editMember.name} was successfully added`, color: 'success' })
-          this.closeEditor()
-        })
-        .catch((err: Error) => {
-          alertModule.UPDATE_ALERT({ text: 'An error occured whilst adding this member', color: 'error' })
-          console.error(err)
-        })
+    },
+    onSave (): void {
+      if (!this.editMember.name) {
+        alertModule.UPDATE_ALERT({ text: 'Name is required', color: 'error' })
+        return
+      }
+      if (this.editID) {
+        congregationModule.update({ memberID: this.editID, member: this.editMember })
+          .then(() => {
+            alertModule.UPDATE_ALERT({ text: `${this.editMember.name} was successfully updated`, color: 'success' })
+            this.closeEditor()
+          })
+          .catch((err: Error) => {
+            alertModule.UPDATE_ALERT({ text: 'An error occured whilst updating this member', color: 'error' })
+            console.error(err)
+          })
+      } else {
+        congregationModule.add(this.editMember)
+          .then(() => {
+            alertModule.UPDATE_ALERT({ text: `${this.editMember.name} was successfully added`, color: 'success' })
+            this.closeEditor()
+          })
+          .catch((err: Error) => {
+            alertModule.UPDATE_ALERT({ text: 'An error occured whilst adding this member', color: 'error' })
+            console.error(err)
+          })
+      }
     }
   }
-}
+})
 </script>
