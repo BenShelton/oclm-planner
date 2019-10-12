@@ -34,7 +34,7 @@
                   <v-select v-model="editMember.appointment" label="Appointment" :items="APPOINTMENTS" />
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-select v-model="editMember.languageGroup" label="Language Group" :items="SUPPORTED_LANGUAGES" />
+                  <v-select v-model="editMember.languageGroup" label="Language Group" :items="USED_LANGUAGES" />
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-checkbox v-model="editMember.show" label="Show On Schedule" />
@@ -146,6 +146,7 @@ import {
   GENDERS,
   APPOINTMENTS,
   SUPPORTED_LANGUAGES,
+  USED_LANGUAGES,
   PRIVILEGES
 } from '@/constants'
 import { ICongregationMember, Languages } from 'types'
@@ -167,7 +168,7 @@ export default Vue.extend({
       name: '',
       gender: GENDERS[0],
       appointment: APPOINTMENTS[0],
-      languageGroup: SUPPORTED_LANGUAGES[0].value,
+      languageGroup: USED_LANGUAGES[0].value,
       show: true,
       privileges: {}
     } as unknown as ICongregationMember
@@ -186,8 +187,8 @@ export default Vue.extend({
     APPOINTMENTS (): typeof APPOINTMENTS {
       return APPOINTMENTS
     },
-    SUPPORTED_LANGUAGES (): typeof SUPPORTED_LANGUAGES {
-      return SUPPORTED_LANGUAGES
+    USED_LANGUAGES (): typeof USED_LANGUAGES {
+      return USED_LANGUAGES
     },
     PRIVILEGES (): typeof PRIVILEGES {
       return PRIVILEGES
@@ -228,7 +229,7 @@ export default Vue.extend({
         name: '',
         gender: GENDERS[0],
         appointment: APPOINTMENTS[0],
-        languageGroup: SUPPORTED_LANGUAGES[0].value,
+        languageGroup: USED_LANGUAGES[0].value,
         show: true,
         privileges: {}
       }
