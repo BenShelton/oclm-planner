@@ -1,3 +1,5 @@
+import { Languages } from 'types'
+
 // TODO: Probably just worth having one map of talks with all their information
 export const ASSIGNMENT_TYPE_MAP = {
   chairman: 'chairman',
@@ -52,7 +54,10 @@ export const SUPPORTED_LANGUAGES = [
 
 export const USED_LANGUAGES = (process.env.VUE_APP_LANGUAGES || 'en')
   .split(',')
-  .map(l => SUPPORTED_LANGUAGES.find(s => s.value === l))
+  .reduce((acc: { text: string, value: Languages }[], l) => {
+    const lang = SUPPORTED_LANGUAGES.find(s => s.value === l)
+    return lang ? acc.concat(lang) : acc
+  }, [])
 
 export const SECOND_SCHOOL = Number(process.env.VUE_APP_SCHOOLS || 1) > 1
 
