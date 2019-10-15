@@ -199,6 +199,7 @@
                   v-model="editAssignment.assignee"
                   label="Assignee"
                   :type="editAssignment.type"
+                  :school="1"
                   :disabled="!!(editAssignment.stream || editAssignment.inherit)"
                 />
               </v-flex>
@@ -207,6 +208,7 @@
                   v-model="editAssignment.assistant"
                   label="Assistant"
                   :type="editAssignment.type + 'Assist'"
+                  :school="1"
                   :disabled="!!(editAssignment.stream || editAssignment.inherit)"
                 />
               </v-flex>
@@ -216,6 +218,7 @@
                     v-model="editAssignment.assignee2"
                     label="Assignee (2)"
                     :type="editAssignment.type"
+                    :school="2"
                     :disabled="!!(editAssignment.stream || editAssignment.inherit)"
                   />
                 </v-flex>
@@ -224,6 +227,7 @@
                     v-model="editAssignment.assistant2"
                     label="Assistant (2)"
                     :type="editAssignment.type + 'Assist'"
+                    :school="2"
                     :disabled="!!(editAssignment.stream || editAssignment.inherit)"
                   />
                 </v-flex>
@@ -487,7 +491,7 @@ export default class ScheduleWeekView extends Vue {
   }
 
   get hasSecondSchool (): boolean {
-    return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(this.editAssignment.type)
+    return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(this.editAssignment.type)
   }
 
   // Methods

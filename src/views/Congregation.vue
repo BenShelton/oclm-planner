@@ -37,6 +37,9 @@
                   <v-select v-model="editMember.languageGroup" label="Language Group" :items="USED_LANGUAGES" />
                 </v-flex>
                 <v-flex xs12 sm6 md4>
+                  <v-select v-model="editMember.school" label="Preferred School" :items="preferredSchools" />
+                </v-flex>
+                <v-flex xs12 sm6 md4>
                   <v-checkbox v-model="editMember.show" label="Show On Schedule" />
                 </v-flex>
               </v-layout>
@@ -147,7 +150,8 @@ import {
   APPOINTMENTS,
   SUPPORTED_LANGUAGES,
   USED_LANGUAGES,
-  PRIVILEGES
+  PRIVILEGES,
+  SECOND_SCHOOL
 } from '@/constants'
 import { ICongregationMember, Languages } from 'types'
 
@@ -169,6 +173,7 @@ export default Vue.extend({
       gender: GENDERS[0],
       appointment: APPOINTMENTS[0],
       languageGroup: USED_LANGUAGES[0].value,
+      school: null,
       show: true,
       privileges: {}
     } as unknown as ICongregationMember
@@ -195,6 +200,11 @@ export default Vue.extend({
     },
     languageGroups (): { [key in Languages]: string } {
       return SUPPORTED_LANGUAGES.reduce((acc, { text, value }) => Object.assign(acc, { [value]: text }), {}) as { [key in Languages]: string }
+    },
+    preferredSchools (): { text: string, value: null | number }[] {
+      const items: { text: string, value: null | number }[] = [{ text: 'Any', value: null }]
+      if (SECOND_SCHOOL) items.push({ text: 'First Only', value: 1 }, { text: 'Second Only', value: 2 })
+      return items
     },
     headers (): { text: string, value: string, align?: string, sortable?: boolean }[] {
       return [
@@ -230,6 +240,7 @@ export default Vue.extend({
         gender: GENDERS[0],
         appointment: APPOINTMENTS[0],
         languageGroup: USED_LANGUAGES[0].value,
+        school: null,
         show: true,
         privileges: {}
       }
@@ -239,12 +250,13 @@ export default Vue.extend({
     },
     onEdit (member: ICongregationMember): void {
       this.editID = member._id
-      const { name, gender, appointment, languageGroup, show, privileges } = member
+      const { name, gender, appointment, languageGroup, school, show, privileges } = member
       const updateProperties: Partial<ICongregationMember> = {
         name,
         gender,
         appointment,
         languageGroup,
+        school,
         show,
         privileges: { ...privileges }
       }
