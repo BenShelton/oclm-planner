@@ -81,8 +81,8 @@ function validateMember (member: Omit<ICongregationMember, '_id'>): string | nul
 }
 
 router.post('/congregation/addMember', (req, res) => {
-  const { name, appointment, gender, languageGroup, privileges, show } = req.body as APITypes.Congregation.AddMember.Data
-  const member = { name, appointment, gender, languageGroup, privileges, show }
+  const { name, appointment, gender, languageGroup, school, privileges, show } = req.body as APITypes.Congregation.AddMember.Data
+  const member = { name, appointment, gender, languageGroup, school, privileges, show }
   const validationError = validateMember(member)
   if (validationError) return res.status(400).json({ message: validationError })
   congregation.addMember(member)

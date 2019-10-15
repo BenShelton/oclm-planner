@@ -59,6 +59,7 @@ export interface ICongregationMember {
   gender: Genders
   appointment: Appointments
   languageGroup: Languages
+  school: null | number
   show: boolean
   privileges: {
     [key in Privileges]?: boolean

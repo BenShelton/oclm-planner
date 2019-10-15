@@ -119,6 +119,7 @@ const members: ICongregationMember[] = data.map(row => ({
   gender: row.gender,
   languageGroup: row.languageGroup,
   show: !!row.show,
+  school: null,
   privileges: {
     chairman: !!row['privileges.chairman'],
     highlights: !!row['privileges.highlights'],

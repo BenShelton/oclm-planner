@@ -48,6 +48,7 @@ export default Vue.extend({
     value: { type: String, default: '' },
     label: { type: String, required: true },
     type: { type: String as PropType<Privileges>, default: '' as Privileges },
+    school: { type: Number, required: true },
     disabled: { type: Boolean, required: true }
   },
 
@@ -66,8 +67,9 @@ export default Vue.extend({
     privilegedMembers (): ICongregationMember[] {
       const { inputDisabled, type, restrictLanguage } = this
       if (inputDisabled || !type) return []
-      return congregationModule.activeMembers.filter(({ privileges, languageGroup }) => {
+      return congregationModule.activeMembers.filter(({ privileges, languageGroup, school }) => {
         if (restrictLanguage && languageGroup !== scheduleModule.language) return false
+        if (school && school !== this.school) return false
         return privileges[type]
       })
     },
