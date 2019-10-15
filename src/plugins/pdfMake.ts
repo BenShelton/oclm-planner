@@ -13,7 +13,7 @@ import {
   ScheduleWeek
 } from 'types'
 
-type ScheduleTableRow = [string | null, string, string | null, string | null, string | null, boolean?] | null
+type ScheduleTableRow = [string | null, string, string | null, string | null, string | null, boolean?, boolean?] | null
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 
@@ -190,7 +190,7 @@ function getScheduleAssignees (assignment?: IScheduleAssignment): string {
   if (!assignment) return ''
   if (assignment.stream) return '(Video Stream)'
   const { type, assignee, assistant, assignee2, assistant2 } = assignment
-  if (SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(type)) {
+  if (SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(type)) {
     if (['initialCall', 'returnVisit', 'bibleStudy'].includes(type)) {
       return getAssigneeName(assignee, '-', true) + ' & ' + getAssigneeName(assistant, '-', true) + ' | ' + getAssigneeName(assignee2, '-', true) + ' & ' + getAssigneeName(assistant2, '-', true)
     } else {
@@ -228,7 +228,7 @@ function createScheduleSeparator (pageStart = false): Content {
   }
 }
 
-function createScheduleTable (markerColor: string, rows: ScheduleTableRow[], expandAssigneeName = false): Content {
+function createScheduleTable (markerColor: string, rows: ScheduleTableRow[]): Content {
   const body = []
   for (const row of rows) {
     const bodyRow: Content[] = []
@@ -237,18 +237,18 @@ function createScheduleTable (markerColor: string, rows: ScheduleTableRow[], exp
       bodyRow.push({ text: '', colSpan: 7 })
       continue
     }
-    const [timeOn, title, assigneeTitle, assigneeName, timeOff] = row
+    const [timeOn, title, assigneeTitle, assigneeName, timeOff, , expandAssigneeName = false] = row
     bodyRow.push(
       { text: timeOn || '' },
       { text: '•', fontSize: 24, color: markerColor, margin: [0, -8] },
       { text: title, paddingLeft: 0, colSpan: expandAssigneeName ? 1 : 2 }
     )
     if (SECOND_SCHOOL && expandAssigneeName) {
-      bodyRow.push({ text: assigneeName || '', colSpan: 3 }, { text: '' }, { text: '' })
+      bodyRow.push({ text: assigneeName || '', colSpan: 3, alignment: 'right' }, { text: '' }, { text: '' })
     } else {
       if (!expandAssigneeName) bodyRow.push({ text: '' })
       bodyRow.push({ text: assigneeTitle || '', fontSize: 8, color: '#6F6F6F', alignment: 'right', margin: [0, 1, 0, 0] })
-      bodyRow.push({ text: assigneeName || '', colSpan: expandAssigneeName ? 2 : 1 })
+      bodyRow.push({ text: assigneeName || '', colSpan: expandAssigneeName ? 2 : 1, alignment: 'right' })
       if (expandAssigneeName) bodyRow.push({ text: '' })
     }
     bodyRow.push({ text: timeOff || '', alignment: 'right' })
@@ -390,7 +390,7 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
     stack.push(createScheduleTable(COLORS.TREASURES, [
       [timer, getAssignmentTitle(highlights), null, getScheduleAssignees(highlights), addTime(highlights.time), highlights.inherit],
       [timer, translation.gems + ' (10 min.)', null, getScheduleAssignees(gems), addTime(gems.time), gems.inherit],
-      [timer, bibleReadingTitle, null, getScheduleAssignees(bibleReading), addTime(bibleReading.time), bibleReading.inherit]
+      [timer, bibleReadingTitle, null, getScheduleAssignees(bibleReading), addTime(bibleReading.time), bibleReading.inherit, true]
     ]))
 
     // MINISTRY Section
@@ -406,9 +406,9 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
       let assigneeTitle = `${translation.student}/${translation.assistant}:`
       if (studentTalk.type === 'ministryVideo') assigneeTitle = ''
       if (studentTalk.type === 'studentTalk') assigneeTitle = translation.student + ':'
-      ministryTableRows.push([timer, getAssignmentTitle(studentTalk), assigneeTitle, getScheduleAssignees(studentTalk), addTime(studentTalk.time), studentTalk.inherit])
+      ministryTableRows.push([timer, getAssignmentTitle(studentTalk), assigneeTitle, getScheduleAssignees(studentTalk), addTime(studentTalk.time), studentTalk.inherit, true])
     }
-    stack.push(createScheduleTable(COLORS.MINISTRY, ministryTableRows, true))
+    stack.push(createScheduleTable(COLORS.MINISTRY, ministryTableRows))
 
     // LIVING Section
     stack.push(createScheduleSubheader(translation.living, COLORS.LIVING))
@@ -603,7 +603,6 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
 
   const slips = []
   const VALID_TYPES = ['bibleReading', 'initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
-  const SECOND_SCHOOL_TYPES = ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk']
   const language = scheduleModule.language
   const translation = ASSIGNMENT_SLIP_TRANSLATIONS[language]
   if (!translation) throw new Error('Translations not created for the selected language')
@@ -619,7 +618,7 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
       const talk: IScheduleAssignment | undefined = assignments[index]
       if (!talk || talk.inherit || !(VALID_TYPES.includes(talk.type))) continue
       slips.push(createSlip(translation, talk, false, date))
-      if (SECOND_SCHOOL && SECOND_SCHOOL_TYPES.includes(talk.type)) slips.push(createSlip(translation, talk, true, date))
+      if (SECOND_SCHOOL) slips.push(createSlip(translation, talk, true, date))
     }
   }
 

@@ -491,7 +491,7 @@ export default class ScheduleWeekView extends Vue {
   }
 
   get hasSecondSchool (): boolean {
-    return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(this.editAssignment.type)
+    return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(this.editAssignment.type)
   }
 
   // Methods

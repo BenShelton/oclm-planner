@@ -88,7 +88,8 @@ export default Vue.extend({
                 'Simplifies user experience for changing languages and logging in',
                 'Date picker no longer closes immediately',
                 'Use correct color on printed schedule for Treasures bullet points',
-                'Clears month data when leaving schedule page'
+                'Clears month data when leaving schedule page',
+                'Update layout of schedule printout to support second school'
               ]
             },
             {

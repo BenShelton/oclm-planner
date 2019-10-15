@@ -83,7 +83,7 @@ export default Vue.extend({
     hasSecondSchool (): boolean {
       const { details } = this.assignment
       if (!details) return false
-      return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk'].includes(details.type)
+      return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(details.type)
     }
   },
 
