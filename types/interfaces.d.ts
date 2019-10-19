@@ -45,6 +45,7 @@ export interface IScheduleWeekViewAssignment {
   name: Assignments
   displayName: string
   inherit: boolean
+  coVisit: boolean
   details?: IScheduleAssignment
 }
 
@@ -69,7 +70,6 @@ export interface ICongregationMember {
 
 export interface IScheduleTranslationMap {
   startTime: string
-  group: string
   header: string
   week: string
   weeks: string
@@ -121,4 +121,12 @@ export interface IAssignmentTranslationMap {
   other: string
   note: { text: string, bold?: boolean, italics?: boolean }[]
   footer: string
+}
+
+export interface ISettings {
+  slug: string
+  db: string
+  displayName: string
+  languages: [Languages, ...Languages[]]
+  schools: 1 | 2
 }

@@ -250,7 +250,7 @@ export default Vue.extend({
     },
     onEdit (member: ICongregationMember): void {
       this.editID = member._id
-      const { name, gender, appointment, languageGroup, school, show, privileges } = member
+      const { name, gender, appointment, languageGroup, school = null, show, privileges } = member
       const updateProperties: Partial<ICongregationMember> = {
         name,
         gender,

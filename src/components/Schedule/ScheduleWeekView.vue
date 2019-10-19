@@ -431,6 +431,7 @@ export default class ScheduleWeekView extends Vue {
   }
 
   get assignments (): ScheduleWeekViewAssignmentMap {
+    const { coVisit } = this
     const { assignments } = this.week
     const assignmentRefs: { name: Assignments, displayName: string }[] = [
       { name: 'chairman', displayName: 'Chairman' },
@@ -452,14 +453,14 @@ export default class ScheduleWeekView extends Vue {
       const assignment = assignments[name]
       const inherit = !!(assignment && assignment.inherit)
       const details = inherit ? this.localWeek.en.assignments[name] : assignment
-      return Object.assign(acc, {
-        [name]: {
-          name,
-          displayName,
-          inherit,
-          details
-        }
-      })
+      const value: IScheduleWeekViewAssignment = {
+        name,
+        displayName,
+        inherit,
+        coVisit,
+        details
+      }
+      return Object.assign(acc, { [name]: value })
     }, {}) as ScheduleWeekViewAssignmentMap
   }
 
@@ -491,7 +492,9 @@ export default class ScheduleWeekView extends Vue {
   }
 
   get hasSecondSchool (): boolean {
-    return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(this.editAssignment.type)
+    return SECOND_SCHOOL &&
+      !this.coVisit &&
+      ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(this.editAssignment.type)
   }
 
   // Methods

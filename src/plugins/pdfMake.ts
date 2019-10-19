@@ -2,7 +2,7 @@ import pdfMake, { Content, CurrentNode, TDocumentDefinitions } from 'pdfmake/bui
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 import { congregationModule, scheduleModule } from '@/store'
-import { COLORS, WEEK_TYPES, SECOND_SCHOOL } from '@/constants'
+import { COLORS, WEEK_TYPES, SECOND_SCHOOL, SETTINGS } from '@/constants'
 import {
   IScheduleTranslationMap,
   IAssignmentTranslationMap,
@@ -22,7 +22,6 @@ const TPO_MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set
 const SCHEDULE_TRANSLATIONS: { [key in Languages]: IScheduleTranslationMap } = {
   en: {
     startTime: '7:00',
-    group: 'CANTON CONGREGATION',
     header: 'Our Christian Life & Ministry Schedule',
     week: 'WEEK',
     weeks: 'WEEKS',
@@ -50,7 +49,6 @@ const SCHEDULE_TRANSLATIONS: { [key in Languages]: IScheduleTranslationMap } = {
   },
   tpo: {
     startTime: '19:00',
-    group: 'GROUP PORTUGUÊS',
     header: 'Programação de reunião de semana',
     week: 'SEMANA',
     weeks: 'SEMANAS',
@@ -186,11 +184,11 @@ function getAssignmentTitle (assignment: IScheduleAssignment): string {
   return `${title} (${time})`
 }
 
-function getScheduleAssignees (assignment?: IScheduleAssignment): string {
+function getScheduleAssignees (assignment: IScheduleAssignment, coVisit: boolean): string {
   if (!assignment) return ''
   if (assignment.stream) return '(Video Stream)'
   const { type, assignee, assistant, assignee2, assistant2 } = assignment
-  if (SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(type)) {
+  if (SECOND_SCHOOL && !coVisit && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(type)) {
     if (['initialCall', 'returnVisit', 'bibleStudy'].includes(type)) {
       return getAssigneeName(assignee, '-', true) + ' & ' + getAssigneeName(assistant, '-', true) + ' | ' + getAssigneeName(assignee2, '-', true) + ' & ' + getAssigneeName(assistant2, '-', true)
     } else {
@@ -300,7 +298,7 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
       stack: [
         {
           columns: [
-            { text: translation.group, width: 160, margin: [0, 8, 0, 0], bold: true },
+            { text: SETTINGS.displayName.toUpperCase(), width: 160, margin: [0, 8, 0, 0], bold: true },
             { text: translation.header, alignment: 'right', fontSize: 17, bold: true }
           ]
         }
@@ -344,6 +342,8 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
     // If no assignments & not a special week then this isn't created
     if (!assignments) throw new Error('Week not created for the selected language')
 
+    const coVisit = type === WEEK_TYPES.coVisit.value
+
     // Extract assignments from the correct language
     const baseAssignments = baseWeek.en.assignments
     const assignmentMap = ((Object.entries(assignments) as unknown) as [keyof IScheduleWeekAssignments, IScheduleAssignment][])
@@ -380,17 +380,17 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
 
     // Introduction Section
     stack.push(createScheduleTable(COLORS.TREASURES, [
-      [setTime(translation.startTime), songs[0], translation.prayer + ':', getScheduleAssignees(openingPrayer), addTime(5), openingPrayer.inherit],
-      [timer, translation.openingComments + ' (3 min.)', translation.chairman + ':', getScheduleAssignees(chairman), addTime(3), chairman.inherit]
+      [setTime(translation.startTime), songs[0], translation.prayer + ':', getScheduleAssignees(openingPrayer, coVisit), addTime(5), openingPrayer.inherit],
+      [timer, translation.openingComments + ' (3 min.)', translation.chairman + ':', getScheduleAssignees(chairman, coVisit), addTime(3), chairman.inherit]
     ]))
 
     // TREASURES Section
     stack.push(createScheduleSubheader(translation.treasures, COLORS.TREASURES))
     const bibleReadingTitle = `${translation.bibleReading} (${bibleReading.time}): ${bibleReading.title}`
     stack.push(createScheduleTable(COLORS.TREASURES, [
-      [timer, getAssignmentTitle(highlights), null, getScheduleAssignees(highlights), addTime(highlights.time), highlights.inherit],
-      [timer, translation.gems + ' (10 min.)', null, getScheduleAssignees(gems), addTime(gems.time), gems.inherit],
-      [timer, bibleReadingTitle, null, getScheduleAssignees(bibleReading), addTime(bibleReading.time), bibleReading.inherit, true]
+      [timer, getAssignmentTitle(highlights), null, getScheduleAssignees(highlights, coVisit), addTime(highlights.time), highlights.inherit],
+      [timer, translation.gems + ' (10 min.)', null, getScheduleAssignees(gems, coVisit), addTime(gems.time), gems.inherit],
+      [timer, bibleReadingTitle, null, getScheduleAssignees(bibleReading, coVisit), addTime(bibleReading.time), bibleReading.inherit, true]
     ]))
 
     // MINISTRY Section
@@ -406,7 +406,7 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
       let assigneeTitle = `${translation.student}/${translation.assistant}:`
       if (studentTalk.type === 'ministryVideo') assigneeTitle = ''
       if (studentTalk.type === 'studentTalk') assigneeTitle = translation.student + ':'
-      ministryTableRows.push([timer, getAssignmentTitle(studentTalk), assigneeTitle, getScheduleAssignees(studentTalk), addTime(studentTalk.time), studentTalk.inherit, true])
+      ministryTableRows.push([timer, getAssignmentTitle(studentTalk), assigneeTitle, getScheduleAssignees(studentTalk, coVisit), addTime(studentTalk.time), studentTalk.inherit, true])
     }
     stack.push(createScheduleTable(COLORS.MINISTRY, ministryTableRows))
 
@@ -415,26 +415,26 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
     setTime(translation.startTime)
     const livingTableRows: ScheduleTableRow[] = [
       [addTime(47), songs[1], null, null, addTime(5), chairman.inherit],
-      [timer, getAssignmentTitle(serviceTalk1), null, getScheduleAssignees(serviceTalk1), addTime(serviceTalk1.time), serviceTalk1.inherit],
+      [timer, getAssignmentTitle(serviceTalk1), null, getScheduleAssignees(serviceTalk1, coVisit), addTime(serviceTalk1.time), serviceTalk1.inherit],
       null
     ]
-    if (serviceTalk2) livingTableRows[2] = [timer, getAssignmentTitle(serviceTalk2), null, getScheduleAssignees(serviceTalk2), addTime(serviceTalk2.time), serviceTalk2.inherit]
-    if (type === WEEK_TYPES.coVisit.value) {
+    if (serviceTalk2) livingTableRows[2] = [timer, getAssignmentTitle(serviceTalk2), null, getScheduleAssignees(serviceTalk2, coVisit), addTime(serviceTalk2.time), serviceTalk2.inherit]
+    if (coVisit) {
       livingTableRows.push(
-        [timer, translation.review + ' (3 min.)', translation.chairman + ':', getScheduleAssignees(chairman), addTime(3), chairman.inherit],
+        [timer, translation.review + ' (3 min.)', translation.chairman + ':', getScheduleAssignees(chairman, coVisit), addTime(3), chairman.inherit],
         [timer, coTitle + ' (30 min.)', translation.co + ':', coName, addTime(30), true],
-        [timer, songs[2], translation.prayer + ':', getScheduleAssignees(closingPrayer), addTime(5), closingPrayer.inherit]
+        [timer, songs[2], translation.prayer + ':', getScheduleAssignees(closingPrayer, coVisit), addTime(5), closingPrayer.inherit]
       )
     } else {
       livingTableRows.push(
-        [timer, translation.cbs + ' (30 min.)', translation.conductor + ':', getScheduleAssignees(congregationBibleStudy), addTime(30), congregationBibleStudy.inherit],
-        [null, congregationBibleStudy.title, translation.reader + ':', getScheduleAssignees(reader), null, reader.inherit],
-        [timer, translation.review + ' (3 min.)', translation.chairman + ':', getScheduleAssignees(chairman), addTime(3), chairman.inherit],
-        [timer, songs[2], translation.prayer + ':', getScheduleAssignees(closingPrayer), addTime(5), closingPrayer.inherit]
+        [timer, translation.cbs + ' (30 min.)', translation.conductor + ':', getScheduleAssignees(congregationBibleStudy, coVisit), addTime(30), congregationBibleStudy.inherit],
+        [null, congregationBibleStudy.title, translation.reader + ':', getScheduleAssignees(reader, coVisit), null, reader.inherit],
+        [timer, translation.review + ' (3 min.)', translation.chairman + ':', getScheduleAssignees(chairman, coVisit), addTime(3), chairman.inherit],
+        [timer, songs[2], translation.prayer + ':', getScheduleAssignees(closingPrayer, coVisit), addTime(5), closingPrayer.inherit]
       )
     }
     const livingTable = createScheduleTable(COLORS.LIVING, livingTableRows)
-    if (type !== WEEK_TYPES.coVisit.value) {
+    if (!coVisit) {
       const coTalk = livingTable.table && livingTable.table.body && livingTable.table.body[3] && livingTable.table.body[3][1]
       if (!coTalk) throw new Error('Could not reformat according to CO week')
       Object.assign(coTalk, { rowSpan: 2 })
@@ -612,13 +612,14 @@ export const generateAssignmentSlips: PDFGenerator = function (weeks, month) {
     if (!week) throw new Error('Week not created for the selected language')
     const { type, assignments } = week
     if (type === WEEK_TYPES.assembly.value || type === WEEK_TYPES.memorial.value) continue
+    const coVisit = type === WEEK_TYPES.coVisit.value
     for (let i = 0; i <= 4; i++) {
       // treat index 0 as the bibleReading, else extract a student talk
       const index = i === 0 ? 'bibleReading' : 'studentTalk' + i as 'bibleReading' | 'studentTalk1' | 'studentTalk2' | 'studentTalk3' | 'studentTalk4'
       const talk: IScheduleAssignment | undefined = assignments[index]
       if (!talk || talk.inherit || !(VALID_TYPES.includes(talk.type))) continue
       slips.push(createSlip(translation, talk, false, date))
-      if (SECOND_SCHOOL) slips.push(createSlip(translation, talk, true, date))
+      if (SECOND_SCHOOL && !coVisit) slips.push(createSlip(translation, talk, true, date))
     }
   }
 
