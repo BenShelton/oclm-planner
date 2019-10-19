@@ -81,9 +81,11 @@ export default Vue.extend({
       return ['initialCall', 'returnVisit', 'bibleStudy'].includes(details.type)
     },
     hasSecondSchool (): boolean {
-      const { details } = this.assignment
+      const { details, coVisit } = this.assignment
       if (!details) return false
-      return SECOND_SCHOOL && ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(details.type)
+      return SECOND_SCHOOL &&
+        !coVisit &&
+        ['initialCall', 'returnVisit', 'bibleStudy', 'studentTalk', 'bibleReading'].includes(details.type)
     }
   },
 

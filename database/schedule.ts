@@ -15,6 +15,7 @@ import {
 } from 'types'
 
 const ASSIGNEE_FIELDS = ['assignee', 'assistant', 'assignee2', 'assistant2'] as const
+const SECOND_SCHOOL_ASSIGNEE_FIELDS = ['assignee2', 'assistant2'] as const
 
 type CollScheduleWeek = MongoInterface<ScheduleWeek>
 
@@ -176,10 +177,13 @@ export const updateWeekType = async (weekID: string, language: Languages, type: 
       break
 
     case WEEK_TYPES.coVisit.value:
-      for (const assignmentName of ['congregationBibleStudy', 'reader'] as const) {
+      for (const assignmentName of ['congregationBibleStudy', 'reader', 'bibleReading', 'studentTalk1', 'studentTalk2', 'studentTalk3', 'studentTalk4'] as const) {
         const assignment = week.assignments[assignmentName]
         if (assignment) {
-          for (const field of ASSIGNEE_FIELDS) {
+          const fieldsToCheck = ['bibleReading', 'studentTalk1', 'studentTalk2', 'studentTalk3', 'studentTalk4'].includes(assignmentName)
+            ? SECOND_SCHOOL_ASSIGNEE_FIELDS
+            : ASSIGNEE_FIELDS
+          for (const field of fieldsToCheck) {
             const memberID = assignment[field]
             if (memberID) {
               const member = await removeAssignment(memberID, { type: assignment.type, date: baseWeek.date })

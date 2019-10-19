@@ -45,6 +45,7 @@ export interface IScheduleWeekViewAssignment {
   name: Assignments
   displayName: string
   inherit: boolean
+  coVisit: boolean
   details?: IScheduleAssignment
 }
 
