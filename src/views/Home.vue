@@ -8,7 +8,7 @@
       Click the navigation menu on the top left to login and navigate the site
     </p>
     <h2>Changelog</h2>
-    <v-expansion-panel class="mt-3">
+    <v-expansion-panel v-model="panel" expand class="mt-3">
       <v-expansion-panel-content v-for="(change, index) of changes" :key="index">
         <template v-slot:header>
           <v-layout align-center class="no-select">
@@ -30,6 +30,7 @@
           </v-layout>
         </template>
         <v-card class="grey lighten-4">
+          <v-card-title class="headline" v-text="change.summary" />
           <v-card-text>
             <div v-for="update of change.updates" :key="update.title">
               <h3 v-text="update.title" />
@@ -59,6 +60,10 @@ interface IChange {
 
 export default Vue.extend({
   name: 'Home',
+
+  data: () => ({
+    panel: [true]
+  }),
 
   computed: {
     changes (): IChange[] {
