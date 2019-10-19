@@ -69,7 +69,23 @@ export default Vue.extend({
     changes (): IChange[] {
       return [
         {
-          version: '1.1',
+          version: '1.1.1',
+          date: '19 Oct 2019',
+          summary: 'Fix schedule & second school display preferences',
+          updates: [
+            { title: 'Features', items: ['Exclude second school assignments on Circuit Overseer visits'] },
+            {
+              title: 'Fixes',
+              items: [
+                'Use congregation display name rather than always showing Canton on the PDF',
+                'Default school preference to Any when editing a member that did not previously set a preference'
+              ]
+            },
+            { title: 'Developer', items: ['Use a settings file rather than multiple env variables'] }
+          ]
+        },
+        {
+          version: '1.1.0',
           date: '15 Oct 2019',
           summary: 'Adds support for different types of congregations',
           updates: [
@@ -110,7 +126,7 @@ export default Vue.extend({
           ]
         },
         {
-          version: '1.0',
+          version: '1.0.0',
           date: '13 Feb 2019',
           summary: 'Initial release of OCLM Planner',
           updates: [
