@@ -2,7 +2,7 @@ import pdfMake, { Content, CurrentNode, TDocumentDefinitions } from 'pdfmake/bui
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 import { congregationModule, scheduleModule } from '@/store'
-import { COLORS, WEEK_TYPES, SECOND_SCHOOL } from '@/constants'
+import { COLORS, WEEK_TYPES, SECOND_SCHOOL, SETTINGS } from '@/constants'
 import {
   IScheduleTranslationMap,
   IAssignmentTranslationMap,
@@ -22,7 +22,6 @@ const TPO_MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set
 const SCHEDULE_TRANSLATIONS: { [key in Languages]: IScheduleTranslationMap } = {
   en: {
     startTime: '7:00',
-    group: 'CANTON CONGREGATION',
     header: 'Our Christian Life & Ministry Schedule',
     week: 'WEEK',
     weeks: 'WEEKS',
@@ -50,7 +49,6 @@ const SCHEDULE_TRANSLATIONS: { [key in Languages]: IScheduleTranslationMap } = {
   },
   tpo: {
     startTime: '19:00',
-    group: 'GROUP PORTUGUÊS',
     header: 'Programação de reunião de semana',
     week: 'SEMANA',
     weeks: 'SEMANAS',
@@ -300,7 +298,7 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
       stack: [
         {
           columns: [
-            { text: translation.group, width: 160, margin: [0, 8, 0, 0], bold: true },
+            { text: SETTINGS.displayName.toUpperCase(), width: 160, margin: [0, 8, 0, 0], bold: true },
             { text: translation.header, alignment: 'right', fontSize: 17, bold: true }
           ]
         }

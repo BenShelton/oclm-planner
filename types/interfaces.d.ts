@@ -69,7 +69,6 @@ export interface ICongregationMember {
 
 export interface IScheduleTranslationMap {
   startTime: string
-  group: string
   header: string
   week: string
   weeks: string
