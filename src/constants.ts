@@ -1,4 +1,7 @@
-import { Languages } from 'types'
+import * as settings from './settings'
+import { Languages, Slug } from 'types'
+
+export const SETTINGS = settings[process.env.VUE_APP_SLUG as Slug]
 
 // TODO: Probably just worth having one map of talks with all their information
 export const ASSIGNMENT_TYPE_MAP = {
@@ -52,14 +55,13 @@ export const SUPPORTED_LANGUAGES = [
   { text: 'Portuguese', value: 'tpo' }
 ] as const
 
-export const USED_LANGUAGES = (process.env.VUE_APP_LANGUAGES || 'en')
-  .split(',')
+export const USED_LANGUAGES = SETTINGS.languages
   .reduce((acc: { text: string, value: Languages }[], l) => {
     const lang = SUPPORTED_LANGUAGES.find(s => s.value === l)
     return lang ? acc.concat(lang) : acc
   }, [])
 
-export const SECOND_SCHOOL = Number(process.env.VUE_APP_SCHOOLS || 1) > 1
+export const SECOND_SCHOOL = SETTINGS.schools > 1
 
 export const WEEK_TYPES = {
   normal: { label: 'Normal', value: 0 },

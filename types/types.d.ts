@@ -1,8 +1,10 @@
+import * as settings from '@/settings'
 import { GENDERS, APPOINTMENTS, SUPPORTED_LANGUAGES, PRIVILEGES, COLORS } from '@/constants'
 import { IScheduleWeekLanguage, IScheduleWeekAssignments } from './interfaces'
 import { TCreatedPdf } from 'pdfmake/build/pdfmake'
 import { ObjectID } from 'mongodb'
 
+export type Slug = keyof typeof settings
 export type Genders = typeof GENDERS[number]
 export type Appointments = typeof APPOINTMENTS[number]
 export type Languages = typeof SUPPORTED_LANGUAGES[number]['value']

@@ -122,3 +122,11 @@ export interface IAssignmentTranslationMap {
   note: { text: string, bold?: boolean, italics?: boolean }[]
   footer: string
 }
+
+export interface ISettings {
+  slug: string
+  db: string
+  displayName: string
+  languages: [Languages, ...Languages[]]
+  schools: 1 | 2
+}
