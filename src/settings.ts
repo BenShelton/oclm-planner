@@ -26,7 +26,7 @@ export const barry: ISettings = {
 
 export const northroad: ISettings = {
   slug: 'northroad',
-  db: 'northrad',
+  db: 'northroad',
   displayName: 'North Road Congregation',
   languages: ['en'],
   schools: 1
