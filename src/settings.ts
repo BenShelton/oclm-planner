@@ -23,3 +23,11 @@ export const barry: ISettings = {
   languages: ['en'],
   schools: 2
 }
+
+export const northroad: ISettings = {
+  slug: 'northroad',
+  db: 'northrad',
+  displayName: 'North Road Congregation',
+  languages: ['en'],
+  schools: 1
+}
