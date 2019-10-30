@@ -389,7 +389,7 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
     const bibleReadingTitle = `${translation.bibleReading} (${bibleReading.time}): ${bibleReading.title}`
     stack.push(createScheduleTable(COLORS.TREASURES, [
       [timer, getAssignmentTitle(highlights), null, getScheduleAssignees(highlights, coVisit), addTime(highlights.time), highlights.inherit],
-      [timer, translation.gems + ' (10 min.)', null, getScheduleAssignees(gems, coVisit), addTime(gems.time), gems.inherit],
+      [timer, `${translation.gems} (${gems.time})`, null, getScheduleAssignees(gems, coVisit), addTime(gems.time), gems.inherit],
       [timer, bibleReadingTitle, null, getScheduleAssignees(bibleReading, coVisit), addTime(bibleReading.time), bibleReading.inherit, true]
     ]))
 

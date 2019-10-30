@@ -47,6 +47,14 @@
               <p class="mt-3 mb-0 subheading">
                 Privileges
               </p>
+              <v-layout align-center class="mt-1 ml-1 grey--text text--darken-1">
+                <span class="font-weight-bold mr-1">TIP:</span>
+                <span>Hover over</span>
+                <v-icon size="19" class="mx-1">
+                  help
+                </v-icon>
+                <span>to see more details of an assignment</span>
+              </v-layout>
               <v-layout wrap>
                 <v-flex
                   v-for="privilege of PRIVILEGES"
@@ -59,7 +67,23 @@
                     v-model="editMember.privileges[privilege.key]"
                     hide-details
                     :label="privilege.name"
-                  />
+                  >
+                    <div slot="label">
+                      <span v-text="privilege.name" />
+                      <v-tooltip v-if="privilege.tip" top>
+                        <template #activator="{ on }">
+                          <v-icon
+                            class="ml-1"
+                            size="19"
+                            v-on="on"
+                          >
+                            help
+                          </v-icon>
+                        </template>
+                        <span v-text="privilege.tip" />
+                      </v-tooltip>
+                    </div>
+                  </v-checkbox>
                 </v-flex>
               </v-layout>
             </v-container>

@@ -69,6 +69,22 @@ export default Vue.extend({
     changes (): IChange[] {
       return [
         {
+          version: '1.1.2',
+          date: '30 Oct 2019',
+          summary: 'Updates for Gems & UX improvements',
+          updates: [
+            { title: 'Features', items: ['Tooltips added to some privileges to clarify which item they apply to'] },
+            {
+              title: 'Fixes',
+              items: [
+                'Gems time no longer always shows "(10 min.)" on the schedule',
+                'Gems time is downloaded properly from the site rather than always being set to "(8 min.)"',
+                'Page now scrolls to the top after changing pages'
+              ]
+            }
+          ]
+        },
+        {
           version: '1.1.1',
           date: '19 Oct 2019',
           summary: 'Fix schedule & second school display preferences',

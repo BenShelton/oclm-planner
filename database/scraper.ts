@@ -140,7 +140,6 @@ export default function scrapeWOL (date: string, language: Languages): Promise<{
         'assignments.openingPrayer.inherit': inherit.includes('openingPrayer'),
         'assignments.gems.text': 'N/A',
         'assignments.gems.type': 'gems',
-        'assignments.gems.time': '8 min.',
         'assignments.gems.inherit': inherit.includes('gems'),
         'assignments.reader.text': 'N/A',
         'assignments.reader.type': 'reader',
@@ -159,6 +158,12 @@ export default function scrapeWOL (date: string, language: Languages): Promise<{
         [highlightsPath + 'title']: highlightsText.replace(/: \(.*\)$/, ''),
         [highlightsPath + 'time']: safeRegex(timeRegex, highlightsText),
         [highlightsPath + 'inherit']: inherit.includes('highlights')
+      })
+
+      // Gems
+      const gemsText = $(paragraphSelector, '#section2').eq(1).text().trim()
+      Object.assign(update, {
+        'assignments.gems.time': safeRegex(timeRegex, gemsText)
       })
 
       // Bible Reading
