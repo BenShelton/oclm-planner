@@ -23,21 +23,21 @@ export const ASSIGNMENT_TYPE_MAP = {
 
 export const PRIVILEGES = [
   { name: 'Chairman', key: 'chairman' },
-  { name: 'Highlights', key: 'highlights' },
-  { name: 'Gems', key: 'gems' },
-  { name: 'Service Talk', key: 'serviceTalk' },
+  { name: 'Highlights', key: 'highlights', tip: 'The first talk in the "Treasures From God\'s Word" section' },
+  { name: 'Gems', key: 'gems', tip: 'AKA "Digging for Spiritual Gems"' },
+  { name: 'Service Talk', key: 'serviceTalk', tip: 'Either of the first 2 talks in the "Living As Christians" section' },
   { name: 'Congregation Bible Study', key: 'congregationBibleStudy' },
-  { name: 'Reader', key: 'reader' },
+  { name: 'CBS Reader', key: 'reader' },
   { name: 'Prayer', key: 'prayer' },
   { name: 'Bible Reading', key: 'bibleReading' },
-  { name: 'Ministry Video', key: 'ministryVideo' },
+  { name: 'Ministry Video', key: 'ministryVideo', tip: 'Normally assigned to the chairman and the first item in "Apply Yourself To The Field Ministry"' },
   { name: 'Initial Call', key: 'initialCall' },
   { name: 'Initial Call Assistant', key: 'initialCallAssist' },
   { name: 'Return Visit', key: 'returnVisit' },
   { name: 'Return Visit Assistant', key: 'returnVisitAssist' },
   { name: 'Bible Study', key: 'bibleStudy' },
   { name: 'Bible Study Assistant', key: 'bibleStudyAssist' },
-  { name: 'Student Talk', key: 'studentTalk' }
+  { name: 'Student Talk', key: 'studentTalk', tip: 'A "Talk" student assignment, normally the last item in "Apply Yourself To The Field Ministry"' }
 ] as const
 
 export const COLORS = {

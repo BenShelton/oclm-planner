@@ -446,7 +446,7 @@ export default class ScheduleWeekView extends Vue {
       { name: 'serviceTalk1', displayName: 'Service Talk 1' },
       { name: 'serviceTalk2', displayName: 'Service Talk 2' },
       { name: 'congregationBibleStudy', displayName: 'Congregation Bible Study' },
-      { name: 'reader', displayName: 'Reader' },
+      { name: 'reader', displayName: 'CBS Reader' },
       { name: 'closingPrayer', displayName: 'Closing Prayer' }
     ]
     return assignmentRefs.reduce((acc, { name, displayName }) => {
