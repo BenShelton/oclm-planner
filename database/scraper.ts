@@ -5,7 +5,7 @@ import { Languages, AssignmentTypes } from 'types'
 
 interface ILanguageOptions {
   months: string[]
-  addressConstructor: (date: string) => string[]
+  addressConstructor: (date: string) => Promise<string[]>
   inherit: AssignmentTypes[]
   cbsTitle: string
   talkRegexes: {
@@ -20,11 +20,31 @@ interface ILanguageOptions {
   }
 }
 
+const transform = (body: Buffer): CheerioStatic => cheerio.load(body)
+
 const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
   en: {
     months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'],
-    addressConstructor: date => {
-      return ['https://wol.jw.org/en/wol/dt/r1/lp-e/' + date.replace(/-/g, '/')]
+    addressConstructor: async (date) => {
+      // this WOL url, although consistent, seemed to stop being updated in 2020
+      const addresses = ['https://wol.jw.org/en/wol/dt/r1/lp-e/' + date.replace(/-/g, '/')]
+      // alternative scraping of main site by going to the consistent workbook page and extracting the link
+      try {
+        const [sY, sM, sD] = date.split('-').map(Number)
+        const month = LANGUAGE_OPTIONS.en.months[sM - 1]
+        const wbMonthUrl = `https://www.jw.org/en/library/jw-meeting-workbook/${month}-${sY}-mwb`
+        const $: CheerioStatic = await rp({ uri: wbMonthUrl, transform })
+        const regex = new RegExp(`^${month}\\s${sD}.+`)
+        const links = $('.synopsis a')
+        links.each((i, el) => {
+          const text = $(el).text().trim().toLowerCase()
+          if (regex.test(text)) {
+            addresses.push('https://www.jw.org' + $(el).attr('href'))
+            return false
+          }
+        })
+      } catch {}
+      return addresses
     },
     inherit: [],
     cbsTitle: 'Congregation Bible Study',
@@ -41,7 +61,7 @@ const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
   },
   tpo: {
     months: ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
-    addressConstructor: date => {
+    addressConstructor: async (date) => {
       const { months } = LANGUAGE_OPTIONS.tpo
       const [sY, sM, sD] = date.split('-').map(Number)
       const endDate = new Date(date)
@@ -80,7 +100,6 @@ const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
   }
 }
 
-const transform = (body: Buffer): CheerioStatic => cheerio.load(body)
 const titleRegex = /^(.*?): /
 const timeRegex = /: \((.*?)\)/
 const studyPointRegex = /\(.*?(\d+)\)\*?$/
@@ -95,14 +114,14 @@ function safeRegex (regex: RegExp, str: string): string {
   return result[1].trim()
 }
 
-export default function scrapeWOL (date: string, language: Languages): Promise<{}> {
+export default async function scrapeWOL (date: string, language: Languages): Promise<{}> {
   const options = LANGUAGE_OPTIONS[language]
   if (!options) throw new Error('Unsupported language')
   const { addressConstructor, inherit, talkRegexes, cbsTitle, bookAbbreviations } = options
   if (!addressConstructor || !inherit || !talkRegexes || !cbsTitle || !bookAbbreviations) throw new Error('Language not fully supported')
 
   // We allow for multiple uris because sometimes the url can change slightly for no obvious reason, so we try them all and catch the first that succeeds
-  const uris = addressConstructor(date)
+  const uris = await addressConstructor(date)
   return Promise.all(uris.map(async uri => {
     try {
       const val = await rp({ uri, transform })
