@@ -27,7 +27,7 @@ const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
     months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'],
     addressConstructor: async (date) => {
       // this WOL url, although consistent, seemed to stop being updated in 2020
-      const addresses = ['https://wol.jw.org/en/wol/dt/r1/lp-e/' + date.replace(/-/g, '/')]
+      let address: string = 'https://wol.jw.org/en/wol/dt/r1/lp-e/' + date.replace(/-/g, '/')
       // alternative scraping of main site by going to the consistent workbook page and extracting the link
       try {
         const [sY, sM, sD] = date.split('-').map(Number)
@@ -39,12 +39,12 @@ const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
         links.each((i, el) => {
           const text = $(el).text().trim().toLowerCase()
           if (regex.test(text)) {
-            addresses.push('https://www.jw.org' + $(el).attr('href'))
+            address = 'https://www.jw.org' + $(el).attr('href')
             return false
           }
         })
       } catch {}
-      return addresses
+      return [address]
     },
     inherit: [],
     cbsTitle: 'Congregation Bible Study',
