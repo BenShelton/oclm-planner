@@ -69,6 +69,14 @@ export default Vue.extend({
     changes (): IChange[] {
       return [
         {
+          version: '1.1.3',
+          date: '20 Nov 2019',
+          summary: 'Scraper Fix for 2020',
+          updates: [
+            { title: 'Fixes', items: ['Week downloader/scraper now adapted to work with site changes for 2020'] }
+          ]
+        },
+        {
           version: '1.1.2',
           date: '30 Oct 2019',
           summary: 'Updates for Gems & UX improvements',
