@@ -71,9 +71,15 @@ export default Vue.extend({
         {
           version: '1.1.3',
           date: '20 Nov 2019',
-          summary: 'Scraper Fix for 2020',
+          summary: '2020 Fixes',
           updates: [
-            { title: 'Fixes', items: ['Week downloader/scraper now adapted to work with site changes for 2020'] }
+            {
+              title: 'Fixes',
+              items: [
+                'Week downloader/scraper now adapted to work with site changes for 2020',
+                'Export now available for 2020'
+              ]
+            }
           ]
         },
         {
