@@ -1,8 +1,8 @@
 import parse from 'csv-parse/lib/sync'
 import fs from 'fs'
 import assert from 'assert'
-import { bulkAddMembers } from './congregation'
-import { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES } from '../src/constants'
+import { bulkAddMembers } from '../congregation'
+import { APPOINTMENTS, GENDERS, SUPPORTED_LANGUAGES } from '../../src/constants'
 import { ICongregationMember, Genders, Languages, Appointments } from 'types'
 
 type BooleanString = 'Y' | 'y' | ''
