@@ -14,7 +14,7 @@
     "serve:app": "vue-cli-service serve",
     "serve:lambda": "cross-env NODE_ENV=development netlify-lambda -c lambda.config.js serve lambda",
     "test:unit": "vue-cli-service test:unit",
-    "upload": "babel-node --config-file=./upload.config.js database/upload"
+    "upload": "babel-node database/scripts/upload.ts"
   },
   "gitHooks": {
     "prepare-commit-msg": "exec < /dev/tty && git cz --hook"

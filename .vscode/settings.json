@@ -5,7 +5,9 @@
     "html",
     "vue"
   ],
-  "eslint.autoFixOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
   "jest.pathToJest": "npm run test:unit --",
   "jest.pathToConfig": "jest.config.js",
   "vetur.experimental.templateInterpolationService": true,
