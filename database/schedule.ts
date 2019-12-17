@@ -86,8 +86,12 @@ export const updateAssignment = async (weekID: string, language: Languages, name
     for (const field of ASSIGNEE_FIELDS) {
       const memberID = previousAssignment[field]
       if (memberID) {
-        const member = await removeAssignment(memberID, { type: previousAssignment.type, date: baseWeek.date })
-        updatedMembers.push(member)
+        try {
+          const member = await removeAssignment(memberID, { type: previousAssignment.type, date: baseWeek.date })
+          updatedMembers.push(member)
+        } catch (err) {
+          if (err.message !== '404') throw new Error(err)
+        }
       }
     }
   }
