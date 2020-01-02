@@ -3,6 +3,7 @@ node_modules
 /dist
 /dist_electron
 /dist_lambda
+/dump
 
 # local env files
 .env
