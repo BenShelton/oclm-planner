@@ -323,7 +323,7 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
 
     // Week Title & Information
     if (index > 0 && index % 2 === 0) stack.push(createScheduleSeparator(true))
-    const [, month, day] = date.split('-')
+    const [year, month, day] = date.split('-')
     const titleDay = day.charAt(0) === '0' ? day.charAt(1) : day
     const titleMonth = translation.months[+month - 1]
     let titleText = `${titleDay} ${titleMonth}`
@@ -379,9 +379,10 @@ export const generateSchedule: PDFGenerator = function (weeks, month) {
     })
 
     // Introduction Section
+    const openingCommentLength = +year >= 2020 ? 1 : 3
     stack.push(createScheduleTable(COLORS.TREASURES, [
       [setTime(translation.startTime), songs[0], translation.prayer + ':', getScheduleAssignees(openingPrayer, coVisit), addTime(5), openingPrayer.inherit],
-      [timer, translation.openingComments + ' (3 min.)', translation.chairman + ':', getScheduleAssignees(chairman, coVisit), addTime(3), chairman.inherit]
+      [timer, translation.openingComments + ` (${openingCommentLength} min.)`, translation.chairman + ':', getScheduleAssignees(chairman, coVisit), addTime(openingCommentLength), chairman.inherit]
     ]))
 
     // TREASURES Section
