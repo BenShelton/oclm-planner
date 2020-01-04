@@ -31,3 +31,11 @@ export const northroad: ISettings = {
   languages: ['en'],
   schools: 1
 }
+
+export const cardiffbay: ISettings = {
+  slug: 'cardiffbay',
+  db: 'cardiffbay',
+  displayName: 'Cardiff Bay Congregation',
+  languages: ['en'],
+  schools: 1
+}
