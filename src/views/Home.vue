@@ -69,6 +69,19 @@ export default Vue.extend({
     changes (): IChange[] {
       return [
         {
+          version: '1.1.4',
+          date: '20 Nov 2020',
+          summary: '2021 Support',
+          updates: [
+            {
+              title: 'Fixes',
+              items: [
+                'Export now available for 2021'
+              ]
+            }
+          ]
+        },
+        {
           version: '1.1.3',
           date: '20 Nov 2019',
           summary: '2020 Fixes',
