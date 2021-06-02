@@ -15,7 +15,7 @@
       <v-btn color="primary" @click="onAdd">
         Add New Member
       </v-btn>
-      <v-dialog v-model="editDialog" max-width="900px">
+      <v-dialog v-model="editDialog" max-width="900px" persistent>
         <v-card>
           <v-card-title>
             <span class="headline" v-text="editTitle" />
@@ -57,7 +57,7 @@
               </v-layout>
               <v-layout wrap>
                 <v-flex
-                  v-for="privilege of PRIVILEGES"
+                  v-for="privilege of visiblePrivileges"
                   :key="privilege.key"
                   xs12
                   sm6
@@ -67,6 +67,7 @@
                     v-model="editMember.privileges[privilege.key]"
                     hide-details
                     :label="privilege.name"
+                    class="mt-0"
                   >
                     <div slot="label">
                       <span v-text="privilege.name" />
@@ -221,6 +222,9 @@ export default Vue.extend({
     },
     PRIVILEGES (): typeof PRIVILEGES {
       return PRIVILEGES
+    },
+    visiblePrivileges (): (typeof PRIVILEGES[number])[] {
+      return this.PRIVILEGES.filter(p => p.key !== 'ministryVideo')
     },
     languageGroups (): { [key in Languages]: string } {
       return SUPPORTED_LANGUAGES.reduce((acc, { text, value }) => Object.assign(acc, { [value]: text }), {}) as { [key in Languages]: string }

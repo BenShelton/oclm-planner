@@ -67,10 +67,11 @@ export default Vue.extend({
     privilegedMembers (): ICongregationMember[] {
       const { inputDisabled, type, restrictLanguage } = this
       if (inputDisabled || !type) return []
+      const resolvedType = type === 'ministryVideo' ? 'chairman' : type
       return congregationModule.activeMembers.filter(({ privileges, languageGroup, school }) => {
         if (restrictLanguage && languageGroup !== scheduleModule.language) return false
         if (school && school !== this.school) return false
-        return privileges[type]
+        return privileges[resolvedType]
       })
     },
     lastAssignmentMap (): { [key: string]: string } {

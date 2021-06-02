@@ -113,6 +113,18 @@ export const updateAssignment = async (weekID: string, language: Languages, name
     }
   }
 
+  // if updating chairman, copy to ministry video
+  if (assignment.type === 'chairman') {
+    const studentTalk = value[language].assignments.studentTalk1
+    if (studentTalk && studentTalk.type === 'ministryVideo') {
+      try {
+        return updateAssignment(weekID, language, 'studentTalk1', { ...studentTalk, assignee: assignment.assignee })
+      } catch (err) {
+        console.error('Could not update video assignment to chairman')
+      }
+    }
+  }
+
   // Return assignment
   return { week: value, members: updatedMembers }
 }

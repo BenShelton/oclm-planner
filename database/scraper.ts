@@ -49,7 +49,7 @@ const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
     inherit: [],
     cbsTitle: 'Congregation Bible Study',
     talkRegexes: {
-      ministryVideo: /(Apply Yourself|Video)/,
+      ministryVideo: /(Apply Yourself|Video|Increase Your Joy)/,
       initialCall: /Initial Call/,
       returnVisit: /Return Visit/,
       bibleStudy: /Bible Study/,
