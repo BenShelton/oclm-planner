@@ -19,6 +19,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const TPO_MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+const ES_MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 const SCHEDULE_TRANSLATIONS: { [key in Languages]: IScheduleTranslationMap } = {
   en: {
     startTime: '7:00',
@@ -73,6 +74,33 @@ const SCHEDULE_TRANSLATIONS: { [key in Languages]: IScheduleTranslationMap } = {
     cbs: 'Estudo Bíblico de Congregagação',
     conductor: 'Dirigente',
     reader: 'Leitor'
+  },
+  es: {
+    startTime: '19:00',
+    header: 'Vida y Ministerio Cristianos',
+    week: 'SEMANA',
+    weeks: 'SEMANAS',
+    months: ES_MONTHS,
+    weeklyBibleReading: 'LECTURA DE LA BIBLIA',
+    assemblyWeek: 'Semana de la Asamblea',
+    memorialWeek: 'Semana de la Memorial',
+    noMeeting: 'Sin reunión',
+    timeOff: 'Fin',
+    prayer: 'Oración',
+    openingComments: 'Palabras de introducción',
+    chairman: 'Presidente',
+    treasures: 'TESOROS DE LA BIBLIA',
+    bibleReading: 'Lectura de la Biblia',
+    gems: 'Busquemos perlas escondidas',
+    ministry: 'SEAMOS MEJORES MAESTROS',
+    student: 'Estudiante',
+    assistant: 'Ayudante',
+    living: 'NUESTRA VIDA CRISTIANA',
+    review: 'Palabras de conclusión',
+    co: 'Superintendente de circuito',
+    cbs: 'Estudio bíblico de la congregación',
+    conductor: 'Director',
+    reader: 'Lector'
   }
 }
 
@@ -144,6 +172,38 @@ const ASSIGNMENT_SLIP_TRANSLATIONS: { [key in Languages]: IAssignmentTranslation
       { text: 'trazer a sua brochura, quer impressa ou em formato electrónico para a Reunião Vida e Ministério.', bold: true }
     ],
     footer: 'S-89-TPO     10/18'
+  },
+  es: {
+    verticalPadding: 40,
+    defaultRoom: 'class1',
+    months: ES_MONTHS,
+    title: 'ASIGNACIÓN PARA LA REUNIÓN VIDA Y MINISTERIO CRISTIANOS',
+    name: 'Nombre',
+    assistant: 'Ayudante',
+    date: 'Fecha',
+    studyPoint: 'Lección',
+    assignment: 'Tipo de intervención',
+    bibleReading: 'Lectura de la Biblia',
+    initialCall: 'Primera conversación',
+    firstReturnVisit: 'Primera Revisita',
+    secondReturnVisit: 'Segunda Revisita',
+    first: 'Primera',
+    second: 'Segunda',
+    givenIn: 'Se presentará en',
+    mainHall: 'Sala principal',
+    class1: 'Sala auxiliar núm. 1',
+    class2: 'Sala auxiliar núm. 2',
+    bibleStudy: 'Curso bíblico',
+    studentTalk: 'Discurso',
+    other: 'Otro: ..................',
+    note: [
+      { text: 'Nota al estudiante: ', bold: true },
+      { text: 'En la ' },
+      { text: 'Guía de actividades ', italics: true },
+      { text: 'encontrará lainformación que necesita para su intervención, así como el aspecto dela oratoria que debe preparar con la ayuda del folleto ' },
+      { text: 'Maestros.', italics: true }
+    ],
+    footer: 'S-89-S     11/20'
   }
 }
 

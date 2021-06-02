@@ -14,10 +14,35 @@ interface ILanguageOptions {
     returnVisit: RegExp
     bibleStudy: RegExp
     studentTalk: RegExp
+    title: RegExp
+    time: RegExp
+    study: RegExp
   }
   bookAbbreviations: {
     [key: string]: string
   }
+}
+
+function getWeek (date: Date): number {
+  const dowOffset = 1
+  const newYear = new Date(date.getFullYear(), 0, 1)
+  let day = newYear.getDay() - dowOffset
+  day = (day >= 0 ? day : day + 7)
+  const daynum = Math.floor((date.getTime() - newYear.getTime() -
+    (date.getTimezoneOffset() - newYear.getTimezoneOffset()) * 60000) / 86400000) + 1
+  let weeknum
+  if (day < 4) {
+    weeknum = Math.floor((daynum + day - 1) / 7) + 1
+    if (weeknum > 52) {
+      const nYear = new Date(date.getFullYear() + 1, 0, 1)
+      let nday = nYear.getDay() - dowOffset
+      nday = nday >= 0 ? nday : nday + 7
+      weeknum = nday < 4 ? 1 : 53
+    }
+  } else {
+    weeknum = Math.floor((daynum + day - 1) / 7)
+  }
+  return weeknum
 }
 
 const transform = (body: Buffer): CheerioStatic => cheerio.load(body)
@@ -53,7 +78,10 @@ const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
       initialCall: /Initial Call/,
       returnVisit: /Return Visit/,
       bibleStudy: /Bible Study/,
-      studentTalk: /Talk/
+      studentTalk: /Talk/,
+      title: /^(.*?): /,
+      time: /: \((.*?)\)/,
+      study: /\(.*?(\d+)\)\*?$/
     },
     bookAbbreviations: {
       jy: 'Jesus - The Way',
@@ -95,15 +123,38 @@ const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
       initialCall: /Contacto Inicial/,
       returnVisit: /Revisita/,
       bibleStudy: /Estudo Bíblico/,
-      studentTalk: /Discurso/
+      studentTalk: /Discurso/,
+      title: /^(.*?): /,
+      time: /: \((.*?)\)/,
+      study: /\(.*?(\d+)\)\*?$/
+    },
+    bookAbbreviations: {}
+  },
+  es: {
+    months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+    addressConstructor: async (date) => {
+      const [y] = date.split('-')
+      const week = getWeek(new Date(date))
+      return [`https://wol.jw.org/es/wol/meetings/r4/lp-s/${y}/${week}`]
+    },
+    inherit: [
+      'serviceTalk'
+    ],
+    cbsTitle: 'Estudio bíblico de la congregación',
+    talkRegexes: {
+      ministryVideo: /(Sea más feliz|Video)/,
+      initialCall: /Primera conversación/,
+      returnVisit: /Revisita/,
+      bibleStudy: /Curso bíblico/,
+      studentTalk: /Discurso/,
+      title: /^(.*?) \(.*?\):?/,
+      time: /\((.*?)\):?/,
+      study: /\(.*?(\d+)\)\.$/
     },
     bookAbbreviations: {}
   }
 }
 
-const titleRegex = /^(.*?): /
-const timeRegex = /: \((.*?)\)/
-const studyPointRegex = /\(.*?(\d+)\)\*?$/
 const paragraphSelector = '.pGroup > ul > li > p'
 
 function safeRegex (regex: RegExp, str: string): string {
@@ -120,6 +171,9 @@ export default async function scrapeWOL (date: string, language: Languages): Pro
   if (!options) throw new Error('Unsupported language')
   const { addressConstructor, inherit, talkRegexes, cbsTitle, bookAbbreviations } = options
   if (!addressConstructor || !inherit || !talkRegexes || !cbsTitle || !bookAbbreviations) throw new Error('Language not fully supported')
+  const titleRegex = talkRegexes.title
+  const timeRegex = talkRegexes.time
+  const studyPointRegex = talkRegexes.study
 
   // We allow for multiple uris because sometimes the url can change slightly for no obvious reason, so we try them all and catch the first that succeeds
   const uris = await addressConstructor(date)
@@ -227,7 +281,7 @@ export default async function scrapeWOL (date: string, language: Languages): Pro
         const title = safeRegex(titleRegex, elemText)
         if (title === cbsTitle) {
           const congregationBibleStudyPath = 'assignments.congregationBibleStudy.'
-          const bookInfo = safeRegex(/\) (.*)$/, elemText)
+          const bookInfo = safeRegex(/\):? (.*)$/, elemText)
           const bookAbbreviation: string = safeRegex(/^(\w+)/, bookInfo)
           const bookTitle: string = bookAbbreviations[bookAbbreviation] || bookAbbreviation
           Object.assign(update, {

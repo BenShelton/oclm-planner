@@ -365,7 +365,7 @@ export default class ScheduleWeekView extends Vue {
   // Data
   WEEK_TYPES = WEEK_TYPES
   fieldClass: string = 'xs12 md6 xl4'
-  localWeek: ScheduleWeek = { _id: '', date: '', en: { assignments: {} }, tpo: { assignments: {} } }
+  localWeek: ScheduleWeek = { _id: '', date: '', en: { assignments: {} }, tpo: { assignments: {} }, es: { assignments: {} } }
   localWeekLoaded = false
   localWeekUnavailable = false
   loadError: boolean = false
