@@ -56,7 +56,8 @@ const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
       studentTalk: /Talk/
     },
     bookAbbreviations: {
-      jy: 'Jesus - The Way'
+      jy: 'Jesus - The Way',
+      rr: 'Pure Worship of Jehovah ​— Restored At Last!'
     }
   },
   tpo: {
