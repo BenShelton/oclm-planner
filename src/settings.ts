@@ -12,7 +12,7 @@ export const canton: ISettings = {
   slug: 'canton',
   db: 'oclm',
   displayName: 'Canton Congregation',
-  languages: ['en', 'tpo'],
+  languages: ['en', 'es'],
   schools: 1
 }
 
