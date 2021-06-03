@@ -69,6 +69,28 @@ export default Vue.extend({
     changes (): IChange[] {
       return [
         {
+          version: '1.2.0',
+          date: '03 Jun 2021',
+          summary: 'Language Support',
+          updates: [
+            {
+              title: 'Features',
+              items: [
+                'Spanish language support added',
+                'Adds nicer reference for current CBS book',
+                'Automatically assign Apply Yourself videos to the chairman',
+                'Remove Ministry Video privilege'
+              ]
+            },
+            {
+              title: 'Developer',
+              items: [
+                'Update congregation settings'
+              ]
+            }
+          ]
+        },
+        {
           version: '1.1.4',
           date: '20 Nov 2020',
           summary: '2021 Support',

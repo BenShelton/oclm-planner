@@ -52,7 +52,8 @@ export const GENDERS = ['Male', 'Female'] as const
 
 export const SUPPORTED_LANGUAGES = [
   { text: 'English', value: 'en' },
-  { text: 'Portuguese', value: 'tpo' }
+  { text: 'Portuguese', value: 'tpo' },
+  { text: 'Spanish', value: 'es' }
 ] as const
 
 export const USED_LANGUAGES = SETTINGS.languages
