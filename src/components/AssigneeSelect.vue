@@ -53,7 +53,7 @@ export default Vue.extend({
   },
 
   data: () => ({
-    restrictLanguage: true
+    restrictLanguage: false
   }),
 
   computed: {
