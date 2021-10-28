@@ -15,7 +15,12 @@
       <v-btn color="primary" @click="onAdd">
         Add New Member
       </v-btn>
-      <v-dialog v-model="editDialog" max-width="900px" persistent>
+      <v-dialog
+        v-model="editDialog"
+        max-width="900px"
+        persistent
+        scrollable
+      >
         <v-card>
           <v-card-title>
             <span class="headline" v-text="editTitle" />
@@ -89,7 +94,7 @@
               </v-layout>
             </v-container>
           </v-card-text>
-
+          <v-divider />
           <v-card-actions>
             <v-spacer />
             <v-btn color="blue darken-1" flat @click="closeEditor">
