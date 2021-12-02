@@ -451,8 +451,9 @@ export default class ScheduleWeekView extends Vue {
     ]
     return assignmentRefs.reduce((acc, { name, displayName }) => {
       const assignment = assignments[name]
+      const enAssignment = this.localWeek.en.assignments[name]
       const inherit = !!(assignment && assignment.inherit)
-      const details = inherit ? this.localWeek.en.assignments[name] : assignment
+      const details = inherit ? enAssignment : assignment
       const value: IScheduleWeekViewAssignment = {
         name,
         displayName,
@@ -475,9 +476,22 @@ export default class ScheduleWeekView extends Vue {
     const multipleAssignments: string[][] = new Array(assignmentFieldsToCheck.length).fill(null).map(() => [])
     for (const assignment of Object.values(this.assignments)) {
       const { details } = assignment
-      if (!details || assignment.name === this.editName) continue
+      const sameAssignment = assignment.name === this.editName
+      const otherAssignments = Object.values<IScheduleWeekLanguage>(this.localWeek)
+        .filter(v => v && v.assignments && v.assignments[assignment.name] && v.assignments[assignment.name] !== details)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        .map(v => v.assignments[assignment.name]!)
       assignmentFieldsToCheck.forEach((field, i) => {
-        if (assignmentFields.some(a => details[a] === field)) multipleAssignments[i].push(assignment.displayName)
+        const duplicate = !sameAssignment && details && assignmentFields.find(a => details[a] === field)
+        if (duplicate) {
+          const assignmentName = assignment.displayName
+          multipleAssignments[i].push(assignmentName)
+        }
+        const otherDuplicate = assignmentFields.find(a => otherAssignments.some(other => other[a] === field))
+        if (otherDuplicate) {
+          const assignmentName = assignment.displayName + ' (Other Language)'
+          multipleAssignments[i].push(assignmentName)
+        }
       })
     }
     return multipleAssignments.reduce((acc: { name: string, assignments: string[] }[], m, i) => {
