@@ -69,6 +69,19 @@ export default Vue.extend({
     changes (): IChange[] {
       return [
         {
+          version: '1.3.0',
+          date: '02 Dec 2021',
+          summary: 'Per-Language Privileges',
+          updates: [
+            {
+              title: 'Features',
+              items: [
+                'Allow different privileges between groups'
+              ]
+            }
+          ]
+        },
+        {
           version: '1.2.1',
           date: '28 Nov 2021',
           summary: '2022 Support',
