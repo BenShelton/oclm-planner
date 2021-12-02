@@ -65,6 +65,9 @@ export interface ICongregationMember {
   privileges: {
     [key in Privileges]?: boolean
   }
+  languagePrivileges?: {
+    [key in Privileges]?: boolean
+  }
   assignments?: IMemberAssignment[]
 }
 

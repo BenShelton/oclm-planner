@@ -15,7 +15,12 @@
       <v-btn color="primary" @click="onAdd">
         Add New Member
       </v-btn>
-      <v-dialog v-model="editDialog" max-width="900px" persistent>
+      <v-dialog
+        v-model="editDialog"
+        max-width="900px"
+        persistent
+        scrollable
+      >
         <v-card>
           <v-card-title>
             <span class="headline" v-text="editTitle" />
@@ -85,11 +90,19 @@
                       </v-tooltip>
                     </div>
                   </v-checkbox>
+                  <template v-if="inLanguageGroup(editMember)">
+                    <v-checkbox
+                      v-model="editMember.languagePrivileges[privilege.key]"
+                      hide-details
+                      :label="languageGroups[editMember.languageGroup]"
+                      class="mt-0"
+                    />
+                  </template>
                 </v-flex>
               </v-layout>
             </v-container>
           </v-card-text>
-
+          <v-divider />
           <v-card-actions>
             <v-spacer />
             <v-btn color="blue darken-1" flat @click="closeEditor">
@@ -149,13 +162,18 @@
       <template slot="expand" slot-scope="props">
         <v-layout row wrap class="grey lighten-5">
           <v-layout
-            v-for="privilege of prettyPrivileges(props.item.privileges)"
+            v-for="privilege of prettyPrivileges(props.item)"
             :key="privilege.name"
             align-center
+            column
             class="pa-3 shrink"
           >
             <span v-text="privilege.name" />
             <BooleanIcon class="px-1" :value="privilege.selected" />
+            <template v-if="inLanguageGroup(props.item)">
+              <span v-text="languageGroups[props.item.languageGroup]" />
+              <BooleanIcon class="px-1" :value="privilege.languageSelected" />
+            </template>
           </v-layout>
         </v-layout>
         <v-divider />
@@ -200,7 +218,8 @@ export default Vue.extend({
       languageGroup: USED_LANGUAGES[0].value,
       school: null,
       show: true,
-      privileges: {}
+      privileges: {},
+      languagePrivileges: {}
     } as unknown as ICongregationMember
   }),
 
@@ -257,9 +276,16 @@ export default Vue.extend({
     closeEditor (): void {
       this.editDialog = false
     },
-    prettyPrivileges (privileges: ICongregationMember['privileges']): { name: string, selected: boolean }[] {
-      if (!privileges) return []
-      return PRIVILEGES.map(({ name, key }) => ({ name, selected: !!privileges[key] }))
+    prettyPrivileges (member: ICongregationMember): { name: string, selected: boolean, languageSelected: boolean }[] {
+      if (!member) return []
+      return PRIVILEGES.map(({ name, key }) => ({
+        name,
+        selected: !!(member.privileges && member.privileges[key]),
+        languageSelected: !!(member.languagePrivileges && member.languagePrivileges[key])
+      }))
+    },
+    inLanguageGroup (member: ICongregationMember): boolean {
+      return member.languageGroup !== 'en'
     },
     onAdd (): void {
       this.editID = null
@@ -270,7 +296,8 @@ export default Vue.extend({
         languageGroup: USED_LANGUAGES[0].value,
         school: null,
         show: true,
-        privileges: {}
+        privileges: {},
+        languagePrivileges: {}
       }
       Object.assign(this.editMember, baseProperties)
       this.editTitle = 'Add New Congregation Member'
@@ -278,7 +305,7 @@ export default Vue.extend({
     },
     onEdit (member: ICongregationMember): void {
       this.editID = member._id
-      const { name, gender, appointment, languageGroup, school = null, show, privileges } = member
+      const { name, gender, appointment, languageGroup, school = null, show, privileges, languagePrivileges } = member
       const updateProperties: Partial<ICongregationMember> = {
         name,
         gender,
@@ -286,7 +313,8 @@ export default Vue.extend({
         languageGroup,
         school,
         show,
-        privileges: { ...privileges }
+        privileges: { ...privileges },
+        languagePrivileges: languagePrivileges ? { ...languagePrivileges } : {}
       }
       Object.assign(this.editMember, updateProperties)
       this.editTitle = 'Edit Existing Congregation Member'
