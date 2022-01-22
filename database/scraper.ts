@@ -1,4 +1,4 @@
-import rp from 'request-promise'
+import fetch from 'node-fetch'
 import cheerio from 'cheerio'
 
 import { Languages, AssignmentTypes } from 'types'
@@ -45,31 +45,35 @@ function getWeek (date: Date): number {
   return weeknum
 }
 
-const transform = (body: Buffer): CheerioStatic => cheerio.load(body)
-
 const LANGUAGE_OPTIONS: { [key in Languages]: ILanguageOptions } = {
   en: {
     months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'],
     addressConstructor: async (date) => {
       // this WOL url, although consistent, seemed to stop being updated in 2020
       let address: string = 'https://wol.jw.org/en/wol/dt/r1/lp-e/' + date.replace(/-/g, '/')
-      // alternative scraping of main site by going to the consistent workbook page and extracting the link
-      try {
-        const [sY, sM, sD] = date.split('-').map(Number)
-        const month = LANGUAGE_OPTIONS.en.months[sM - 1]
-        const wbMonthUrl = `https://www.jw.org/en/library/jw-meeting-workbook/${month}-${sY}-mwb`
-        const $: CheerioStatic = await rp({ uri: wbMonthUrl, transform })
-        const regex = new RegExp(`^${month}\\s${sD}.+`)
-        const links = $('.synopsis a')
-        links.each((i, el) => {
-          const text = $(el).text().trim().toLowerCase()
-          if (regex.test(text)) {
-            address = 'https://www.jw.org' + $(el).attr('href')
-            return false
-          }
-        })
-      } catch {}
       return [address]
+      // TODO: rebuild alternative scraping of main site by going to the consistent workbook page and extracting the link
+      // try {
+      //   const [sY, sM, sD] = date.split('-').map(Number)
+      //   const month = LANGUAGE_OPTIONS.en.months[sM - 1]
+      //   const wbMonthUrl = `https://www.jw.org/en/library/jw-meeting-workbook/${month}-${sY}-mwb`
+      //   const response = await fetch(wbMonthUrl)
+      //   if (!response.ok) throw new Error(`unexpected response ${response.statusText} for request ${wbMonthUrl}`)
+      //   const body = await response.text()
+      //   const $ = cheerio.load(body)
+      //   const regex = new RegExp(`^${month}\\s${sD}.+`)
+      //   const links = $('.synopsis a')
+      //   links.each((i, el) => {
+      //     const text = $(el).text().trim().toLowerCase()
+      //     if (regex.test(text)) {
+      //       address = 'https://www.jw.org' + $(el).attr('href')
+      //       return false
+      //     }
+      //   })
+      // } catch (err) {
+      //   console.warn(err)
+      // }
+      // return [address]
     },
     inherit: [],
     cbsTitle: 'Congregation Bible Study',
@@ -179,8 +183,11 @@ export default async function scrapeWOL (date: string, language: Languages): Pro
   const uris = await addressConstructor(date)
   return Promise.all(uris.map(async uri => {
     try {
-      const val = await rp({ uri, transform })
-      return Promise.reject(val)
+      const response = await fetch(uri)
+      if (!response.ok) throw new Error(`unexpected response ${response.statusText} for request ${uri}`)
+      const body = await response.text()
+      const $ = cheerio.load(body)
+      return Promise.reject($)
     } catch (err) {
       return Promise.resolve(err)
     }
