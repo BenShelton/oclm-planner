@@ -69,6 +69,26 @@ export default Vue.extend({
     changes (): IChange[] {
       return [
         {
+          version: '1.3.1',
+          date: '22 Jan 2022',
+          summary: 'Maintenance',
+          updates: [
+            {
+              title: 'Fixes',
+              items: [
+                'Removes labels from navigation menu',
+                'Reduces execution time of scrape to avoid timeouts'
+              ]
+            },
+            {
+              title: 'Developer',
+              items: [
+                'Replaced request-promise with node-fetch to reduce execution time'
+              ]
+            }
+          ]
+        },
+        {
           version: '1.3.0',
           date: '02 Dec 2021',
           summary: 'Per-Language Privileges',
