@@ -69,6 +69,19 @@ export default Vue.extend({
     changes (): IChange[] {
       return [
         {
+          version: '1.3.2',
+          date: '06 Dec 2022',
+          summary: 'Export Years',
+          updates: [
+            {
+              title: 'Features',
+              items: [
+                'Adds more years to export field'
+              ]
+            }
+          ]
+        },
+        {
           version: '1.3.1',
           date: '22 Jan 2022',
           summary: 'Maintenance',
