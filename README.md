@@ -2,6 +2,8 @@
 
 > Welcome to OCLM Planner, a program designed to assist with the planning of assignments for the Our Christian Life & Ministry meeting.
 
+:warning: **Please note this project is no longer being actively maintained. We suggest you use something like [NW Scheduler](https://nwscheduler.com/) which has much better support and a wider range of features.** :warning:
+
 ## Status
 
 ### Site Deployment Statuses
