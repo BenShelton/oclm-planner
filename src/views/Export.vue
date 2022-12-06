@@ -88,7 +88,7 @@ export default Vue.extend({
       { text: 'December', value: '12' }
     ] as IMonth[],
     year: new Date().getFullYear().toString(),
-    years: ['2019', '2020', '2021', '2022'],
+    years: ['2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027'],
     pdf: null as TCreatedPdf | null,
     showPreview: false,
     generationError: false
