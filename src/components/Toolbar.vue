@@ -2,6 +2,15 @@
   <v-toolbar app>
     <v-toolbar-side-icon @click.stop="toggleDrawer" />
     <v-toolbar-title v-text="title" />
+    <v-toolbar-title>
+      <v-icon color="red" class="pr-2">
+        warning
+      </v-icon>
+      <span class="red--text">This site will shut down August 11 2023</span>
+      <v-icon color="red" class="pl-2">
+        warning
+      </v-icon>
+    </v-toolbar-title>
     <v-spacer />
     <v-toolbar-items>
       <v-select
